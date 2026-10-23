@@ -1,0 +1,6 @@
+{
+  "title": "Ekskluzywne Meble Dla Twojego Domu",
+  "subtitle": "Stwórz wyjątkowe wnętrze z naszymi ekskluzywnimi meblami",
+  "contact_phone": "+48 666688298",
+  "contact_email": "slmmeble2022@gmail.com"
+}
