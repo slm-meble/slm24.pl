@@ -31,6 +31,8 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            flex-wrap: wrap;
+            gap: 15px;
         }
         .logo {
             font-size: 26px;
@@ -70,6 +72,7 @@
             letter-spacing: 2px;
             margin-bottom: 20px;
             color: #fff;
+            text-transform: uppercase;
         }
         .hero p {
             font-size: 18px;
@@ -112,7 +115,7 @@
             margin: 0 auto;
             padding: 0 20px 80px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 40px;
         }
         .product-card {
@@ -120,17 +123,25 @@
             border: 1px solid #2a2a2a;
             overflow: hidden;
             transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
         }
         .product-card:hover {
             transform: translateY(-5px);
+            border-color: #444;
         }
         .product-img {
             height: 280px;
             background-size: cover;
             background-position: center;
+            cursor: zoom-in;
+            position: relative;
         }
         .product-info {
             padding: 25px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
         .product-info h3 {
             margin: 0 0 10px;
@@ -142,11 +153,13 @@
             color: var(--gray-text);
             font-size: 14px;
             margin-bottom: 20px;
+            flex-grow: 1;
         }
         .product-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: auto;
         }
         .price {
             font-size: 18px;
@@ -179,10 +192,20 @@
             letter-spacing: 2px;
             margin-bottom: 15px;
         }
-        /* Плаваюча кнопка WhatsApp з відступом знизу, щоб не перекривати службові елементи */
+        .admin-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #444;
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.3s;
+        }
+        .admin-link:hover {
+            color: var(--accent-color);
+        }
         .floating-whatsapp {
             position: fixed;
-            bottom: 60px;
+            bottom: 30px;
             right: 25px;
             background-color: #25d366;
             color: white;
@@ -202,6 +225,28 @@
             transform: scale(1.05);
             background-color: #20ba5a;
         }
+        /* Модальне вікно для збільшення фото */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+        }
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border: 2px solid var(--accent-color);
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 32px; }
+            header { padding: 15px 20px; }
+        }
     </style>
 </head>
 <body>
@@ -209,76 +254,47 @@
     <header>
         <a href="#" class="logo">SLM<span>24</span>.PL</a>
         <div class="header-contacts">
-            <p>📍 Leśna 11, 63-604 Baranów</p>
-            <p>🕒 Pn-Pt: 9:00 – 18:00</p>
-            <p>📞 Tel: +48 666 688 298</p>
+            <p id="header-address">📍 Leśna 11, 63-604 Baranów</p>
+            <p id="header-hours">🕒 Pn-Pt: 9:00 – 18:00</p>
+            <p id="header-phone">📞 Tel: +48 666 688 298</p>
         </div>
     </header>
 
-    <section class="hero">
+    <section class="hero" id="hero-banner">
         <div class="hero-content">
-            <h1>EKSKLUZYWNE MEBLE DLA TWOJEGO DOMU</h1>
-            <p>Kunszt, elegancja i najwyższy komfort. Odkryj kolekcję stworzoną z myślą o wyjątkowych wnętrzach.</p>
-            <a href="https://wa.me/48666688298" class="btn" target="_blank">Skontaktuj się z nami</a>
+            <h1 id="hero-title">EKSKLUZYWNE MEBLE DLA TWOJEGO DOMU</h1>
+            <p id="hero-subtitle">Kunszt, elegancja i najwyższy komfort. Odkryj kolekcję stworzoną z myślą o wyjątkowych wnętrzach.</p>
+            <a href="https://wa.me/48666688298" id="hero-btn" class="btn" target="_blank">Skontaktuj się z nami</a>
         </div>
     </section>
 
     <div class="section-title">
-        <h2>KOLEKCJE WYJĄTKOWYCH MEBLI</h2>
-        <p>Wybierz klasę i styl, które odmienią Twoją przestrzeń</p>
+        <h2 id="catalog-title">KOLEKCJE WYJĄTKOWYCH MEBLI</h2>
+        <p id="catalog-subtitle">Wybierz klasę i styl, które odmienią Twoją przestrzeń</p>
     </div>
 
-    <!-- Каталог товарів (тепер готовий до підключення адмін-панелі) -->
-    <div class="catalog" id="product-list">
-        <div class="product-card">
-            <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80');"></div>
-            <div class="product-info">
-                <h3>Nowoczesne Sofy i Narożniki</h3>
-                <p>Ekskluzywne materiały, niezrównany komfort wypoczynku i bogata paleta kolorów.</p>
-                <div class="product-footer">
-                    <span class="price">Na zamówienie</span>
-                    <a href="https://wa.me/48666688298?text=Dzień%20dobry,%20interesują%20mnie%20sofy" class="details-btn" target="_blank">Zapytaj</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80');"></div>
-            <div class="product-info">
-                <h3>Eleganckie Łóżka Sypialniane</h3>
-                <p>Stworzone dla idealnego snu i luksusowego wyglądu Twojej sypialni.</p>
-                <div class="product-footer">
-                    <span class="price">Na zamówienie</span>
-                    <a href="https://wa.me/48666688298?text=Dzień%20dobry,%20interesują%20mnie%20łóżka" class="details-btn" target="_blank">Zapytaj</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <div class="product-img" style="background-image: url('https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80');"></div>
-            <div class="product-info">
-                <h3>Meble na Wymiar i Dodatki</h3>
-                <p>Indywidualne projekty dostosowane do specyfiki i charakteru Twojego wnętrza.</p>
-                <div class="product-footer">
-                    <span class="price">Indywidualnie</span>
-                    <a href="https://wa.me/48666688298?text=Dzień%20dobry,%20interesują%20mnie%20meble%20na%20wymiar" class="details-btn" target="_blank">Zapytaj</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Каталог товарів -->
+    <div class="catalog" id="product-list"></div>
 
     <footer>
         <div class="footer-brand">SLM24.PL</div>
-        <p>Adres: Leśna 11, 63-604 Baranów</p>
-        <p>Godziny otwarcia: Poniedziałek – Piątek: 9:00 – 18:00</p>
-        <p>Telefon / WhatsApp: +48 666 688 298</p>
+        <p id="footer-address">Adres: Leśna 11, 63-604 Baranów</p>
+        <p id="footer-hours">Godziny otwarcia: Poniedziałek – Piątek: 9:00 – 18:00</p>
+        <p id="footer-phone">Telefon / WhatsApp: +48 666 688 298</p>
         <p style="margin-top: 30px; font-size: 12px; color: #555;">&copy; 2026 SLM24.pl. Wszelkie prawa zastrzeżone.</p>
+        <a href="/admin/" class="admin-link">⚙️ Panel Administracyjny</a>
     </footer>
 
-    <!-- Плаваюча кнопка WhatsApp -->
-    <a href="https://wa.me/48666688298" class="floating-whatsapp" target="_blank">
+    <a href="https://wa.me/48666688298" id="whatsapp-float" class="floating-whatsapp" target="_blank">
         💬 WhatsApp
     </a>
 
-</body>
-</html>
+    <!-- Спливаюче вікно для фото -->
+    <div class="lightbox" id="lightbox" onclick="this.style.display='none'">
+        <img id="lightbox-img" src="" alt="Meble">
+    </div>
+
+    <script>
+        const defaultData = {
+            title: "EKSKLUZYWNE MEBLE DLA TWOJEGO DOMU",
+            subtitle: "Kunszt, elegancja i najwyższy komfort. Odkryj kolekcję stworzoną z myślą o wyjątkowych wnętrzach
