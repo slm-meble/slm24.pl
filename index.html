@@ -293,8 +293,57 @@
     <div class="lightbox" id="lightbox" onclick="this.style.display='none'">
         <img id="lightbox-img" src="" alt="Meble">
     </div>
+<script>
+        async function loadSiteContent() {
+            try {
+                // Завантажуємо свіжі дані з файлу home.json (із захистом від кешу)
+                const response = await fetch('content/home.json?v=' + new Date().getTime());
+                if (!response.ok) return;
+                const data = await response.json();
 
-    <script>
-        const defaultData = {
-            title: "EKSKLUZYWNE MEBLE DLA TWOJEGO DOMU",
-            subtitle: "Kunszt, elegancja i najwyższy komfort. Odkryj kolekcję stworzoną z myślą o wyjątkowych wnętrzach
+                // 1. Оновлюємо головний заголовок і підзаголовок на банері
+                const heroTitle = document.querySelector('#hero-title, .hero h1, h1');
+                if (heroTitle && data.title) heroTitle.textContent = data.title;
+
+                const heroSubtitle = document.querySelector('#hero-subtitle, .hero p');
+                if (heroSubtitle && data.subtitle) heroSubtitle.textContent = data.subtitle;
+
+                // 2. Оновлюємо контакти у підвалі та шапці
+                if (data.contact_address) {
+                    const addr = document.getElementById('footer-address');
+                    if (addr) addr.textContent = 'Adres: ' + data.contact_address;
+                }
+                if (data.contact_hours) {
+                    const hours = document.getElementById('footer-hours');
+                    if (hours) hours.textContent = 'Godziny otwarcia: ' + data.contact_hours;
+                }
+                if (data.contact_phone) {
+                    const phone = document.getElementById('footer-phone');
+                    if (phone) phone.textContent = 'Telefon / WhatsApp: ' + data.contact_phone;
+                    const wa = document.getElementById('whatsapp-float');
+                    if (wa) wa.href = 'https://wa.me/' + data.contact_phone.replace(/[^0-9]/g, '');
+                }
+
+                // 3. Оновлюємо каталог товарів, якщо він є у файлі
+                const catalog = document.getElementById('product-list');
+                if (catalog && Array.isArray(data.products) && data.products.length > 0) {
+                    catalog.innerHTML = data.products.map(item => `
+                        <div class="product-card">
+                            <img src="${item.image}" alt="${item.name || ''}" onclick="document.getElementById('lightbox-img').src=this.src; document.getElementById('lightbox').style.display='flex';">
+                            <div class="product-info">
+                                <h3>${item.name || ''}</h3>
+                                <p>${item.description || ''}</p>
+                                <div class="price">${item.price || ''}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Помилка завантаження даних:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadSiteContent);
+    </script>
+</body>
+</html>
