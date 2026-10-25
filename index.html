@@ -5,6 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SLM24.pl - Ekskluzywne Meble</title>
     <style>
+        /* Стилі для відкриття фото на весь екран (Lightbox) */
+        .lightbox-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .lightbox-modal.open {
+            display: flex;
+        }
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .lightbox-nav:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        .lightbox-prev { left: -60px; }
+        .lightbox-next { right: -60px; }
+        @media (max-width: 768px) {
+            .lightbox-prev { left: 10px; }
+            .lightbox-next { right: 10px; }
+        }
         :root {
             --bg-main: #faf8f5;
             --bg-card: #ffffff;
@@ -1123,4 +1183,13 @@
         </div>
     </footer>
 </body>
+    <!-- Вікно для повноранкового перегляду фото -->
+    <div class="lightbox-modal" id="lightbox-modal" onclick="closeLightbox(event)">
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <button class="lightbox-close" onclick="closeLightboxDirect()">✕</button>
+            <button class="lightbox-nav lightbox-prev" onclick="changeLightboxImg(-1)">‹</button>
+            <img id="lightbox-img" src="" alt="Zoomed photo">
+            <button class="lightbox-nav lightbox-next" onclick="changeLightboxImg(1)">›</button>
+        </div>
+    </div>
 </html>
