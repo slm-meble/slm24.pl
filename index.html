@@ -983,15 +983,28 @@
     </div>
     <button class="chat-fab" onclick="document.getElementById('chat-popup').classList.toggle('show')">💬</button>
 
-    <footer>
+   <footer>
         <div class="footer-inner">
             <div class="footer-grid">
                 <div class="footer-col"><h4>Obsługa klienta</h4><ul><li>Dostawa w całej Polsce</li><li>24 miesiące gwarancji</li></ul></div>
                 <div class="footer-col" id="footer-contact"><h4>Kontakt</h4><ul><li id="footer-address">📍 Leśna 11</li><li id="footer-hours">🕒 Pn-Pt: 9:00 - 18:00</li><li id="footer-phone">📞 +48 666 688 298</li></ul></div>
             </div>
-            <div class="footer-bottom"><p>&copy; 2026 SLM24.PL</p><a href="/admin/" class="admin-link">⚙️ Panel Administracyjny</a></div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SLM24.PL. Wszelkie prawa zastrzeżone.</p>
+                <a href="/admin/" class="admin-link">⚙️ Panel Administracyjny</a>
+            </div>
         </div>
     </footer>
+
+    <!-- Вікно для повноранкового перегляду фото -->
+    <div class="lightbox-modal" id="lightbox-modal" onclick="closeLightbox(event)">
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <button class="lightbox-close" onclick="closeLightboxDirect()">✕</button>
+            <button class="lightbox-nav lightbox-prev" onclick="changeLightboxImg(-1)">‹</button>
+            <img id="lightbox-img" src="" alt="Zoomed photo">
+            <button class="lightbox-nav lightbox-next" onclick="changeLightboxImg(1)">›</button>
+        </div>
+    </div>
 
     <script>
         let allProducts = [];
@@ -1001,6 +1014,9 @@
         
         let currentModalImages = [];
         let currentImageIndex = 0;
+
+        let lbImages = [];
+        let lbIndex = 0;
 
         function toggleDrawer(open) {
             document.getElementById('side-drawer').classList.toggle('open', open);
@@ -1084,7 +1100,6 @@
             const item = allProducts[index];
             if (!item) return;
 
-            // Збираємо галерею фото (до 10 штук через кому або окремо)
             let rawImgs = item.images || item.image || '';
             currentModalImages = rawImgs.split(',').map(s => s.trim()).filter(Boolean);
             if (currentModalImages.length === 0) currentModalImages = [''];
@@ -1092,7 +1107,6 @@
 
             updateGalleryView();
 
-            // Блок тканин на 3 фотографії
             const fabricSec = document.getElementById('fabric-section');
             const fabricGrid = document.getElementById('fabric-grid');
             let rawFabrics = item.fabric_images || '';
@@ -1100,11 +1114,13 @@
 
             if (fabricArr.length > 0) {
                 fabricSec.style.display = 'block';
-                fabricGrid.innerHTML = fabricArr.slice(0, 3).map(f => `
-                    <div class="fabric-img-wrap"><img src="${f}" alt="Tkanina"></div>
+                fabricGrid.innerHTML = fabricArr.slice(0, 3).map((f, i) => `
+                    <div class="fabric-img-wrap" style="cursor:pointer;" onclick="openFabricLightbox(${i})"><img src="${f}" alt="Tkanina"></div>
                 `).join('');
+                window.currentFabricImages = fabricArr.slice(0, 3);
             } else {
                 fabricSec.style.display = 'none';
+                window.currentFabricImages = [];
             }
 
             const title = item.name || item.title || '';
@@ -1153,6 +1169,42 @@
             btn.parentElement.classList.toggle('active');
         }
 
+        function openLightboxDirectly() {
+            if (currentModalImages && currentModalImages.length > 0 && currentModalImages[0] !== '') {
+                lbImages = currentModalImages;
+                lbIndex = currentImageIndex;
+                document.getElementById('lightbox-img').src = lbImages[lbIndex];
+                document.getElementById('lightbox-modal').classList.add('open');
+            }
+        }
+
+        function openFabricLightbox(index) {
+            if (window.currentFabricImages && window.currentFabricImages.length > 0) {
+                lbImages = window.currentFabricImages;
+                lbIndex = index;
+                document.getElementById('lightbox-img').src = lbImages[lbIndex];
+                document.getElementById('lightbox-modal').classList.add('open');
+            }
+        }
+
+        function closeLightbox(e) {
+            if (e.target.id === 'lightbox-modal') {
+                document.getElementById('lightbox-modal').classList.remove('open');
+            }
+        }
+
+        function closeLightboxDirect() {
+            document.getElementById('lightbox-modal').classList.remove('open');
+        }
+
+        function changeLightboxImg(dir) {
+            if (lbImages.length === 0) return;
+            lbIndex += dir;
+            if (lbIndex < 0) lbIndex = lbImages.length - 1;
+            if (lbIndex >= lbImages.length) lbIndex = 0;
+            document.getElementById('lightbox-img').src = lbImages[lbIndex];
+        }
+
         async function loadSiteContent() {
             try {
                 const res = await fetch('content/home.json?v=' + new Date().getTime());
@@ -1162,7 +1214,6 @@
                 if (data.title) document.getElementById('hero-title').textContent = data.title;
                 if (data.subtitle) document.getElementById('hero-subtitle').textContent = data.subtitle;
                 if (data.hero_bg) {
-             
                     document.getElementById('hero-banner-bg').style.backgroundImage = `url('${data.hero_bg}')`;
                 }
                 if (data.contact_hours) document.getElementById('top-hours').textContent = '🕒 Godziny: ' + data.contact_hours;
@@ -1176,60 +1227,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadSiteContent();
             setTimeout(() => document.getElementById('chat-popup').classList.add('show'), 3000);
+            
+            const mainModalImg = document.getElementById('modal-main-img');
+            if (mainModalImg) {
+                mainModalImg.addEventListener('click', openLightboxDirectly);
+            }
         });
     </script>
-    <footer>
-        <div class="footer-inner">
-            <div class="footer-bottom">
-                <p>&copy; 2026 SLM24.PL. Wszelkie prawa zastrzeżone.</p>
-                <a href="/admin/" class="admin-link">⚙️ Panel Administracyjny</a>
-            </div>
-        </div>
-    </footer>
-    let lbImages = [];
-    let lbIndex = 0;
-
-    function openLightboxDirectly() {
-        const activeImg = document.getElementById('modal-main-img');
-        if (activeImg && activeImg.src) {
-            lbImages = [activeImg.src];
-            
-            const galleryThumbnails = document.querySelectorAll('.opbox-sheet img, ._07951_wGB4F, .image-tiles img');
-            if (galleryThumbnails.length > 0) {
-                lbImages = Array.from(galleryThumbnails).map(img => img.src || img.dataset.src).filter(Boolean);
-            }
-            
-            lbIndex = 0;
-            document.getElementById('lightbox-img').src = activeImg.src;
-            document.getElementById('lightbox-modal').classList.add('open');
-        }
-    }
-
-    function closeLightbox(e) {
-        if (e.target.id === 'lightbox-modal') {
-            document.getElementById('lightbox-modal').classList.remove('open');
-        }
-    }
-
-    function closeLightboxDirect() {
-        document.getElementById('lightbox-modal').classList.remove('open');
-    }
-
-    function changeLightboxImg(dir) {
-        if (lbImages.length === 0) return;
-        lbIndex += dir;
-        if (lbIndex < 0) lbIndex = lbImages.length - 1;
-        if (lbIndex >= lbImages.length) lbIndex = 0;
-        document.getElementById('lightbox-img').src = lbImages[lbIndex];
-    }
 </body>
-    <!-- Вікно для повноранкового перегляду фото -->
-    <div class="lightbox-modal" id="lightbox-modal" onclick="closeLightbox(event)">
-        <div class="lightbox-content" onclick="event.stopPropagation()">
-            <button class="lightbox-close" onclick="closeLightboxDirect()">✕</button>
-            <button class="lightbox-nav lightbox-prev" onclick="changeLightboxImg(-1)">‹</button>
-            <img id="lightbox-img" src="" alt="Zoomed photo">
-            <button class="lightbox-nav lightbox-next" onclick="changeLightboxImg(1)">›</button>
-        </div>
-    </div>
 </html>
