@@ -31,7 +31,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Верхня панель лише з годинами роботи */
         .top-bar {
             background-color: #dec5c1;
             color: #3b2826;
@@ -39,10 +38,8 @@
             padding: 7px 15px;
             font-size: 13px;
             font-weight: 500;
-            letter-spacing: 0.3px;
         }
 
-        /* Шапка магазину */
         header {
             background-color: var(--bg-card);
             border-bottom: 1px solid var(--border-color);
@@ -96,7 +93,6 @@
             margin-top: -2px;
         }
 
-        /* Пошуковий рядок (розкладний) */
         .search-bar {
             display: none;
             background: var(--bg-card);
@@ -118,7 +114,6 @@
             background: var(--bg-main);
         }
 
-        /* Бокове виїзне меню (три смужки) */
         .drawer-overlay {
             position: fixed;
             inset: 0;
@@ -187,26 +182,33 @@
             text-decoration: none;
             font-size: 15px;
             cursor: pointer;
-            transition: color 0.2s;
         }
         .drawer-list li a:hover {
             color: var(--accent);
         }
-        .drawer-list li a span.arrow {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
 
-        /* Головний банер */
+        /* Головний банер з можливістю зміни фону */
         .hero-banner {
-            background: linear-gradient(135deg, #efe9e0 0%, #e4d9c8 100%);
-            padding: 32px 16px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            padding: 45px 16px;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(250, 248, 245, 0.88); /* легке затемнення для читабельності тексту */
+            z-index: 1;
         }
         .hero-inner {
             max-width: 820px;
             margin: 0 auto;
+            position: relative;
+            z-index: 2;
         }
         .breadcrumbs {
             font-size: 13px;
@@ -219,7 +221,6 @@
         #hero-title {
             font-size: 28px;
             font-weight: 700;
-            color: var(--text-dark);
             margin-bottom: 8px;
             line-height: 1.25;
         }
@@ -228,7 +229,6 @@
             color: var(--text-muted);
         }
 
-        /* Панель фільтрів та сортування */
         .catalog-wrapper {
             max-width: 1320px;
             margin: 0 auto;
@@ -275,7 +275,6 @@
             cursor: pointer;
         }
 
-        /* Швидкі кнопки категорій */
         .category-pills {
             display: flex;
             gap: 8px;
@@ -305,7 +304,6 @@
             border-color: var(--accent);
         }
 
-        /* Сітка товарів: 2 в ряд на телефоні, 3-4 на комп'ютері */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -355,10 +353,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.35s ease;
-        }
-        .product-card:hover .card-img-wrap img {
-            transform: scale(1.04);
         }
 
         .card-body {
@@ -414,16 +408,9 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: background 0.2s;
-        }
-        .card-order-btn:hover {
-            background: var(--accent-hover);
         }
 
-        /* Детальне вікно товару (Product Modal) */
+        /* Галерея у модальному вікні з гортанням */
         .product-modal {
             position: fixed;
             inset: 0;
@@ -433,7 +420,6 @@
             align-items: flex-start;
             justify-content: center;
             overflow-y: auto;
-            padding: 0;
         }
         .product-modal.open {
             display: flex;
@@ -479,7 +465,6 @@
             border-radius: 50%;
             font-size: 20px;
             cursor: pointer;
-            color: var(--text-dark);
         }
 
         .modal-body {
@@ -498,17 +483,97 @@
             }
         }
 
-        .modal-img-box {
+        /* Слайдер галереї */
+        .gallery-container {
             background: var(--bg-card);
             border-radius: 12px;
             border: 1px solid var(--border-color);
             overflow: hidden;
         }
-        .modal-img-box img {
+        .gallery-main-img-wrap {
+            position: relative;
             width: 100%;
-            max-height: 440px;
+            aspect-ratio: 1 / 1;
+            background: #000;
+        }
+        .gallery-main-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .gallery-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gallery-prev { left: 10px; }
+        .gallery-next { right: 10px; }
+
+        .gallery-thumbs {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            overflow-x: auto;
+            background: var(--bg-soft);
+        }
+        .gallery-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .gallery-thumb.active {
+            border-color: var(--accent);
+        }
+        .gallery-thumb img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            display: block;
+        }
+
+        /* Блок тканин на 3 фотографії */
+        .fabric-section {
+            margin-top: 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+        }
+        .fabric-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .fabric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .fabric-img-wrap {
+            aspect-ratio: 1 / 1;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #eee;
+            border: 1px solid var(--border-color);
+        }
+        .fabric-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .modal-title {
@@ -546,10 +611,6 @@
             margin-bottom: 12px;
             border: none;
             cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-primary-action:hover {
-            background: var(--accent-hover);
         }
 
         .btn-phone-action {
@@ -569,7 +630,6 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Блок довіри (без внесення) */
         .trust-box {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -584,9 +644,7 @@
             padding: 14px 16px;
             border-bottom: 1px solid var(--border-color);
         }
-        .trust-item:last-child {
-            border-bottom: none;
-        }
+        .trust-item:last-child { border-bottom: none; }
         .trust-icon {
             width: 38px;
             height: 38px;
@@ -599,24 +657,12 @@
             font-size: 18px;
             flex-shrink: 0;
         }
-        .trust-text strong {
-            display: block;
-            font-size: 14px;
-            color: var(--text-dark);
-        }
-        .trust-text span {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
 
-        /* Розкладні списки (Акордеони) */
         .accordion-group {
             border-top: 1px solid var(--border-color);
             margin-top: 16px;
         }
-        .accordion-item {
-            border-bottom: 1px solid var(--border-color);
-        }
+        .accordion-item { border-bottom: 1px solid var(--border-color); }
         .accordion-header {
             width: 100%;
             background: none;
@@ -631,14 +677,6 @@
             align-items: center;
             cursor: pointer;
         }
-        .accordion-header span.acc-arrow {
-            font-size: 14px;
-            color: var(--text-muted);
-            transition: transform 0.25s;
-        }
-        .accordion-item.active .accordion-header span.acc-arrow {
-            transform: rotate(180deg);
-        }
         .accordion-body {
             display: none;
             padding: 0 4px 16px;
@@ -646,68 +684,27 @@
             color: var(--text-muted);
             line-height: 1.6;
         }
-        .accordion-item.active .accordion-body {
-            display: block;
-        }
+        .accordion-item.active .accordion-body { display: block; }
 
-        /* Блок: Маєш питання? */
         .question-card {
             background: #efeae2;
             border-radius: 12px;
             padding: 20px;
             margin-top: 24px;
         }
-        .question-card h4 {
-            font-size: 19px;
-            margin-bottom: 6px;
-            color: var(--text-dark);
-        }
-        .question-card p {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 14px;
-        }
-        .question-actions {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-        .question-phone {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-dark);
-            text-decoration: none;
-        }
-        .question-btn {
-            background: var(--accent);
-            color: #fff;
-            text-decoration: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-        }
+        .question-card h4 { font-size: 19px; margin-bottom: 6px; }
+        .question-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .question-phone { font-size: 16px; font-weight: 700; color: var(--text-dark); text-decoration: none; }
+        .question-btn { background: var(--accent); color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; }
 
-        /* Секція: Подивись також (Схожі меблі) */
-        .related-section {
-            margin-top: 32px;
-        }
-        .related-title {
-            text-align: center;
-            font-size: 22px;
-            font-weight: 600;
-            margin-bottom: 18px;
-        }
+        .related-section { margin-top: 32px; }
+        .related-title { text-align: center; font-size: 22px; font-weight: 600; margin-bottom: 18px; }
 
-        /* Спливаюче вікно привітання чату */
         .chat-widget-popup {
             position: fixed;
             bottom: 84px;
             right: 16px;
             width: 310px;
-            max-width: calc(100vw - 32px);
             background: var(--bg-card);
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
@@ -716,37 +713,9 @@
             border: 1px solid var(--border-color);
             display: none;
         }
-        .chat-widget-popup.show {
-            display: block;
-        }
-        .chat-popup-close {
-            position: absolute;
-            top: 12px;
-            right: 14px;
-            background: none;
-            border: none;
-            font-size: 18px;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-        .chat-popup-text {
-            font-size: 14px;
-            color: var(--text-dark);
-            margin-bottom: 14px;
-            padding-right: 16px;
-        }
-        .chat-popup-btn {
-            display: block;
-            width: 100%;
-            text-align: center;
-            background: #d01f58;
-            color: #fff;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            padding: 11px;
-            border-radius: 24px;
-        }
+        .chat-widget-popup.show { display: block; }
+        .chat-popup-close { position: absolute; top: 12px; right: 14px; background: none; border: none; font-size: 18px; cursor: pointer; }
+        .chat-popup-btn { display: block; width: 100%; text-align: center; background: #d01f58; color: #fff; text-decoration: none; font-weight: 600; padding: 11px; border-radius: 24px; margin-top: 10px; }
 
         .chat-fab {
             position: fixed;
@@ -767,173 +736,83 @@
             justify-content: center;
         }
 
-        /* Солідний підвал сайту (Footer) */
         footer {
             background: #f2ece4;
             border-top: 1px solid var(--border-color);
             padding: 45px 16px 30px;
             margin-top: 40px;
         }
-        .footer-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 28px;
-            margin-bottom: 35px;
-        }
-        @media (min-width: 768px) {
-            .footer-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        .footer-col h4 {
-            font-size: 17px;
-            font-weight: 700;
-            margin-bottom: 14px;
-            color: var(--text-dark);
-        }
-        .footer-col ul {
-            list-style: none;
-        }
-        .footer-col ul li {
-            margin-bottom: 9px;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-        .footer-col ul li a {
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .footer-col ul li a:hover {
-            color: var(--accent);
-        }
+        .footer-inner { max-width: 1200px; margin: 0 auto; }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 28px; margin-bottom: 35px; }
+        @media (min-width: 768px) { .footer-grid { grid-template-columns: repeat(4, 1fr); } }
+        .footer-col h4 { font-size: 17px; font-weight: 700; margin-bottom: 14px; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 9px; font-size: 14px; color: var(--text-muted); }
+        .footer-col ul li a { color: var(--text-muted); text-decoration: none; }
 
-        /* Іконки платіжних систем */
-        .payment-badges {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 20px 0;
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 20px;
-        }
-        .pay-badge {
-            background: #fff;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 5px 11px;
-            font-size: 12px;
-            font-weight: 800;
-            color: #222;
-            letter-spacing: 0.4px;
-        }
-        .pay-badge.blik { background: #111; color: #fff; }
-        .pay-badge.visa { color: #1a1f71; }
-        .pay-badge.p24 { color: #b31926; }
-        .pay-badge.mbank { background: #e30613; color: #fff; }
-
-        .footer-bottom {
-            text-align: center;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-        .admin-link {
-            display: inline-block;
-            margin-top: 10px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 12px;
-            opacity: 0.75;
-        }
+        .payment-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 20px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
+        .pay-badge { background: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: 5px 11px; font-size: 12px; font-weight: 800; }
+        .footer-bottom { text-align: center; font-size: 13px; color: var(--text-muted); }
+        .admin-link { display: inline-block; margin-top: 10px; color: var(--text-muted); text-decoration: none; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <!-- Верхня вузька панель лише з годинами роботи -->
     <div class="top-bar">
-        <span id="top-hours">🕒 Godziny otwarcia: Pon - Pt: 8:00 - 16:00</span>
+        <span id="top-hours">🕒 Godziny otwarcia: Pon - Pt: 9:00 - 18:00</span>
     </div>
 
-    <!-- Шапка сайту -->
     <header>
         <div class="header-inner">
             <div class="header-left">
-                <button class="icon-btn" onclick="toggleDrawer(true)" aria-label="Menu">☰</button>
+                <button class="icon-btn" onclick="toggleDrawer(true)">☰</button>
             </div>
             <a href="#" class="logo" onclick="selectCategory('all'); return false;">
                 SLM24.PL
                 <span>EXCLUSIVE FURNITURE</span>
             </a>
             <div class="header-right">
-                <button class="icon-btn" onclick="toggleSearch()" aria-label="Szukaj">🔍</button>
-                <a href="#footer-contact" class="icon-btn" title="Kontakt" style="text-decoration:none;">📞</a>
+                <button class="icon-btn" onclick="toggleSearch()">🔍</button>
+                <a href="#footer-contact" class="icon-btn" style="text-decoration:none;">📞</a>
             </div>
         </div>
         <div class="search-bar" id="search-bar">
-            <input type="text" id="search-input" placeholder="Szukaj mebli (np. Fotel, Sofa, Chesterfield, Pozzo)..." oninput="renderCatalog()">
+            <input type="text" id="search-input" placeholder="Szukaj mebli..." oninput="renderCatalog()">
         </div>
     </header>
 
-    <!-- Бокове виїзне меню (три смужки) -->
     <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
     <aside class="side-drawer" id="side-drawer">
         <div class="drawer-header">
             <span>Menu</span>
             <button class="icon-btn" onclick="toggleDrawer(false)">✕</button>
         </div>
-
         <div class="drawer-section">
             <div class="drawer-section-title">Kategorie mebli</div>
             <ul class="drawer-list">
-                <li><a onclick="selectCategory('all')">Wszystkie meble <span class="arrow">›</span></a></li>
-                <li><a onclick="selectCategory('fotele')">Fotele <span class="arrow">›</span></a></li>
-                <li><a onclick="selectCategory('narozniki')">Narożniki <span class="arrow">›</span></a></li>
-                <li><a onclick="selectCategory('sofy')">Sofy (2- i 3-osobowe) <span class="arrow">›</span></a></li>
-                <li><a onclick="selectCategory('chesterfield')">Meble Chesterfield <span class="arrow">›</span></a></li>
-                <li><a onclick="selectCategory('anton-pozzo')">Kolekcje Anton i Pozzo <span class="arrow">›</span></a></li>
-                <li><a onclick="selectCategory('lozka')">Łóżka i Sypialnia <span class="arrow">›</span></a></li>
-                <li><a onclick="selectCategory('tkaniny')">Tkaniny do wyboru <span class="arrow">›</span></a></li>
-            </ul>
-        </div>
-
-        <div class="drawer-section">
-            <div class="drawer-section-title">Pomieszczenia</div>
-            <ul class="drawer-list">
-                <li><a onclick="selectCategory('all')">Salon</a></li>
-                <li><a onclick="selectCategory('lozka')">Sypialnia</a></li>
-                <li><a onclick="selectCategory('fotele')">Gabinet i Hotel</a></li>
-                <li><a onclick="selectCategory('all')">Przedpokój</a></li>
-            </ul>
-        </div>
-
-        <div class="drawer-section">
-            <ul class="drawer-list">
-                <li><a href="#footer-info" onclick="toggleDrawer(false)">O nas i Gwarancja</a></li>
-                <li><a href="#footer-b2b" onclick="toggleDrawer(false)">Współpraca B2B / Hotele</a></li>
-                <li><a href="#footer-contact" onclick="toggleDrawer(false)">Kontakt</a></li>
+                <li><a onclick="selectCategory('all')">Wszystkie meble <span>›</span></a></li>
+                <li><a onclick="selectCategory('fotele')">Fotele <span>›</span></a></li>
+                <li><a onclick="selectCategory('narozniki')">Narożniki <span>›</span></a></li>
+                <li><a onclick="selectCategory('sofy')">Sofy <span>›</span></a></li>
+                <li><a onclick="selectCategory('chesterfield')">Meble Chesterfield <span>›</span></a></li>
+                <li><a onclick="selectCategory('anton-pozzo')">Anton i Pozzo <span>›</span></a></li>
+                <li><a onclick="selectCategory('lozka')">Łóżka <span>›</span></a></li>
+                <li><a onclick="selectCategory('tkaniny')">Tkaniny <span>›</span></a></li>
             </ul>
         </div>
     </aside>
 
-    <!-- Світлий банер -->
-    <section class="hero-banner">
+    <!-- Головний банер (фон міняється динамічно) -->
+    <section class="hero-banner" id="hero-banner-bg">
         <div class="hero-inner">
             <div class="breadcrumbs">Strona główna / <strong id="current-cat-label">Kolekcja mebli</strong></div>
             <h1 id="hero-title">EKSKLUZYWNE MEBLE DLA TWOJEGO DOMU</h1>
-            <p id="hero-subtitle">Kunszt, elegancja i najwyższy komfort. Odkryj kolekcję stworzoną z myślą o wyjątkowych wnętrzach.</p>
+            <p id="hero-subtitle">Kunszt, elegancja i najwyższy komfort.</p>
         </div>
     </section>
 
-    <!-- Каталог з фільтрами та сортуванням -->
     <main class="catalog-wrapper">
-        <div class="category-pills" id="category-pills">
+        <div class="category-pills">
             <button class="pill-btn active" data-cat="all" onclick="selectCategory('all')">Wszystkie</button>
             <button class="pill-btn" data-cat="fotele" onclick="selectCategory('fotele')">Fotele</button>
             <button class="pill-btn" data-cat="narozniki" onclick="selectCategory('narozniki')">Narożniki</button>
@@ -945,121 +824,79 @@
         </div>
 
         <div class="toolbar">
-            <div class="product-counter">
-                <strong id="product-count">0</strong> produktów
-            </div>
+            <div class="product-counter"><strong id="product-count">0</strong> produktów</div>
             <div class="toolbar-controls">
                 <select class="filter-select" id="category-select" onchange="selectCategory(this.value)">
-                    <option value="all">▽ Filtruj: Wszystkie kategorie</option>
+                    <option value="all">Wszystkie kategorie</option>
                     <option value="fotele">Fotele</option>
                     <option value="narozniki">Narożniki</option>
-                    <option value="sofy">Sofy 2- i 3-osobowe</option>
+                    <option value="sofy">Sofy</option>
                     <option value="chesterfield">Chesterfield</option>
-                    <option value="anton-pozzo">Kolekcje Anton i Pozzo</option>
+                    <option value="anton-pozzo">Anton / Pozzo</option>
                     <option value="lozka">Łóżka</option>
                     <option value="tkaniny">Tkaniny</option>
                 </select>
-
                 <select class="filter-select" id="sort-select" onchange="renderCatalog()">
                     <option value="default">Sortuj: Domyślne</option>
                     <option value="price-asc">Cena: od najniższej</option>
                     <option value="price-desc">Cena: od najwyższej</option>
-                    <option value="name-asc">Nazwa: A - Z</option>
                 </select>
             </div>
         </div>
 
-        <!-- Сітка товарів -->
         <div class="product-grid" id="product-list"></div>
     </main>
 
-    <!-- Модальне вікно детальної картки товару -->
+    <!-- Модальне вікно з галереєю на 10 фото та тканинами -->
     <div class="product-modal" id="product-modal">
         <div class="modal-content">
             <div class="modal-top-bar">
-                <span style="font-size:14px; color:var(--text-muted);">Szczegóły produktu</span>
+                <span>Szczegóły produktu</span>
                 <button class="close-modal-btn" onclick="closeProductModal()">✕</button>
             </div>
             <div class="modal-body">
                 <div class="modal-main-grid">
-                    <div class="modal-img-box">
-                        <img id="modal-img" src="" alt="Meble">
+                    <div>
+                        <!-- Галерея фото -->
+                        <div class="gallery-container">
+                            <div class="gallery-main-img-wrap">
+                                <img id="modal-main-img" src="" alt="Meble">
+                                <button class="gallery-nav-btn gallery-prev" onclick="changeImage(-1)">‹</button>
+                                <button class="gallery-nav-btn gallery-next" onclick="changeImage(1)">›</button>
+                            </div>
+                            <div class="gallery-thumbs" id="gallery-thumbs"></div>
+                        </div>
+
+                        <!-- Блок тканин на 3 фото -->
+                        <div class="fabric-section" id="fabric-section" style="display:none;">
+                            <div class="fabric-title">Warianty tkanin (Do wyboru):</div>
+                            <div class="fabric-grid" id="fabric-grid"></div>
+                        </div>
                     </div>
+
                     <div>
                         <h2 class="modal-title" id="modal-title"></h2>
                         <div class="modal-price" id="modal-price"></div>
                         <p class="modal-desc" id="modal-desc"></p>
 
-                        <a id="modal-wa-btn" href="#" target="_blank" class="btn-primary-action">
-                            🛒 Zamów / Zapytaj na WhatsApp
-                        </a>
+                        <a id="modal-wa-btn" href="#" target="_blank" class="btn-primary-action">🛒 Zamów / Zapytaj na WhatsApp</a>
+                        <a id="modal-phone-btn" href="tel:+48666688298" class="btn-phone-action">📞 Zadzwoń: <span id="modal-phone-text">+48 666 688 298</span></a>
 
-                        <a id="modal-phone-btn" href="tel:+48666688298" class="btn-phone-action">
-                            📞 Zamów telefonicznie: <span id="modal-phone-text">+48 666 688 298</span>
-                        </a>
-
-                        <!-- Блок переваг (без внесення) -->
                         <div class="trust-box">
-                            <div class="trust-item">
-                                <div class="trust-icon">🚚</div>
-                                <div class="trust-text">
-                                    <strong>Dostawa na terenie całej Polski</strong>
-                                    <span>Bezpieczny transport prosto do Twojego domu</span>
-                                </div>
-                            </div>
-                            <div class="trust-item">
-                                <div class="trust-icon">🛡️</div>
-                                <div class="trust-text">
-                                    <strong>24 miesiące gwarancji</strong>
-                                    <span>Pełna gwarancja producenta na konstrukcję i wykonanie</span>
-                                </div>
-                            </div>
-                            <div class="trust-item">
-                                <div class="trust-icon">↺</div>
-                                <div class="trust-text">
-                                    <strong>14 dni na zwrot mebla</strong>
-                                    <span>Bezproblemowy zwrot lub wymiana zgodnie z regulaminem</span>
-                                </div>
-                            </div>
+                            <div class="trust-item"><div class="trust-icon">🚚</div><div><strong>Dostawa w całej Polsce</strong><span>Bezpieczny transport</span></div></div>
+                            <div class="trust-item"><div class="trust-icon">🛡️</div><div><strong>24 miesiące gwarancji</strong><span>Gwarancja producenta</span></div></div>
                         </div>
 
-                        <!-- Розкладні списки (Акордеони) -->
                         <div class="accordion-group">
                             <div class="accordion-item">
-                                <button class="accordion-header" onclick="toggleAccordion(this)">
-                                    <span>Tkaniny do wyboru</span>
-                                    <span class="acc-arrow">⌄</span>
-                                </button>
-                                <div class="accordion-body">
-                                    Oferujemy szeroki wybór tkanin premium: welury łatwoczyszczące, plecionki, tkaniny boucle oraz materiały hydrofobowe (Pet Friendly). Napisz do nas lub zadzwoń — prześlemy zdjęcia próbników i pomożemy dobrać idealny kolor!
-                                </div>
-                            </div>
-
-                            <div class="accordion-item">
-                                <button class="accordion-header" onclick="toggleAccordion(this)">
-                                    <span>Dostawa i płatność</span>
-                                    <span class="acc-arrow">⌄</span>
-                                </button>
-                                <div class="accordion-body">
-                                    Dostarczamy meble bezpiecznym transportem na terenie całej Polski. Możliwość płatności przelewem, BLIK lub przy odbiorze po uzgodnieniu. Szczegóły oraz dokładny koszt transportu ustalamy indywidualnie przy zamówieniu.
-                                </div>
-                            </div>
-
-                            <div class="accordion-item">
-                                <button class="accordion-header" onclick="toggleAccordion(this)">
-                                    <span>Gwarancja i jakość wykonania</span>
-                                    <span class="acc-arrow">⌄</span>
-                                </button>
-                                <div class="accordion-body">
-                                    Wszystkie nasze meble produkowane są z wysokiej jakości komponentów, litego drewna oraz wysokoelastycznych pianek. Każdy produkt objęty jest 24-miesięczną gwarancją oraz 14-dniowym prawem zwrotu.
-                                </div>
+                                <button class="accordion-header" onclick="toggleAccordion(this)"><span>Tkaniny i kolory</span> <span>⌄</span></button>
+                                <div class="accordion-body">Oferujemy szeroki wybór tkanin premium. Pomagamy dobrać idealny kolor!</div>
                             </div>
                         </div>
 
-                        <!-- Блок: Маєш питання? -->
                         <div class="question-card">
                             <h4>Masz pytania?</h4>
-                            <p>Skontaktuj się z nami przez WhatsApp lub zadzwoń bezpośrednio — chętnie doradzimy w wyborze modelu i tkaniny.</p>
+                            <p>Zadzwoń do nas lub napisz na WhatsApp.</p>
                             <div class="question-actions">
                                 <a id="question-phone-link" href="tel:+48666688298" class="question-phone">+48 666 688 298</a>
                                 <a id="question-wa-link" href="https://wa.me/48666688298" target="_blank" class="question-btn">Zadaj pytanie</a>
@@ -1068,7 +905,6 @@
                     </div>
                 </div>
 
-                <!-- Схожі меблі -->
                 <div class="related-section">
                     <h3 class="related-title">Zobacz również</h3>
                     <div class="product-grid" id="related-list"></div>
@@ -1077,79 +913,20 @@
         </div>
     </div>
 
-    <!-- Спливаюче вікно чату -->
     <div class="chat-widget-popup" id="chat-popup">
         <button class="chat-popup-close" onclick="document.getElementById('chat-popup').classList.remove('show')">✕</button>
-        <div class="chat-popup-text">
-            <strong>Witaj! 👋</strong><br>
-            Masz pytania dotyczące mebli lub wyboru tkaniny? Z chęcią na nie odpowiemy!
-        </div>
-        <a id="chat-popup-wa" href="https://wa.me/48666688298" target="_blank" class="chat-popup-btn">➢ Rozpocznij rozmowę</a>
+        <div class="chat-popup-text"><strong>Witaj! 👋</strong><br>Masz pytania? Chętnie odpowiemy!</div>
+        <a id="chat-popup-wa" href="https://wa.me/48666688298" target="_blank" class="chat-popup-btn">Rozpocznij rozmowę</a>
     </div>
+    <button class="chat-fab" onclick="document.getElementById('chat-popup').classList.toggle('show')">💬</button>
 
-    <button class="chat-fab" onclick="document.getElementById('chat-popup').classList.toggle('show')" aria-label="Czat">💬</button>
-
-    <!-- Солідний підвал сайту (Footer) -->
     <footer>
         <div class="footer-inner">
             <div class="footer-grid">
-                <div class="footer-col" id="footer-info">
-                    <h4>Obsługa klienta</h4>
-                    <ul>
-                        <li>Dostawa na terenie całej Polski</li>
-                        <li>24 miesiące gwarancji</li>
-                        <li>14 dni na zwrot i reklamacje</li>
-                        <li>Metody płatności i raty</li>
-                        <li>Dobór tkanin na zamówienie</li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Informacje</h4>
-                    <ul>
-                        <li><a href="#" onclick="selectCategory('all'); return false;">Pełny katalog mebli</a></li>
-                        <li><a href="#" onclick="selectCategory('fotele'); return false;">Fotele i Krzesła</a></li>
-                        <li><a href="#" onclick="selectCategory('sofy'); return false;">Sofy i Narożniki</a></li>
-                        <li>Regulamin sklepu</li>
-                        <li>Polityka prywatności</li>
-                    </ul>
-                </div>
-
-                <div class="footer-col" id="footer-b2b">
-                    <h4>Współpraca</h4>
-                    <ul>
-                        <li>Współpraca hurtowa</li>
-                        <li>Współpraca B2B</li>
-                        <li>Hotele i pensjonaty</li>
-                        <li>Architekci i projektanci wnętrz</li>
-                    </ul>
-                </div>
-
-                <div class="footer-col" id="footer-contact">
-                    <h4>Kontakt i dane</h4>
-                    <ul>
-                        <li id="footer-address">📍 Adres: Leśna 11, 63-604 Baranów</li>
-                        <li id="footer-hours">🕒 Godziny: Poniedziałek - Piątek: 8:00 - 16:00</li>
-                        <li id="footer-phone">📞 Tel / WhatsApp: +48 666 688 298</li>
-                    </ul>
-                </div>
+                <div class="footer-col"><h4>Obsługa klienta</h4><ul><li>Dostawa w całej Polsce</li><li>24 miesiące gwarancji</li></ul></div>
+                <div class="footer-col" id="footer-contact"><h4>Kontakt</h4><ul><li id="footer-address">📍 Leśna 11</li><li id="footer-hours">🕒 Pn-Pt: 9:00 - 18:00</li><li id="footer-phone">📞 +48 666 688 298</li></ul></div>
             </div>
-
-            <!-- Іконки платіжних систем -->
-            <div class="payment-badges">
-                <span class="pay-badge p24">Przelewy24</span>
-                <span class="pay-badge">Apple Pay</span>
-                <span class="pay-badge">G Pay</span>
-                <span class="pay-badge blik">BLIK</span>
-                <span class="pay-badge visa">VISA</span>
-                <span class="pay-badge">Mastercard</span>
-                <span class="pay-badge mbank">mBank</span>
-            </div>
-
-            <div class="footer-bottom">
-                <p>&copy; 2026 SLM24.PL. Wszelkie prawa zastrzeżone.</p>
-                <a href="/admin/" class="admin-link">⚙️ Panel Administracyjny</a>
-            </div>
+            <div class="footer-bottom"><p>&copy; 2026 SLM24.PL</p><a href="/admin/" class="admin-link">⚙️ Panel Administracyjny</a></div>
         </div>
     </footer>
 
@@ -1158,47 +935,32 @@
         let activeCategory = 'all';
         let contactPhoneRaw = '48666688298';
         let contactPhoneDisplay = '+48 666 688 298';
+        
+        let currentModalImages = [];
+        let currentImageIndex = 0;
 
-        // Вмикання та вимикання бокового меню
         function toggleDrawer(open) {
             document.getElementById('side-drawer').classList.toggle('open', open);
             document.getElementById('drawer-overlay').classList.toggle('open', open);
         }
 
         function toggleSearch() {
-            const bar = document.getElementById('search-bar');
-            bar.classList.toggle('active');
-            if (bar.classList.contains('active')) {
-                document.getElementById('search-input').focus();
-            }
-        }
-
-        // Розумне визначення категорії за назвою, описом або полем category
-        function detectCategory(item) {
-            const explicit = (item.category || '').toLowerCase();
-            const text = ((item.name || '') + ' ' + (item.description || '') + ' ' + explicit).toLowerCase();
-
-            if (text.includes('tkanin') || text.includes('тканин') || text.includes('welur') || text.includes('boucle')) return 'tkaniny';
-            if (text.includes('chesterfield') || text.includes('честер')) return 'chesterfield';
-            if (text.includes('anton') || text.includes('pozzo') || text.includes('антон') || text.includes('поццо') || text.includes('поцо')) return 'anton-pozzo';
-            if (text.includes('naroż') || text.includes('naroz') || text.includes('нарож') || text.includes('кутов')) return 'narozniki';
-            if (text.includes('łóżk') || text.includes('lozk') || text.includes('ліжк') || text.includes('sypialn') || text.includes('люльк')) return 'lozka';
-            if (text.includes('fotel') || text.includes('фотел') || text.includes('крісл') || text.includes('krzes')) return 'fotele';
-            if (text.includes('sofa') || text.includes('sofy') || text.includes('софа') || text.includes('софи') || text.includes('диван') || text.includes('kanap')) return 'sofy';
-            return 'other';
+            document.getElementById('search-bar').classList.toggle('active');
         }
 
         function matchesCategory(item, cat) {
             if (cat === 'all') return true;
-            const text = ((item.name || '') + ' ' + (item.description || '') + ' ' + (item.category || '')).toLowerCase();
-            if (cat === 'fotele') return text.includes('fotel') || text.includes('фотел') || text.includes('крісл') || text.includes('krzes');
-            if (cat === 'narozniki') return text.includes('naroż') || text.includes('naroz') || text.includes('нарож') || text.includes('кутов');
-            if (cat === 'sofy') return text.includes('sofa') || text.includes('sofy') || text.includes('софа') || text.includes('софи') || text.includes('диван') || text.includes('kanap');
+            const explicit = (item.category || '').toLowerCase();
+            const text = ((item.name || '') + ' ' + (item.title || '') + ' ' + (item.description || '') + ' ' + explicit).toLowerCase();
+            
             if (cat === 'chesterfield') return text.includes('chesterfield') || text.includes('честер');
-            if (cat === 'anton-pozzo') return text.includes('anton') || text.includes('pozzo') || text.includes('антон') || text.includes('поццо') || text.includes('поцо');
-            if (cat === 'lozka') return text.includes('łóżk') || text.includes('lozk') || text.includes('ліжк') || text.includes('sypialn') || text.includes('люльк');
-            if (cat === 'tkaniny') return text.includes('tkanin') || text.includes('тканин') || text.includes('welur') || text.includes('boucle');
-            return detectCategory(item) === cat;
+            if (cat === 'anton-pozzo') return text.includes('anton') || text.includes('pozzo');
+            if (cat === 'narozniki') return text.includes('naroż') || text.includes('naroz') || text.includes('кутов');
+            if (cat === 'sofy') return text.includes('sofa') || text.includes('sofy') || text.includes('диван');
+            if (cat === 'lozka') return text.includes('łóżk') || text.includes('lozk') || text.includes('ліжк');
+            if (cat === 'tkaniny') return text.includes('tkanin') || text.includes('welur');
+            if (cat === 'fotele') return text.includes('fotel') || text.includes('крісл');
+            return explicit === cat;
         }
 
         function parsePrice(priceStr) {
@@ -1210,24 +972,7 @@
         function selectCategory(cat) {
             activeCategory = cat;
             toggleDrawer(false);
-
-            const labels = {
-                'all': 'Kolekcja mebli',
-                'fotele': 'Fotele',
-                'narozniki': 'Narożniki',
-                'sofy': 'Sofy 2- i 3-osobowe',
-                'chesterfield': 'Meble Chesterfield',
-                'anton-pozzo': 'Kolekcje Anton i Pozzo',
-                'lozka': 'Łóżka',
-                'tkaniny': 'Tkaniny do wyboru'
-            };
-            document.getElementById('current-cat-label').textContent = labels[cat] || 'Kolekcja mebli';
             document.getElementById('category-select').value = cat;
-
-            document.querySelectorAll('.pill-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.cat === cat);
-            });
-
             renderCatalog();
         }
 
@@ -1239,83 +984,101 @@
             let filtered = allProducts.filter((item, idx) => {
                 item._index = idx;
                 const catOk = matchesCategory(item, activeCategory);
-                const searchOk = !searchQuery ||
-                    (item.name || '').toLowerCase().includes(searchQuery) ||
-                    (item.description || '').toLowerCase().includes(searchQuery);
+                const searchOk = !searchQuery || (item.name || item.title || '').toLowerCase().includes(searchQuery);
                 return catOk && searchOk;
             });
 
-            if (sortBy === 'price-asc') {
-                filtered.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
-            } else if (sortBy === 'price-desc') {
-                filtered.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
-            } else if (sortBy === 'name-asc') {
-                filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-            }
+            if (sortBy === 'price-asc') filtered.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+            if (sortBy === 'price-desc') filtered.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
 
             document.getElementById('product-count').textContent = filtered.length;
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; padding:40px 15px; color:var(--text-muted);">Brak produktów w wybranej kategorii. Wybierz „Wszystkie”, aby zobaczyć pełną ofertę.</div>`;
+                container.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; padding:40px; color:var(--text-muted);">Brak produktów w tej kategorii.</div>`;
                 return;
             }
 
-            container.innerHTML = filtered.map(item => `
-                <div class="product-card" onclick="openProductModal(${item._index})">
-                    <div class="card-img-wrap">
-                        <img src="${item.image}" alt="${item.name || 'Meble'}" loading="lazy">
-                    </div>
-                    <div class="card-body">
-                        <div class="card-title">${item.name || 'Mebel ekskluzywny'}</div>
-                        <div class="card-desc">${item.description || ''}</div>
-                        <div class="card-footer">
-                            <div class="card-price">${item.price || ''}</div>
-                            <button class="card-order-btn" aria-label="Zamów">🛒</button>
+            container.innerHTML = filtered.map(item => {
+                const mainImg = item.image || (item.images ? item.images.split(',')[0].trim() : '');
+                const title = item.name || item.title || 'Mebel';
+                return `
+                    <div class="product-card" onclick="openProductModal(${item._index})">
+                        <div class="card-img-wrap"><img src="${mainImg}" alt="${title}" loading="lazy"></div>
+                        <div class="card-body">
+                            <div class="card-title">${title}</div>
+                            <div class="card-desc">${item.description || ''}</div>
+                            <div class="card-footer">
+                                <div class="card-price">${item.price || ''}</div>
+                                <button class="card-order-btn">🛒</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function openProductModal(index) {
             const item = allProducts[index];
             if (!item) return;
 
-            document.getElementById('modal-img').src = item.image || '';
-            document.getElementById('modal-title').textContent = item.name || '';
+            // Збираємо галерею фото (до 10 штук через кому або окремо)
+            let rawImgs = item.images || item.image || '';
+            currentModalImages = rawImgs.split(',').map(s => s.trim()).filter(Boolean);
+            if (currentModalImages.length === 0) currentModalImages = [''];
+            currentImageIndex = 0;
+
+            updateGalleryView();
+
+            // Блок тканин на 3 фотографії
+            const fabricSec = document.getElementById('fabric-section');
+            const fabricGrid = document.getElementById('fabric-grid');
+            let rawFabrics = item.fabric_images || '';
+            let fabricArr = rawFabrics.split(',').map(s => s.trim()).filter(Boolean);
+
+            if (fabricArr.length > 0) {
+                fabricSec.style.display = 'block';
+                fabricGrid.innerHTML = fabricArr.slice(0, 3).map(f => `
+                    <div class="fabric-img-wrap"><img src="${f}" alt="Tkanina"></div>
+                `).join('');
+            } else {
+                fabricSec.style.display = 'none';
+            }
+
+            const title = item.name || item.title || '';
+            document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-price').textContent = item.price || '';
             document.getElementById('modal-desc').textContent = item.description || '';
 
-            const msg = encodeURIComponent(`Dzień dobry! Chcę zapytać o mebel ze strony SLM24.pl: ${item.name || ''} (${item.price || ''})`);
+            const msg = encodeURIComponent(`Dzień dobry! Chcę zapytać o mebel: ${title} (${item.price || ''})`);
             document.getElementById('modal-wa-btn').href = `https://wa.me/${contactPhoneRaw}?text=${msg}`;
-            document.getElementById('modal-phone-btn').href = `tel:+${contactPhoneRaw}`;
-            document.getElementById('modal-phone-text').textContent = contactPhoneDisplay;
-
-            // Схожі меблі (до 4 товарів)
-            const related = allProducts
-                .map((p, i) => ({ ...p, _index: i }))
-                .filter(p => p._index !== index)
-                .slice(0, 4);
-
-            const relatedContainer = document.getElementById('related-list');
-            relatedContainer.innerHTML = related.map(r => `
-                <div class="product-card" onclick="openProductModal(${r._index})">
-                    <div class="card-img-wrap">
-                        <img src="${r.image}" alt="${r.name || ''}">
-                    </div>
-                    <div class="card-body">
-                        <div class="card-title">${r.name || ''}</div>
-                        <div class="card-footer">
-                            <div class="card-price">${r.price || ''}</div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
 
             const modal = document.getElementById('product-modal');
             modal.classList.add('open');
-            modal.scrollTop = 0;
             document.body.style.overflow = 'hidden';
+        }
+
+        function updateGalleryView() {
+            const mainImg = document.getElementById('modal-main-img');
+            mainImg.src = currentModalImages[currentImageIndex] || '';
+
+            const thumbsContainer = document.getElementById('gallery-thumbs');
+            thumbsContainer.innerHTML = currentModalImages.map((img, i) => `
+                <div class="gallery-thumb ${i === currentImageIndex ? 'active' : ''}" onclick="setGalleryIndex(${i})">
+                    <img src="${img}" alt="Thumb">
+                </div>
+            `).join('');
+        }
+
+        function setGalleryIndex(i) {
+            currentImageIndex = i;
+            updateGalleryView();
+        }
+
+        function changeImage(dir) {
+            currentImageIndex += dir;
+            if (currentImageIndex < 0) currentImageIndex = currentModalImages.length - 1;
+            if (currentImageIndex >= currentModalImages.length) currentImageIndex = 0;
+            updateGalleryView();
         }
 
         function closeProductModal() {
@@ -1324,54 +1087,31 @@
         }
 
         function toggleAccordion(btn) {
-            const item = btn.parentElement;
-            item.classList.toggle('active');
+            btn.parentElement.classList.toggle('active');
         }
 
         async function loadSiteContent() {
             try {
-                const response = await fetch('content/home.json?v=' + new Date().getTime());
-                if (!response.ok) return;
-                const data = await response.json();
+                const res = await fetch('content/home.json?v=' + new Date().getTime());
+                if (!res.ok) return;
+                const data = await res.json();
 
-                if (data.title) {
-                    document.getElementById('hero-title').textContent = data.title;
+                if (data.title) document.getElementById('hero-title').textContent = data.title;
+                if (data.subtitle) document.getElementById('hero-subtitle').textContent = data.subtitle;
+                if (data.hero_bg) {
+                    document.getElementById('hero-banner-bg').style.backgroundImage = `url('${data.hero_bg}')`;
                 }
-                if (data.subtitle) {
-                    document.getElementById('hero-subtitle').textContent = data.subtitle;
-                }
-                if (data.contact_address) {
-                    document.getElementById('footer-address').textContent = '📍 Adres: ' + data.contact_address;
-                }
-                if (data.contact_hours) {
-                    document.getElementById('footer-hours').textContent = '🕒 Godziny: ' + data.contact_hours;
-                    document.getElementById('top-hours').textContent = '🕒 Godziny otwarcia: ' + data.contact_hours;
-                }
-                if (data.contact_phone) {
-                    contactPhoneDisplay = data.contact_phone;
-                    contactPhoneRaw = data.contact_phone.replace(/[^0-9]/g, '');
-                    document.getElementById('footer-phone').textContent = '📞 Tel / WhatsApp: ' + data.contact_phone;
-                    document.getElementById('question-phone-link').textContent = data.contact_phone;
-                    document.getElementById('question-phone-link').href = 'tel:+' + contactPhoneRaw;
-                    document.getElementById('question-wa-link').href = 'https://wa.me/' + contactPhoneRaw;
-                    document.getElementById('chat-popup-wa').href = 'https://wa.me/' + contactPhoneRaw;
-                }
-
+                if (data.contact_hours) document.getElementById('top-hours').textContent = '🕒 Godziny: ' + data.contact_hours;
                 if (Array.isArray(data.products)) {
                     allProducts = data.products;
-                   
                     renderCatalog();
                 }
-            } catch (err) {
-                console.error('Błąd ładowania danych:', err);
-            }
+            } catch (e) { console.error(e); }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             loadSiteContent();
-            setTimeout(() => {
-                document.getElementById('chat-popup').classList.add('show');
-            }, 4000);
+            setTimeout(() => document.getElementById('chat-popup').classList.add('show'), 3000);
         });
     </script>
 </body>
