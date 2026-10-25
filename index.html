@@ -1162,6 +1162,7 @@
                 if (data.title) document.getElementById('hero-title').textContent = data.title;
                 if (data.subtitle) document.getElementById('hero-subtitle').textContent = data.subtitle;
                 if (data.hero_bg) {
+             
                     document.getElementById('hero-banner-bg').style.backgroundImage = `url('${data.hero_bg}')`;
                 }
                 if (data.contact_hours) document.getElementById('top-hours').textContent = '🕒 Godziny: ' + data.contact_hours;
@@ -1185,6 +1186,42 @@
             </div>
         </div>
     </footer>
+    let lbImages = [];
+    let lbIndex = 0;
+
+    function openLightboxDirectly() {
+        const activeImg = document.getElementById('modal-main-img');
+        if (activeImg && activeImg.src) {
+            lbImages = [activeImg.src];
+            
+            const galleryThumbnails = document.querySelectorAll('.opbox-sheet img, ._07951_wGB4F, .image-tiles img');
+            if (galleryThumbnails.length > 0) {
+                lbImages = Array.from(galleryThumbnails).map(img => img.src || img.dataset.src).filter(Boolean);
+            }
+            
+            lbIndex = 0;
+            document.getElementById('lightbox-img').src = activeImg.src;
+            document.getElementById('lightbox-modal').classList.add('open');
+        }
+    }
+
+    function closeLightbox(e) {
+        if (e.target.id === 'lightbox-modal') {
+            document.getElementById('lightbox-modal').classList.remove('open');
+        }
+    }
+
+    function closeLightboxDirect() {
+        document.getElementById('lightbox-modal').classList.remove('open');
+    }
+
+    function changeLightboxImg(dir) {
+        if (lbImages.length === 0) return;
+        lbIndex += dir;
+        if (lbIndex < 0) lbIndex = lbImages.length - 1;
+        if (lbIndex >= lbImages.length) lbIndex = 0;
+        document.getElementById('lightbox-img').src = lbImages[lbIndex];
+    }
 </body>
     <!-- Вікно для повноранкового перегляду фото -->
     <div class="lightbox-modal" id="lightbox-modal" onclick="closeLightbox(event)">
