@@ -14,6 +14,8 @@
     <style>
         html, body {
             -webkit-overflow-scrolling: touch;
+            width: 100%;
+            overflow-x: hidden;
         }
 
         #modal-main-img {
@@ -488,7 +490,7 @@
             margin-top: 5px;
         }
 
-        /* --- МОДАЛЬНЕ ВІКНО --- */
+        /* --- СУПЕР-АДАПТИВНЕ МОДАЛЬНЕ ВІКНО --- */
         .product-modal {
             position: fixed;
             inset: 0;
@@ -496,7 +498,7 @@
             z-index: 1000;
             display: none;
             overflow-y: auto;
-            overflow-x: hidden; /* Заборона виходу за межі екрана */
+            overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
             padding: 0;
         }
@@ -513,7 +515,7 @@
             position: relative;
             padding-bottom: 40px;
             margin: 0 auto;
-            overflow-x: hidden; /* Жорстко обрізаємо все, що ширше екрана */
+            overflow-x: hidden;
         }
 
         @media (min-width: 768px) {
@@ -561,11 +563,469 @@
             overflow-x: hidden;
         }
 
-        /* Фікс розриву сітки */
         .modal-main-grid {
             display: grid;
-            grid-template-columns: minmax(0, 100%); /* Не дає сітці розширюватись більше за 100% */
+            grid-template-columns: 100%;
             gap: 20px;
             width: 100%;
+            box-sizing: border-box;
         }
-        @media
+        @media (min-width: 768px) {
+            .modal-main-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 28px;
+            }
+        }
+
+        .gallery-container {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            width: 100%;
+        }
+        .gallery-main-img-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #000;
+        }
+        .gallery-main-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .gallery-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gallery-prev { left: 10px; }
+        .gallery-next { right: 10px; }
+
+        .gallery-thumbs {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            overflow-x: auto;
+            background: var(--bg-soft);
+            -webkit-overflow-scrolling: touch;
+        }
+        .gallery-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .gallery-thumb.active {
+            border-color: var(--accent);
+        }
+        .gallery-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .fabric-section {
+            margin-top: 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            width: 100%;
+        }
+        .fabric-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .fabric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .fabric-img-wrap {
+            aspect-ratio: 1 / 1;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #eee;
+            border: 1px solid var(--border-color);
+        }
+        .fabric-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            word-break: break-word;
+        }
+        .modal-price {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 14px;
+        }
+        .modal-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+            white-space: pre-line;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .btn-primary-action, .btn-phone-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border: none;
+            cursor: pointer;
+            white-space: normal;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .btn-primary-action {
+            background: var(--accent);
+            color: #fff;
+            gap: 10px;
+        }
+        .btn-phone-action {
+            background: #f0ede8;
+            color: var(--text-dark);
+            gap: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            font-size: 15px;
+        }
+
+        .trust-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 22px;
+            overflow: hidden;
+            width: 100%;
+        }
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .trust-item:last-child { border-bottom: none; }
+        .trust-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: #f8eff1;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .accordion-group {
+            border-top: 1px solid var(--border-color);
+            margin-top: 16px;
+        }
+        .accordion-item { border-bottom: 1px solid var(--border-color); }
+        .accordion-header {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 16px 4px;
+            text-align: left;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .accordion-body {
+            display: none;
+            padding: 0 4px 16px;
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .accordion-item.active .accordion-body { display: block; }
+
+        .question-card {
+            background: #efeae2;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .question-card h4 { font-size: 19px; margin-bottom: 6px; }
+        .question-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .question-phone { font-size: 16px; font-weight: 700; color: var(--text-dark); text-decoration: none; }
+        .question-btn { background: var(--accent); color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; text-align: center; }
+
+        .related-section { margin-top: 32px; }
+        .related-title { text-align: center; font-size: 22px; font-weight: 600; margin-bottom: 18px; }
+
+        .chat-widget-popup {
+            position: fixed;
+            bottom: 84px;
+            right: 16px;
+            width: 310px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 18px;
+            z-index: 800;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+        .chat-widget-popup.show { display: block; }
+        .chat-popup-close { position: absolute; top: 12px; right: 14px; background: none; border: none; font-size: 18px; cursor: pointer; }
+        .chat-popup-btn { display: block; width: 100%; text-align: center; background: #d01f58; color: #fff; text-decoration: none; font-weight: 600; padding: 11px; border-radius: 24px; margin-top: 10px; }
+
+        .chat-fab {
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            box-shadow: 0 6px 18px rgba(158, 42, 72, 0.4);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 850;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        footer {
+            background: #f2ece4;
+            border-top: 1px solid var(--border-color);
+            padding: 45px 16px 30px;
+            margin-top: 40px;
+        }
+        .footer-inner { max-width: 1200px; margin: 0 auto; }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 28px; margin-bottom: 35px; }
+        @media (min-width: 768px) { .footer-grid { grid-template-columns: repeat(3, 1fr); } }
+        .footer-col h4 { font-size: 17px; font-weight: 700; margin-bottom: 14px; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 9px; font-size: 14px; color: var(--text-muted); }
+        .footer-col ul li a { color: var(--text-muted); text-decoration: none; }
+        .footer-col ul li a:hover { color: var(--accent); }
+
+        .footer-bottom { text-align: center; font-size: 13px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <span id="top-hours">🕒 Godziny otwarcia: Pon - Pt: 9:00 - 18:00</span>
+    </div>
+
+    <header>
+        <div class="header-inner">
+            <div class="header-left">
+                <button class="icon-btn" onclick="toggleDrawer(true)">☰</button>
+            </div>
+            <a href="#" class="logo" onclick="selectCategory('all'); return false;">
+                SLM24.PL
+                <span>EXCLUSIVE FURNITURE</span>
+            </a>
+            <div class="header-right">
+                <button class="icon-btn" onclick="toggleSearch()">🔍</button>
+                <a href="#footer-contact" class="icon-btn" style="text-decoration:none;">📞</a>
+            </div>
+        </div>
+        <div class="search-bar" id="search-bar">
+            <input type="text" id="search-input" placeholder="Szukaj mebli..." oninput="renderCatalog()">
+        </div>
+    </header>
+
+    <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
+    <aside class="side-drawer" id="side-drawer">
+        <div class="drawer-header">
+            <span>Menu</span>
+            <button class="icon-btn" onclick="toggleDrawer(false)">✕</button>
+        </div>
+        <div class="drawer-section">
+            <div class="drawer-section-title">Kategorie mebli</div>
+            <ul class="drawer-list">
+                <li><a onclick="selectCategory('all')">Wszystkie meble <span>›</span></a></li>
+                <li><a onclick="selectCategory('fotele')">Fotele <span>›</span></a></li>
+                <li><a onclick="selectCategory('narozniki')">Narożniki <span>›</span></a></li>
+                <li><a onclick="selectCategory('sofy')">Sofy <span>›</span></a></li>
+                <li><a onclick="selectCategory('chesterfield')">Meble Chesterfield <span>›</span></a></li>
+                <li><a onclick="selectCategory('anton-pozzo')">Anton i Pozzo <span>›</span></a></li>
+                <li><a onclick="selectCategory('lozka')">Łóżka <span>›</span></a></li>
+                <li><a onclick="selectCategory('tkaniny')">Tkaniny <span>›</span></a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <section class="hero-banner" id="hero-banner-bg">
+        <div class="hero-inner">
+            <div class="breadcrumbs">Strona główna / <strong id="current-cat-label">Kolekcja mebli</strong></div>
+            <h1 id="hero-title">EKSKLUZYWNE MEBLE DLA TWOJEGO DOMU</h1>
+            <p id="hero-subtitle">Kunszt, elegancja i najwyższy komfort.</p>
+        </div>
+    </section>
+
+    <main class="catalog-wrapper">
+        <div class="category-pills">
+            <button class="pill-btn active" data-cat="all" onclick="selectCategory('all')">Wszystkie</button>
+            <button class="pill-btn" data-cat="fotele" onclick="selectCategory('fotele')">Fotele</button>
+            <button class="pill-btn" data-cat="narozniki" onclick="selectCategory('narozniki')">Narożniki</button>
+            <button class="pill-btn" data-cat="sofy" onclick="selectCategory('sofy')">Sofy</button>
+            <button class="pill-btn" data-cat="chesterfield" onclick="selectCategory('chesterfield')">Chesterfield</button>
+            <button class="pill-btn" data-cat="anton-pozzo" onclick="selectCategory('anton-pozzo')">Anton / Pozzo</button>
+            <button class="pill-btn" data-cat="lozka" onclick="selectCategory('lozka')">Łóżka</button>
+            <button class="pill-btn" data-cat="tkaniny" onclick="selectCategory('tkaniny')">Tkaniny</button>
+        </div>
+
+        <div class="toolbar">
+            <div class="product-counter"><strong id="product-count">0</strong> produktów</div>
+            <div class="toolbar-controls">
+                <select class="filter-select" id="category-select" onchange="selectCategory(this.value)">
+                    <option value="all">Wszystkie kategorie</option>
+                    <option value="fotele">Fotele</option>
+                    <option value="narozniki">Narożniki</option>
+                    <option value="sofy">Sofy</option>
+                    <option value="chesterfield">Chesterfield</option>
+                    <option value="anton-pozzo">Anton / Pozzo</option>
+                    <option value="lozka">Łóżka</option>
+                    <option value="tkaniny">Tkaniny</option>
+                </select>
+                <select class="filter-select" id="sort-select" onchange="renderCatalog()">
+                    <option value="default">Sortuj: Domyślne</option>
+                    <option value="price-asc">Cena: od najniższej</option>
+                    <option value="price-desc">Cena: od najwyższej</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="product-grid" id="product-list"></div>
+    </main>
+
+    <div class="product-modal" id="product-modal">
+        <div class="modal-content">
+            <div class="modal-top-bar">
+                <span>Szczegóły produktu</span>
+                <button class="close-modal-btn" onclick="closeProductModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-main-grid">
+                    <div>
+                        <div class="gallery-container">
+                            <div class="gallery-main-img-wrap">
+                                <img id="modal-main-img" src="" alt="Meble">
+                                <button class="gallery-nav-btn gallery-prev" onclick="changeImage(-1)">‹</button>
+                                <button class="gallery-nav-btn gallery-next" onclick="changeImage(1)">›</button>
+                            </div>
+                            <div class="gallery-thumbs" id="gallery-thumbs"></div>
+                        </div>
+
+                        <div class="fabric-section" id="fabric-section" style="display:none;">
+                            <div class="fabric-title">Warianty tkanin (Do wyboru):</div>
+                            <div class="fabric-grid" id="fabric-grid"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="modal-title" id="modal-title"></h2>
+                        <div class="modal-price" id="modal-price"></div>
+                        <p class="modal-desc" id="modal-desc"></p>
+
+                        <a id="modal-wa-btn" href="#" target="_blank" class="btn-primary-action">💬 Zapytaj o cenę na WhatsApp</a>
+                        <a id="modal-phone-btn" href="tel:+48666688298" class="btn-phone-action">📞 Zadzwoń: <span id="modal-phone-text">+48 666 688 298</span></a>
+
+                        <div class="trust-box">
+                            <div class="trust-item"><div class="trust-icon">🚚</div><div><strong>Dostawa w całej Polsce</strong><span>Bezpieczny transport</span></div></div>
+                            <div class="trust-item"><div class="trust-icon">🛡️</div><div><strong>24 miesiące gwarancji</strong><span>Gwarancja producenta</span></div></div>
+                        </div>
+
+                        <div class="accordion-group">
+                            <div class="accordion-item">
+                                <button class="accordion-header" onclick="toggleAccordion(this)"><span>Tkaniny i kolory</span> <span>⌄</span></button>
+                                <div class="accordion-body">Oferujemy szeroki wybór tkanin premium. Pomagamy dobrać idealny kolor przez WhatsApp. Wymagane podanie nazwy tkaniny przy składaniu zamówienia.</div>
+                            </div>
+                        </div>
+
+                        <div class="question-card">
+                            <h4>Masz pytania?</h4>
+                            <p>Zadzwoń do nas lub napisz na WhatsApp.</p>
+                            <div class="question-actions">
+                                <a id="question-phone-link" href="tel:+48666688298" class="question-phone">+48 666 688 298</a>
+                                <a id="question-wa-link" href="https://wa.me/48666688298" target="_blank" class="question-btn">Zadaj pytanie</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-widget-popup" id="chat-popup">
+        <button class="chat-popup-close" onclick="document.getElementById('chat-popup').classList.remove('show')">✕</button>
+        <div class="chat-popup-text"><strong>Witaj! 👋</strong><br>Masz pytania? Chętnie odpowiemy!</div>
+        <a id="chat-popup-wa" href="https://wa.me/48666688298" target="_blank" class="chat-popup-btn">Rozpocznij rozmowę</a>
+    </div>
+    <button class="chat-fab" onclick="document.getElementById('chat-popup').classList.toggle('show')">💬</button>
+
+   <footer>
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Obsługa klienta</h4>
+                    <ul>
+                        <li>Dostawa w całej Polsce</li>
+                        <li>24 miesiące gwarancji</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Informacje prawne</h4>
+                    <ul>
+                        <li><a href="regulamin.html">Regulamin sklepu</a></li>
+                        <li><a href="polityka-prywatnosci.html">Polityka prywatności</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col" id="footer-contact">
+                    <h4>Kontakt</h4>
+                    <ul>
+                        <li id="footer-address">📍 Leśna 11</li>
+                        <li id="footer-hours">🕒 Pn-Pt: 9:00 - 18:00</li>
+                        <li id="footer-
