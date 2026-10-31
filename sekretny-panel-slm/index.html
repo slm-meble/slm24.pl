@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -48,7 +47,7 @@
         .btn-secondary { background: #6e6a64; }
         textarea {
             width: 100%;
-            height: 180px;
+            height: 160px;
             font-family: monospace;
             padding: 10px;
             border: 1px solid var(--border-color);
@@ -63,24 +62,24 @@
 <body>
 
     <h1>⚙️ Panel Zarządzania SLM24.PL</h1>
-    <p>Witaj w ukrytym panelu administracyjnym. Tutaj możesz zarządzać treścią i zdjęciami swojego sklepu.</p>
+    <p>Witaj w ukrytym panelu administracyjnym. Stąd masz szybki dostęp do edycji ogłoszeń i zdjęć.</p>
 
     <div class="admin-card">
         <h2>1. Zarządzanie zdjęciami</h2>
         <p>Przesyłaj nowe zdjęcia mebli lub próbek tkanin bezpośrednio do folderu <b>images</b> na GitHubie.</p>
-        <a href="https://github.com/slm-meble/slm24.pl/upload/main/images" target="_blank" class="btn">📁 Otwórz folder Zdjęć (GitHub)</a>
+        <a href="https://github.com/slm-meble/slm24.pl/upload/main/images" target="_blank" class="btn">📁 Otwórz folder Zdjęć</a>
     </div>
 
     <div class="admin-card">
         <h2>2. Edycja produktów i cen</h2>
-        <p>Wszystkie produkty są zapisane w pliku <b>content/home.json</b>. Możesz edytować go jednym kliknięciem:</p>
-        <a href="https://github.com/slm-meble/slm24.pl/edit/main/content/home.json" target="_blank" class="btn">✏️ Edytuj plik home.json na GitHubie</a>
-        <a href="/" class="btn btn-secondary" target="_blank">🌐 Zobacz Stronę Główną</a>
+        <p>Wszystkie produkty sklepu zapisane są w pliku <b>content/home.json</b>. Kliknij poniżej, aby edytować:</p>
+        <a href="https://github.com/slm-meble/slm24.pl/edit/main/content/home.json" target="_blank" class="btn">✏️ Edytuj plik home.json</a>
+        <a href="/" class="btn btn-secondary" target="_blank">🌐 Przejdź do Sklepu</a>
     </div>
 
     <div class="admin-card">
-        <h2>3. Szablon nowego mebla (Skopiuj do dodania)</h2>
-        <p>Gdy chcesz dodać nowe ogłoszenie, skopiuj ten blok kodu, wklej go do pliku <code>home.json</code> (pamiętaj o przecinku między produktami) i wpisz swoje dane:</p>
+        <h2>3. Szablon nowego mebla</h2>
+        <p>Skopiuj ten gotowy blok kodu, wklej go do pliku <code>home.json</code> (pamiętaj o przecinku między produktami) i uzupełnij swoimi danymi:</p>
         <textarea readonly>
     {
       "title": "Nazwa Twojego mebla",
@@ -93,17 +92,6 @@
       "fabric_images": ""
     }
         </textarea>
-    </div>
-
-    <div class="admin-card">
-        <h2>📖 Instrukcja krok po kroku:</h2>
-        <ol class="step-list">
-            <li>Wejdź w folder <b>images</b> і завантаж туди нове фото меблів.</li>
-            <li>Скопіюйте назву завантаженого файлу (наприклад, <i>images/fotel-zielony.jpg</i>).</li>
-            <li>Натисніть кнопку <b>"Edytuj plik home.json"</b> вище.</li>
-            <li>Додайте новий товар за шаблоном, підставивши свою назву, ціну та посилання на фото.</li>
-            <li>Натисніть зелену кнопку <b>Commit changes</b> — і за 10 секунд товар з'явиться на сайті!</li>
-        </ol>
     </div>
 
 </body>
