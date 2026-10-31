@@ -4,10 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SLM24.pl - Ekskluzywne Meble</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Ekskluzywne meble tapicerowane od producenta. Narożniki, sofy, fotele Chesterfield. Wysoka jakość, dostawa w całej Polsce.">
+    <meta name="keywords" content="meble tapicerowane, narożniki, sofy Chesterfield, meble od producenta, Polska">
+    <meta property="og:title" content="SLM24 - Ekskluzywne Meble">
+    <meta property="og:description" content="Kunszt, elegancja i najwyższy komfort dla Twojego domu.">
+    
     <style>
+        /* Виправлення проблеми зі скролом на мобільних */
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
         #modal-main-img {
-    cursor: pointer;
-}
+            cursor: pointer;
+        }
         /* Стилі для відкриття фото на весь екран (Lightbox) */
         .lightbox-modal {
             position: fixed;
@@ -203,6 +217,7 @@
             transform: translateX(-100%);
             transition: transform 0.3s ease;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Mobile scroll fix */
             display: flex;
             flex-direction: column;
         }
@@ -250,7 +265,6 @@
             color: var(--accent);
         }
 
-        /* Головний банер з можливістю зміни фону */
         .hero-banner {
             background-size: cover;
             background-position: center;
@@ -264,7 +278,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(250, 248, 245, 0.30); /* легке затемнення для читабельності тексту */
+            background: rgba(250, 248, 245, 0.30);
             z-index: 1;
         }
         .hero-inner {
@@ -342,6 +356,7 @@
             display: flex;
             gap: 8px;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             padding-bottom: 14px;
             margin-bottom: 10px;
             scrollbar-width: none;
@@ -454,6 +469,7 @@
             gap: 8px;
             margin-top: auto;
             padding-top: 6px;
+            flex-wrap: wrap;
         }
 
         .card-price {
@@ -471,9 +487,11 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
+            width: 100%;
+            margin-top: 5px;
         }
 
-        /* Галерея у модальному вікні з гортанням */
+        /* Галерея у модальному вікні */
         .product-modal {
             position: fixed;
             inset: 0;
@@ -483,6 +501,7 @@
             align-items: flex-start;
             justify-content: center;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Mobile scroll fix */
         }
         .product-modal.open {
             display: flex;
@@ -546,7 +565,6 @@
             }
         }
 
-        /* Слайдер галереї */
         .gallery-container {
             background: var(--bg-card);
             border-radius: 12px;
@@ -589,6 +607,7 @@
             padding: 10px;
             overflow-x: auto;
             background: var(--bg-soft);
+            -webkit-overflow-scrolling: touch;
         }
         .gallery-thumb {
             width: 60px;
@@ -608,7 +627,6 @@
             object-fit: cover;
         }
 
-        /* Блок тканин на 3 фотографії */
         .fabric-section {
             margin-top: 15px;
             background: var(--bg-card);
@@ -807,16 +825,14 @@
         }
         .footer-inner { max-width: 1200px; margin: 0 auto; }
         .footer-grid { display: grid; grid-template-columns: 1fr; gap: 28px; margin-bottom: 35px; }
-        @media (min-width: 768px) { .footer-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 768px) { .footer-grid { grid-template-columns: repeat(3, 1fr); } }
         .footer-col h4 { font-size: 17px; font-weight: 700; margin-bottom: 14px; }
         .footer-col ul { list-style: none; }
         .footer-col ul li { margin-bottom: 9px; font-size: 14px; color: var(--text-muted); }
         .footer-col ul li a { color: var(--text-muted); text-decoration: none; }
+        .footer-col ul li a:hover { color: var(--accent); }
 
-        .payment-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 20px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
-        .pay-badge { background: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: 5px 11px; font-size: 12px; font-weight: 800; }
-        .footer-bottom { text-align: center; font-size: 13px; color: var(--text-muted); }
-        .admin-link { display: inline-block; margin-top: 10px; color: var(--text-muted); text-decoration: none; font-size: 12px; }
+        .footer-bottom { text-align: center; font-size: 13px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 20px; }
     </style>
 </head>
 <body>
@@ -865,7 +881,6 @@
         </div>
     </aside>
 
-    <!-- Головний банер (фон міняється динамічно) -->
     <section class="hero-banner" id="hero-banner-bg">
         <div class="hero-inner">
             <div class="breadcrumbs">Strona główna / <strong id="current-cat-label">Kolekcja mebli</strong></div>
@@ -910,7 +925,6 @@
         <div class="product-grid" id="product-list"></div>
     </main>
 
-    <!-- Модальне вікно з галереєю на 10 фото та тканинами -->
     <div class="product-modal" id="product-modal">
         <div class="modal-content">
             <div class="modal-top-bar">
@@ -920,7 +934,6 @@
             <div class="modal-body">
                 <div class="modal-main-grid">
                     <div>
-                        <!-- Галерея фото -->
                         <div class="gallery-container">
                             <div class="gallery-main-img-wrap">
                                 <img id="modal-main-img" src="" alt="Meble">
@@ -930,7 +943,6 @@
                             <div class="gallery-thumbs" id="gallery-thumbs"></div>
                         </div>
 
-                        <!-- Блок тканин на 3 фото -->
                         <div class="fabric-section" id="fabric-section" style="display:none;">
                             <div class="fabric-title">Warianty tkanin (Do wyboru):</div>
                             <div class="fabric-grid" id="fabric-grid"></div>
@@ -942,7 +954,7 @@
                         <div class="modal-price" id="modal-price"></div>
                         <p class="modal-desc" id="modal-desc"></p>
 
-                        <a id="modal-wa-btn" href="#" target="_blank" class="btn-primary-action">🛒 Zamów / Zapytaj na WhatsApp</a>
+                        <a id="modal-wa-btn" href="#" target="_blank" class="btn-primary-action">💬 Zapytaj o cenę na WhatsApp</a>
                         <a id="modal-phone-btn" href="tel:+48666688298" class="btn-phone-action">📞 Zadzwoń: <span id="modal-phone-text">+48 666 688 298</span></a>
 
                         <div class="trust-box">
@@ -953,7 +965,7 @@
                         <div class="accordion-group">
                             <div class="accordion-item">
                                 <button class="accordion-header" onclick="toggleAccordion(this)"><span>Tkaniny i kolory</span> <span>⌄</span></button>
-                                <div class="accordion-body">Oferujemy szeroki wybór tkanin premium. Pomagamy dobrać idealny kolor!</div>
+                                <div class="accordion-body">Oferujemy szeroki wybór tkanin premium. Pomagamy dobrać idealny kolor przez WhatsApp. Wymagane podanie nazwy tkaniny przy składaniu zamówienia.</div>
                             </div>
                         </div>
 
@@ -966,11 +978,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="related-section">
-                    <h3 class="related-title">Zobacz również</h3>
-                    <div class="product-grid" id="related-list"></div>
                 </div>
             </div>
         </div>
@@ -986,17 +993,36 @@
    <footer>
         <div class="footer-inner">
             <div class="footer-grid">
-                <div class="footer-col"><h4>Obsługa klienta</h4><ul><li>Dostawa w całej Polsce</li><li>24 miesiące gwarancji</li></ul></div>
-                <div class="footer-col" id="footer-contact"><h4>Kontakt</h4><ul><li id="footer-address">📍 Leśna 11</li><li id="footer-hours">🕒 Pn-Pt: 9:00 - 18:00</li><li id="footer-phone">📞 +48 666 688 298</li></ul></div>
+                <div class="footer-col">
+                    <h4>Obsługa klienta</h4>
+                    <ul>
+                        <li>Dostawa w całej Polsce</li>
+                        <li>24 miesiące gwarancji</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Informacje prawne</h4>
+                    <ul>
+                        <li><a href="regulamin.html">Regulamin sklepu</a></li>
+                        <li><a href="polityka-prywatnosci.html">Polityka prywatności</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col" id="footer-contact">
+                    <h4>Kontakt</h4>
+                    <ul>
+                        <li id="footer-address">📍 Leśna 11</li>
+                        <li id="footer-hours">🕒 Pn-Pt: 9:00 - 18:00</li>
+                        <li id="footer-phone">📞 +48 666 688 298</li>
+                    </ul>
+                </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 SLM24.PL. Wszelkie prawa zastrzeżone.</p>
-                <a href="/admin/" class="admin-link">⚙️ Panel Administracyjny</a>
+                <!-- Зашифрований вхід в адмінку -->
+                <p id="secret-admin-trigger" onclick="triggerAdmin()" style="cursor:default; user-select:none;">&copy; 2026 SLM24.PL. Wszelkie prawa zastrzeżone.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Вікно для повноранкового перегляду фото -->
     <div class="lightbox-modal" id="lightbox-modal" onclick="closeLightbox(event)">
         <div class="lightbox-content" onclick="event.stopPropagation()">
             <button class="lightbox-close" onclick="closeLightboxDirect()">✕</button>
@@ -1088,8 +1114,8 @@
                             <div class="card-desc">${item.description || ''}</div>
                             <div class="card-footer">
                                 <div class="card-price">${item.price || ''}</div>
-                                <button class="card-order-btn">🛒</button>
                             </div>
+                            <button class="card-order-btn">💬 Zapytaj o cenę</button>
                         </div>
                     </div>
                 `;
@@ -1104,6 +1130,11 @@
             currentModalImages = rawImgs.split(',').map(s => s.trim()).filter(Boolean);
             if (currentModalImages.length === 0) currentModalImages = [''];
             currentImageIndex = 0;
+
+            const title = item.name || item.title || '';
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-price').textContent = item.price || '';
+            document.getElementById('modal-desc').textContent = item.description || '';
 
             updateGalleryView();
 
@@ -1123,12 +1154,7 @@
                 window.currentFabricImages = [];
             }
 
-            const title = item.name || item.title || '';
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-price').textContent = item.price || '';
-            document.getElementById('modal-desc').textContent = item.description || '';
-
-            const msg = encodeURIComponent(`Dzień dobry! Chcę zapytać o mebel: ${title} (${item.price || ''})`);
+            const msg = encodeURIComponent(`Dzień dobry! Chcę zapytać o mebel: ${title} (${item.price || ''}). Interesuje mnie dobór tkaniny i czas realizacji.`);
             document.getElementById('modal-wa-btn').href = `https://wa.me/${contactPhoneRaw}?text=${msg}`;
 
             const modal = document.getElementById('product-modal');
@@ -1139,11 +1165,12 @@
         function updateGalleryView() {
             const mainImg = document.getElementById('modal-main-img');
             mainImg.src = currentModalImages[currentImageIndex] || '';
+            mainImg.alt = "Zdjęcie " + (currentImageIndex + 1) + " - " + document.getElementById('modal-title').textContent;
 
             const thumbsContainer = document.getElementById('gallery-thumbs');
             thumbsContainer.innerHTML = currentModalImages.map((img, i) => `
                 <div class="gallery-thumb ${i === currentImageIndex ? 'active' : ''}" onclick="setGalleryIndex(${i})">
-                    <img src="${img}" alt="Thumb">
+                    <img src="${img}" alt="Miniatura ${i+1}">
                 </div>
             `).join('');
         }
@@ -1174,6 +1201,7 @@
                 lbImages = currentModalImages;
                 lbIndex = currentImageIndex;
                 document.getElementById('lightbox-img').src = lbImages[lbIndex];
+                document.getElementById('lightbox-img').alt = document.getElementById('modal-title').textContent;
                 document.getElementById('lightbox-modal').classList.add('open');
             }
         }
@@ -1222,6 +1250,18 @@
                     renderCatalog();
                 }
             } catch (e) { console.error(e); }
+        }
+
+        // --- Зашифрований вхід в Адмінку ---
+        let secretClicks = 0;
+        let secretTimer = null;
+        function triggerAdmin() {
+            secretClicks++;
+            if (secretClicks >= 3) {
+                window.location.href = '/sekretny-panel-slm/'; // Твоє приховане посилання
+            }
+            clearTimeout(secretTimer);
+            secretTimer = setTimeout(() => { secretClicks = 0; }, 1500);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
