@@ -14,6 +14,8 @@
             --accent-hover: #7d1e37;
             --green: #2e7d32;
             --green-hover: #1b5e20;
+            --ai-purple: #6b21a8;
+            --ai-purple-hover: #581c87;
             --border: #e0d9ce;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -71,7 +73,7 @@
             border-radius: 8px; font-size: 15px; background: #fff;
         }
         .form-control:focus { border-color: var(--accent); outline: none; }
-        textarea.form-control { min-height: 160px; resize: vertical; line-height: 1.5; }
+        textarea.form-control { min-height: 170px; resize: vertical; line-height: 1.5; }
 
         .btn {
             background: var(--accent); color: #fff; border: none; padding: 12px 20px;
@@ -82,6 +84,8 @@
         .btn:hover { background: var(--accent-hover); }
         .btn-green { background: var(--green); }
         .btn-green:hover { background: var(--green-hover); }
+        .btn-ai { background: var(--ai-purple); color: #fff; padding: 8px 14px; font-size: 13px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-ai:hover { background: var(--ai-purple-hover); }
         .btn-gray { background: #6e6a64; }
         .btn-full { width: 100%; }
 
@@ -122,6 +126,10 @@
             border-radius: 10px; text-align: center; font-weight: 600;
             box-shadow: 0 8px 25px rgba(0,0,0,0.25); display: none; z-index: 9999;
         }
+        .desc-header {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 8px; margin-bottom: 6px;
+        }
     </style>
 </head>
 <body>
@@ -141,19 +149,30 @@
     <div class="screen" id="mainScreen">
         <header>
             <h1>⚙️ Zarządzanie Sklepem SLM24</h1>
-            <div style="display:flex; gap:8px;">
-                <button class="btn btn-gray" style="padding:8px 14px; font-size:13px;" onclick="toggleTokenBox()">🔑 Klucz GitHub</button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-gray" style="padding:8px 14px; font-size:13px;" onclick="toggleBox('tokenBox')">🔑 Klucz GitHub</button>
+                <button class="btn" style="background:var(--ai-purple); padding:8px 14px; font-size:13px;" onclick="toggleBox('geminiBox')">🤖 Klucz Gemini AI</button>
                 <a href="/" target="_blank" class="btn" style="padding:8px 14px; font-size:13px;">🌐 Zobacz sklep</a>
             </div>
         </header>
 
-        <!-- Налаштування ключа GitHub (показується якщо ключа ще немає) -->
+        <!-- Налаштування ключа GitHub -->
         <div class="card" id="tokenBox" style="display:none; background:#fff8e6; border-color:#ffd54f;">
             <h3>🔑 Połączenie z serwerem GitHub (jednorazowo)</h3>
-            <p style="font-size:13px; color:#555; margin-bottom:10px;">Wklej tutaj swój klucz (Personal Access Token z GitHuba zaczynający się od <b>ghp_...</b>), aby panel mógł sam wgrywać zdjęcia z telefonu i zapisywać ogłoszenia jednym kliknięciem:</p>
+            <p style="font-size:13px; color:#555; margin-bottom:10px;">Klucz Personal Access Token z GitHuba (zaczynający się od <b>ghp_...</b>):</p>
             <div style="display:flex; gap:10px;">
                 <input type="password" id="ghTokenInput" class="form-control" style="margin:0;">
-                <button class="btn btn-green" onclick="saveToken()">Zapisz klucz</button>
+                <button class="btn btn-green" onclick="saveToken()">Zapisz</button>
+            </div>
+        </div>
+
+        <!-- Налаштування ключа Gemini AI -->
+        <div class="card" id="geminiBox" style="display:none; background:#f3e8ff; border-color:#d8b4fe;">
+            <h3 style="color:var(--ai-purple);">🤖 Klucz sztucznej inteligencji Gemini (jednorazowo)</h3>
+            <p style="font-size:13px; color:#555; margin-bottom:10px;">Wklej tutaj darmowy klucz API Gemini ze strony <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ai-purple); font-weight:bold;">aistudio.google.com/apikey</a> (zaczyna się od <b>AIzaSy...</b>):</p>
+            <div style="display:flex; gap:10px;">
+                <input type="password" id="geminiKeyInput" class="form-control" style="margin:0;">
+                <button class="btn" style="background:var(--ai-purple);" onclick="saveGeminiKey()">Zapisz klucz AI</button>
             </div>
         </div>
 
@@ -205,8 +224,12 @@
                 <div class="photo-list" id="photoPreviewList"></div>
             </div>
 
+            <!-- БЛОК ОПИСУ З КНОПКОЮ GEMINI AI -->
             <div class="form-group">
-                <label>Opis przedmiotu (nieograniczona ilość tekstu)</label>
+                <div class="desc-header">
+                    <label style="margin:0;">Opis przedmiotu (wpisz krótkie notatki po ukraińsku lub polsku i kliknij przycisk AI 👉)</label>
+                    <button type="button" class="btn-ai" id="aiBtn" onclick="generateDescriptionWithAI()">✨ Ulepsz / Napisz opis z Gemini AI</button>
+                </div>
                 <textarea id="fDesc" class="form-control"></textarea>
             </div>
 
@@ -229,23 +252,22 @@
     <div class="status-bar" id="statusBar"></div>
 
     <script>
-        // НАЛАШТУВАННЯ
-        const ADMIN_PIN = "1234"; // Твій ПІН-код для входу
+        const ADMIN_PIN = "1234";
         const REPO_OWNER = "slm-meble";
         const REPO_NAME = "slm24.pl";
         const JSON_PATH = "content/home.json";
 
         let catalogData = { products: [] };
-        let currentPhotos = []; // масив шляхів типу "images/plik.jpg"
-        let homeJsonSha = ""; // потрібен для перезапису файлу на GitHub
+        let currentPhotos = [];
+        let homeJsonSha = "";
 
-        // 1. Перевірка PIN
+        // 1. Вхід за PIN
         function loginPin() {
             const val = document.getElementById('pinInput').value.trim();
             if (val === ADMIN_PIN) {
                 document.getElementById('pinScreen').classList.remove('active');
                 document.getElementById('mainScreen').classList.add('active');
-                checkToken();
+                initKeys();
                 syncWithGitHub();
             } else {
                 document.getElementById('pinErr').style.display = 'block';
@@ -255,26 +277,38 @@
             if (e.key === 'Enter') loginPin();
         });
 
-        // 2. Робота з Токеном GitHub
+        // 2. Керування ключами GitHub та Gemini
         function getToken() { return localStorage.getItem('slm_gh_token') || ''; }
-        function checkToken() {
-            const t = getToken();
-            document.getElementById('ghTokenInput').value = t;
-            if (!t) {
-                document.getElementById('tokenBox').style.display = 'block';
-            }
+        function getGeminiKey() { return localStorage.getItem('slm_gemini_key') || ''; }
+
+        function initKeys() {
+            const gh = getToken();
+            const gem = getGeminiKey();
+            document.getElementById('ghTokenInput').value = gh;
+            document.getElementById('geminiKeyInput').value = gem;
+            if (!gh) document.getElementById('tokenBox').style.display = 'block';
         }
-        function toggleTokenBox() {
-            const box = document.getElementById('tokenBox');
+
+        function toggleBox(id) {
+            const box = document.getElementById(id);
             box.style.display = box.style.display === 'none' ? 'block' : 'none';
         }
+
         function saveToken() {
             const val = document.getElementById('ghTokenInput').value.trim();
-            if (!val) return alert('Wpisz klucz!');
+            if (!val) return alert('Wpisz klucz GitHub!');
             localStorage.setItem('slm_gh_token', val);
             document.getElementById('tokenBox').style.display = 'none';
-            showStatus('✅ Klucz zapisany w pamięci przeglądarki!', 3000);
+            showStatus('✅ Klucz GitHub zapisany!', 3000);
             syncWithGitHub();
+        }
+
+        function saveGeminiKey() {
+            const val = document.getElementById('geminiKeyInput').value.trim();
+            if (!val) return alert('Wpisz klucz Gemini AI!');
+            localStorage.setItem('slm_gemini_key', val);
+            document.getElementById('geminiBox').style.display = 'none';
+            showStatus('🤖 Klucz Gemini AI zapisany! Możesz teraz generować opisy.', 3500);
         }
 
         function showStatus(msg, autoHide = 0) {
@@ -286,7 +320,76 @@
             }
         }
 
-        // 3. Завантаження актуального списку товарів
+        // 3. ГЕНЕРАЦІЯ ТА ПОКРАЩЕННЯ ОПИСУ ЧЕРЕЗ GEMINI AI
+        async function generateDescriptionWithAI() {
+            const apiKey = getGeminiKey();
+            if (!apiKey) {
+                alert('Najpierw wklej darmowy klucz Gemini AI (kliknij fioletowy przycisk "🤖 Klucz Gemini AI" na górze ekranu)!');
+                document.getElementById('geminiBox').style.display = 'block';
+                return;
+            }
+
+            const name = document.getElementById('fName').value.trim();
+            const cat = document.getElementById('fCat').value;
+            const price = document.getElementById('fPrice').value.trim();
+            const rawDesc = document.getElementById('fDesc').value.trim();
+
+            if (!name && !rawDesc) {
+                alert('Wpisz chociaż nazwę mebla lub kilka słów w polu opisu (może być po ukraińsku lub polsku), aby sztuczna inteligencja wiedziała, o czym pisać!');
+                return;
+            }
+
+            const aiBtn = document.getElementById('aiBtn');
+            const origText = aiBtn.innerHTML;
+            aiBtn.disabled = true;
+            aiBtn.innerHTML = '⏳ Gemini pisze tekst...';
+            showStatus('✨ Sztuczna inteligencja Gemini tworzy profesjonalny opis...');
+
+            const promptText = `Jesteś profesjonalnym copywriterem polskiego sklepu meblowego SLM24.pl (sprzedaż foteli, sof, narożników, łóżek i mebli Chesterfield).
+Twoim zadaniem jest napisać lub ulepszyć opis produktu w języku polskim, tak aby zachęcał klienta do zakupu, był czytelny, elegancki i dobrze sformatowany.
+Uwaga: Notatki od właściciela mogą być napisane po ukraińsku, po polsku lub z błędami — przetłumacz je i przekształć w piękny polski tekst sprzedażowy. Nie wymyślaj dokładnych wymiarów w centymetrach, jeśli nie podano ich w notatkach.
+
+Dane produktu:
+- Nazwa mebla: ${name || 'Mebel tapicerowany'}
+- Kategoria: ${cat}
+- Cena: ${price || 'do ustalenia'}
+- Notatki / dotychczasowy opis od właściciela: ${rawDesc || 'Brak dodatkowych notatek — napisz atrakcyjny opis na podstawie nazwy i kategorii.'}
+
+Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto propozycja opisu" i bez gwiazdek Markdown **). Użyj ładnych akapitów oraz wypunktowań (np. z myślnikami lub dyskretnymi emotikonami ✔), podkreśl komfort, wysoką jakość wykonania oraz możliwość personalizacji tkaniny.`;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Błąd API Gemini');
+                }
+
+                const data = await response.json();
+                const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (generatedText) {
+                    document.getElementById('fDesc').value = generatedText.trim();
+                    showStatus('✨ Gotowe! Opis został napisany i wstawiony.', 3500);
+                } else {
+                    throw new Error('Pusta odpowiedź AI');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Nie udało się wygenerować tekstu. Sprawdź, czy poprawnie skopiowałeś klucz Gemini AI.');
+                showStatus('❌ Błąd generowania opisu AI', 3000);
+            } finally {
+                aiBtn.disabled = false;
+                aiBtn.innerHTML = origText;
+            }
+        }
+
+        // 4. Завантаження актуального списку товарів з GitHub
         async function syncWithGitHub() {
             showStatus('⏳ Pobieranie aktualnych ogłoszeń...');
             try {
@@ -301,7 +404,6 @@
                     const decoded = new TextDecoder('utf-8').decode(Uint8Array.from(atob(data.content), c => c.charCodeAt(0)));
                     catalogData = JSON.parse(decoded);
                 } else {
-                    // Резервне завантаження напряму з сайту
                     const directRes = await fetch(`/${JSON_PATH}?v=${Date.now()}`);
                     catalogData = await directRes.json();
                 }
@@ -315,7 +417,7 @@
             }
         }
 
-        // 4. Відображення списку товарів з кнопками Edytuj, Закріпити (📌), Usuń
+        // 5. Відображення списку товарів
         function renderProductsList() {
             const container = document.getElementById('productsContainer');
             document.getElementById('countBadge').textContent = catalogData.products.length;
@@ -352,14 +454,14 @@
             }).join('');
         }
 
-        // 5. Стиснення фото у браузері та пряма відправка в папку images/ на GitHub
+        // 6. Стиснення та відправка фото
         async function handlePhotoUpload(event) {
             const files = Array.from(event.target.files);
             if (!files.length) return;
 
             const token = getToken();
             if (!token) {
-                alert('Najpierw wklej swój Klucz GitHub (przycisk "🔑 Klucz GitHub" u góry), aby móc automatycznie wgrywać zdjęcia z telefonu!');
+                alert('Najpierw wklej swój Klucz GitHub (przycisk "🔑 Klucz GitHub" u góry)!');
                 document.getElementById('tokenBox').style.display = 'block';
                 return;
             }
@@ -385,12 +487,12 @@
                         })
                     });
 
-                    if (!res.ok) throw new Error('Błąd wysyłania zdjęcia na GitHub');
+                    if (!res.ok) throw new Error('Błąd wysyłania zdjęcia');
                     currentPhotos.push(filePath);
                     renderPhotoPreviews();
                 } catch (err) {
                     console.error(err);
-                    alert('Błąd podczas wysyłania zdjęcia nr ' + (i + 1) + '. Sprawdź klucz GitHub.');
+                    alert('Błąd podczas wysyłania zdjęcia nr ' + (i + 1));
                 }
             }
             event.target.value = '';
@@ -406,7 +508,7 @@
                     img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_DIM = 1200; // Оптимальний розмір для швидкого сайту
+                        const MAX_DIM = 1200;
                         let w = img.width;
                         let h = img.height;
 
@@ -440,7 +542,7 @@
             renderPhotoPreviews();
         }
 
-        // 6. Збереження нового або відредагованого товару
+        // 7. Збереження товару
         async function saveProductToList() {
             const name = document.getElementById('fName').value.trim();
             const price = document.getElementById('fPrice').value.trim();
@@ -482,7 +584,6 @@
             }
         }
 
-        // 7. Редагування існуючого оголошення
         function startEditProduct(idx) {
             const p = catalogData.products[idx];
             document.getElementById('editIdx').value = idx;
@@ -501,7 +602,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 8. Закріплення на горі та видалення
         async function pinToTop(idx) {
             const item = catalogData.products.splice(idx, 1)[0];
             catalogData.products.unshift(item);
@@ -529,18 +629,16 @@
             document.getElementById('cancelEditBtn').style.display = 'none';
         }
 
-        // 9. Автоматичний запис home.json на сервер GitHub
         async function pushJsonToGitHub(commitMsg) {
             const token = getToken();
             if (!token) {
-                alert('Wklej najpierw swój Klucz GitHub (przycisk "🔑 Klucz GitHub" na górze), aby zapisać zmiany automatycznie!');
+                alert('Wklej najpierw swój Klucz GitHub!');
                 document.getElementById('tokenBox').style.display = 'block';
                 return false;
             }
 
             showStatus('⏳ Zapisywanie zmian na serwerze GitHub...');
             try {
-                // Отримуємо актуальний SHA перед записом, щоб ніколи не було конфліктів
                 const getRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${JSON_PATH}?t=${Date.now()}`, {
                     headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
                 });
@@ -579,7 +677,7 @@
                 return true;
             } catch (err) {
                 console.error(err);
-                alert('Wystąpił błąd podczas zapisywania na GitHub. Sprawdź czy Twój klucz GitHub ma uprawnienia "repo".');
+                alert('Wystąpił błąd podczas zapisywania na GitHub.');
                 showStatus('❌ Błąd zapisu', 3000);
                 return false;
             }
