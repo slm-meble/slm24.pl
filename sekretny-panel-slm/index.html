@@ -73,7 +73,6 @@
 </head>
 <body>
 
-    <!-- ЕКРАН ВХОДУ З ПІН-КОДОМ -->
     <div class="login-box active" id="loginBox">
         <div class="login-card">
             <h2>🔒 Podaj PIN</h2>
@@ -84,7 +83,6 @@
         </div>
     </div>
 
-    <!-- АДМІН-ПАНЕЛЬ -->
     <div class="admin-panel" id="adminPanel">
         <header>
             <h1>⚙️ Panel Zarządzania SLM24</h1>
@@ -97,7 +95,7 @@
             
             <div class="form-group">
                 <label>Nazwa mebla:</label>
-                <input type="text" id="newName" class="form-control" placeholder="">
+                <input type="text" id="newName" class="form-control" value="">
             </div>
             <div class="form-group">
                 <label>Kategoria:</label>
@@ -112,12 +110,11 @@
             </div>
             <div class="form-group">
                 <label>Cena (np. 950.00 zł):</label>
-                <input type="text" id="newPrice" class="form-control" placeholder="">
+                <input type="text" id="newPrice" class="form-control" value="">
             </div>
             
-            <!-- НЕОБМЕЖЕНА КІЛЬКІСТЬ ФОТОГРАФІЙ -->
             <div class="form-group">
-                <label>Wybierz zdjęcia (możesz zaznaczyć od razu kilka z galerii):</label>
+                <label>Wybierz zdjęcia (nieograniczona ilość):</label>
                 <input type="file" id="imageFiles" class="form-control" accept="image/*" multiple onchange="compressMultipleImages(event)">
                 <input type="hidden" id="newImgs">
             </div>
@@ -126,7 +123,7 @@
 
             <div class="form-group" style="margin-top: 15px;">
                 <label>Opis mebla (nieograniczona długość):</label>
-                <textarea id="newDesc" class="form-control" placeholder=""></textarea>
+                <textarea id="newDesc" class="form-control"></textarea>
             </div>
             
             <button class="btn btn-success" id="saveBtn" onclick="saveProduct()">💾 Zapisz ogłoszenie</button>
@@ -140,7 +137,7 @@
     </div>
 
     <script>
-        const ADMIN_PIN = "1234"; // Можеш змінити на свій пін
+        const ADMIN_PIN = "1234";
 
         function checkPin() {
             if (document.getElementById('pinInput').value === ADMIN_PIN) {
@@ -188,7 +185,6 @@
             `).join('');
         }
 
-        // Автоматичне зменшення та накопичення необмеженої кількості фото
         function compressMultipleImages(event) {
             const files = event.target.files;
             if (!files.length) return;
@@ -265,16 +261,16 @@
             };
 
             if (index === -1) {
-                siteData.products.unshift(productData); // Додавання нового
+                siteData.products.unshift(productData);
             } else {
-                siteData.products[index] = productData; // Оновлення існуючого
+                siteData.products[index] = productData;
             }
 
             renderProductsAdmin();
             resetForm();
             
             alert('Gotowe! Skopiuj wygenerowany kod JSON і встав його у файл content/home.json na GitHub.');
-            prompt("Skopiuj ten gotowy kod JSON і встав у файл content/home.json:", JSON.stringify(siteData, null, 2));
+            prompt("Skopiuj ten gotowy kod JSON і wklej w plik content/home.json:", JSON.stringify(siteData, null, 2));
         }
 
         function editProduct(index) {
@@ -311,7 +307,7 @@
             if (confirm('Czy na pewno chcesz usunąć ten produkt?')) {
                 siteData.products.splice(index, 1);
                 renderProductsAdmin();
-                prompt("Skopiuj zaktualizowany kod JSON і встав у файл content/home.json:", JSON.stringify(siteData, null, 2));
+                prompt("Skopiuj zaktualizowany kod JSON і wklej w plik content/home.json:", JSON.stringify(siteData, null, 2));
             }
         }
     </script>
