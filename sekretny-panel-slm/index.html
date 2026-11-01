@@ -5,205 +5,583 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administracyjny - SLM24.pl</title>
     <style>
-        :root { --bg-main: #faf8f5; --bg-card: #ffffff; --text-dark: #1f1d1a; --text-muted: #6e6a64; --accent: #9e2a48; --border-color: #e6dfd5; }
-        body { font-family: sans-serif; background: var(--bg-main); color: var(--text-dark); padding: 20px; max-width: 900px; margin: 0 auto; line-height: 1.5; }
-        .box { display: none; }
-        .box.active { display: block; }
-        .card { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit; font-size: 14px; }
-        textarea { height: 150px; resize: vertical; }
-        .btn { background: var(--accent); color: #fff; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; text-align: center; }
-        .btn-green { background: #2e7d32; }
+        :root {
+            --bg-main: #f4f1ea;
+            --bg-card: #ffffff;
+            --text-dark: #1f1d1a;
+            --text-muted: #6e6a64;
+            --accent: #9e2a48;
+            --accent-hover: #7d1e37;
+            --green: #2e7d32;
+            --green-hover: #1b5e20;
+            --border: #e0d9ce;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            padding: 15px;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* Екран PIN */
+        .pin-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 35px 25px;
+            max-width: 380px;
+            margin: 80px auto;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+        }
+        .pin-box h2 { color: var(--accent); margin-bottom: 15px; }
+        .pin-input {
+            width: 100%; padding: 14px; font-size: 24px; text-align: center;
+            letter-spacing: 8px; border: 2px solid var(--border); border-radius: 10px;
+            margin-bottom: 15px; font-weight: bold;
+        }
+
+        /* Картки та кнопки */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+        h1 { color: var(--accent); font-size: 22px; }
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .card h3 { margin-bottom: 15px; font-size: 18px; color: var(--text-dark); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--text-dark); }
+        .form-control {
+            width: 100%; padding: 12px; border: 1px solid #ccc;
+            border-radius: 8px; font-size: 15px; background: #fff;
+        }
+        .form-control:focus { border-color: var(--accent); outline: none; }
+        textarea.form-control { min-height: 160px; resize: vertical; line-height: 1.5; }
+
+        .btn {
+            background: var(--accent); color: #fff; border: none; padding: 12px 20px;
+            border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none; transition: 0.2s;
+        }
+        .btn:hover { background: var(--accent-hover); }
+        .btn-green { background: var(--green); }
+        .btn-green:hover { background: var(--green-hover); }
         .btn-gray { background: #6e6a64; }
-        .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
-        .actions button { margin-left: 5px; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn-edit { background: #f0ede8; color: #000; }
-        .btn-del { background: #f8eff1; color: var(--accent); }
+        .btn-full { width: 100%; }
+
+        /* Галерея завантажених фото */
+        .upload-zone {
+            border: 2px dashed var(--accent); border-radius: 10px; padding: 20px;
+            text-align: center; background: #fdfaf9; cursor: pointer; margin-bottom: 10px;
+        }
+        .photo-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .photo-item {
+            position: relative; width: 85px; height: 85px; border-radius: 8px;
+            overflow: hidden; border: 1px solid var(--border); background: #eee;
+        }
+        .photo-item img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-item .remove-photo {
+            position: absolute; top: 3px; right: 3px; background: rgba(208, 31, 88, 0.9);
+            color: #fff; border: none; width: 22px; height: 22px; border-radius: 50%;
+            font-size: 12px; cursor: pointer; font-weight: bold; line-height: 22px; text-align: center;
+        }
+
+        /* Список товарів */
+        .prod-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px; border: 1px solid var(--border); border-radius: 10px;
+            margin-bottom: 10px; background: #faf8f5; gap: 12px; flex-wrap: wrap;
+        }
+        .prod-info { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 220px; }
+        .prod-thumb { width: 60px; height: 60px; border-radius: 6px; object-fit: cover; border: 1px solid #ddd; background: #fff; }
+        .prod-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .btn-sm { padding: 8px 12px; font-size: 13px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-pin { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .btn-edit { background: #e2e6ea; color: #212529; }
+        .btn-del { background: #f8d7da; color: #721c24; }
+
+        .status-bar {
+            position: fixed; bottom: 20px; right: 20px; left: 20px; max-width: 500px;
+            margin: 0 auto; background: #1f1d1a; color: #fff; padding: 15px 20px;
+            border-radius: 10px; text-align: center; font-weight: 600;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25); display: none; z-index: 9999;
+        }
     </style>
 </head>
 <body>
 
-    <div class="box active" id="loginBox" style="text-align:center; margin-top:100px;">
-        <div class="card" style="max-width:400px; margin:auto;">
-            <h2 style="color:var(--accent);">🔒 Podaj PIN</h2>
-            <input type="password" id="pinInput" placeholder="" style="text-align:center; font-size:20px; letter-spacing:5px;">
-            <button class="btn" style="width:100%;" onclick="checkPin()">Wejdź</button>
-            <p id="pinError" style="color:red; display:none; margin-top:10px;">Zły PIN!</p>
+    <!-- ЕКРАН 1: ВХІД ЗА ПІН-КОДОМ -->
+    <div class="screen active" id="pinScreen">
+        <div class="pin-box">
+            <h2>🔒 Panel SLM24</h2>
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:15px;">Wprowadź PIN administratora</p>
+            <input type="password" id="pinInput" class="pin-input" maxlength="8" autocomplete="off">
+            <button class="btn btn-full" onclick="loginPin()">Wejdź do panelu</button>
+            <p id="pinErr" style="color:#d01f58; margin-top:12px; font-size:14px; display:none; font-weight:bold;">Nieprawidłowy PIN!</p>
         </div>
     </div>
 
-    <div class="box" id="adminBox">
-        <h1 style="color:var(--accent); margin-bottom:20px;">⚙️ Panel SLM24</h1>
+    <!-- ЕКРАН 2: ГОЛОВНА ПАНЕЛЬ -->
+    <div class="screen" id="mainScreen">
+        <header>
+            <h1>⚙️ Zarządzanie Sklepem SLM24</h1>
+            <div style="display:flex; gap:8px;">
+                <button class="btn btn-gray" style="padding:8px 14px; font-size:13px;" onclick="toggleTokenBox()">🔑 Klucz GitHub</button>
+                <a href="/" target="_blank" class="btn" style="padding:8px 14px; font-size:13px;">🌐 Zobacz sklep</a>
+            </div>
+        </header>
 
-        <!-- КРОК 1: КНОПКА ЗАВАНТАЖЕННЯ ФОТО -->
-        <div class="card">
-            <h3>1️⃣ Krok 1: Wgraj zdjęcia</h3>
-            <p style="font-size:14px; color:var(--text-muted); margin-bottom: 10px;">Najpierw prześlij zdjęcia mebli na serwer GitHub (otworzy się bezpiecznie w nowej karcie). Zapamiętaj nazwy plików, które wgrywasz.</p>
-            <a href="https://github.com/slm-meble/slm24.pl/upload/main/images" target="_blank" class="btn btn-green">📁 Prześlij zdjęcia z telefonu na serwer</a>
+        <!-- Налаштування ключа GitHub (показується якщо ключа ще немає) -->
+        <div class="card" id="tokenBox" style="display:none; background:#fff8e6; border-color:#ffd54f;">
+            <h3>🔑 Połączenie z serwerem GitHub (jednorazowo)</h3>
+            <p style="font-size:13px; color:#555; margin-bottom:10px;">Wklej tutaj swój klucz (Personal Access Token z GitHuba zaczynający się od <b>ghp_...</b>), aby panel mógł sam wgrywać zdjęcia z telefonu i zapisywać ogłoszenia jednym kliknięciem:</p>
+            <div style="display:flex; gap:10px;">
+                <input type="password" id="ghTokenInput" class="form-control" style="margin:0;">
+                <button class="btn btn-green" onclick="saveToken()">Zapisz klucz</button>
+            </div>
         </div>
 
-        <!-- КРОК 2: ФОРМА ДОДАВАННЯ/РЕДАГУВАННЯ -->
+        <!-- ФОРМА ДОДАВАННЯ / РЕДАГУВАННЯ ОГОЛОШЕННЯ -->
         <div class="card">
-            <h3 id="formTitle">2️⃣ Krok 2: Dodaj / Edytuj ogłoszenie</h3>
-            <input type="hidden" id="editIndex" value="-1">
+            <h3 id="formHeader">➕ Dodaj nowe ogłoszenie</h3>
+            <input type="hidden" id="editIdx" value="-1">
 
-            <label>Nazwa mebla:</label>
-            <input type="text" id="pName" placeholder="">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nazwa mebla</label>
+                    <input type="text" id="fName" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Cena (np. 1299.00 zł)</label>
+                    <input type="text" id="fPrice" class="form-control">
+                </div>
+            </div>
 
-            <label>Kategoria:</label>
-            <select id="pCat">
-                <option value="fotele">Fotele</option>
-                <option value="sofy">Sofy</option>
-                <option value="narozniki">Narożniki</option>
-                <option value="chesterfield">Chesterfield</option>
-                <option value="lozka">Łóżka</option>
-                <option value="tkaniny">Tkaniny</option>
-            </select>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Kategoria</label>
+                    <select id="fCat" class="form-control">
+                        <option value="fotele">Fotele</option>
+                        <option value="sofy">Sofy</option>
+                        <option value="narozniki">Narożniki</option>
+                        <option value="chesterfield">Chesterfield</option>
+                        <option value="lozka">Łóżka</option>
+                        <option value="tkaniny">Tkaniny</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Pozycja na liście</label>
+                    <select id="fPin" class="form-control">
+                        <option value="top">📌 Dodaj na początek (Góra strony)</option>
+                        <option value="bottom">Na koniec listy</option>
+                    </select>
+                </div>
+            </div>
 
-            <label>Cena (np. 950.00 zł):</label>
-            <input type="text" id="pPrice" placeholder="">
+            <!-- БЛОК ФОТОГРАФІЙ З АВТО-СТИСНЕННЯМ -->
+            <div class="form-group">
+                <label>Zdjęcia mebla (nieograniczona ilość — automatyczne zmniejszanie)</label>
+                <div class="upload-zone" onclick="document.getElementById('filePicker').click()">
+                    <strong style="color:var(--accent); font-size:16px;">📷 Kliknij tutaj, aby wybrać zdjęcia z telefonu lub komputera</strong>
+                    <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Możesz zaznaczyć od razu 5, 10 lub więcej zdjęć. Zostaną automatycznie pomniejszone i wysłane na serwer.</p>
+                </div>
+                <input type="file" id="filePicker" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)">
+                <div class="photo-list" id="photoPreviewList"></div>
+            </div>
 
-            <label>Nazwy zdjęć (oddziel przecinkiem, jeśli jest ich więcej. Np: <b>fotel1.jpg, fotel2.jpg</b>):</label>
-            <input type="text" id="pImgs" placeholder="">
+            <div class="form-group">
+                <label>Opis przedmiotu (nieograniczona ilość tekstu)</label>
+                <textarea id="fDesc" class="form-control"></textarea>
+            </div>
 
-            <label>Opis mebla (dowolna długość, enter robi akapit):</label>
-            <textarea id="pDesc" placeholder=""></textarea>
-
-            <button class="btn" id="saveBtn" onclick="saveData()">💾 Zapisz ogłoszenie</button>
-            <button class="btn btn-gray" id="cancelBtn" onclick="resetForm()" style="display:none;">Anuluj edycję</button>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn-green" id="submitFormBtn" style="flex:1;" onclick="saveProductToList()">💾 Zapisz ogłoszenie i wyślij na stronę</button>
+                <button class="btn btn-gray" id="cancelEditBtn" style="display:none;" onclick="clearForm()">Anuluj edycję</button>
+            </div>
         </div>
 
-        <!-- КРОК 3: СПИСОК АКТИВНИХ ОГОЛОШЕНЬ -->
+        <!-- СПИСОК АКТИВНИХ ОГОЛОШЕНЬ -->
         <div class="card">
-            <h3>📦 Aktywne ogłoszenia (<span id="pCount">0</span>)</h3>
-            <div id="listDiv">Ładowanie produktów...</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0; border:none;">📦 Lista aktywnych ogłoszeń (<span id="countBadge">0</span>)</h3>
+                <button class="btn btn-green" style="padding:8px 14px; font-size:13px;" onclick="syncWithGitHub()">🔄 Odśwież listę</button>
+            </div>
+            <div id="productsContainer">Ładowanie ogłoszeń...</div>
         </div>
     </div>
+
+    <div class="status-bar" id="statusBar"></div>
 
     <script>
-        const PIN = "0709";
-        let db = { products: [] };
+        // НАЛАШТУВАННЯ
+        const ADMIN_PIN = "1234"; // Твій ПІН-код для входу
+        const REPO_OWNER = "slm-meble";
+        const REPO_NAME = "slm24.pl";
+        const JSON_PATH = "content/home.json";
 
-        function checkPin() {
-            if(document.getElementById('pinInput').value === PIN) {
-                document.getElementById('loginBox').classList.remove('active');
-                document.getElementById('adminBox').classList.add('active');
-                loadProducts();
+        let catalogData = { products: [] };
+        let currentPhotos = []; // масив шляхів типу "images/plik.jpg"
+        let homeJsonSha = ""; // потрібен для перезапису файлу на GitHub
+
+        // 1. Перевірка PIN
+        function loginPin() {
+            const val = document.getElementById('pinInput').value.trim();
+            if (val === ADMIN_PIN) {
+                document.getElementById('pinScreen').classList.remove('active');
+                document.getElementById('mainScreen').classList.add('active');
+                checkToken();
+                syncWithGitHub();
             } else {
-                document.getElementById('pinError').style.display = 'block';
+                document.getElementById('pinErr').style.display = 'block';
+            }
+        }
+        document.getElementById('pinInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') loginPin();
+        });
+
+        // 2. Робота з Токеном GitHub
+        function getToken() { return localStorage.getItem('slm_gh_token') || ''; }
+        function checkToken() {
+            const t = getToken();
+            document.getElementById('ghTokenInput').value = t;
+            if (!t) {
+                document.getElementById('tokenBox').style.display = 'block';
+            }
+        }
+        function toggleTokenBox() {
+            const box = document.getElementById('tokenBox');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
+        function saveToken() {
+            const val = document.getElementById('ghTokenInput').value.trim();
+            if (!val) return alert('Wpisz klucz!');
+            localStorage.setItem('slm_gh_token', val);
+            document.getElementById('tokenBox').style.display = 'none';
+            showStatus('✅ Klucz zapisany w pamięci przeglądarki!', 3000);
+            syncWithGitHub();
+        }
+
+        function showStatus(msg, autoHide = 0) {
+            const bar = document.getElementById('statusBar');
+            bar.textContent = msg;
+            bar.style.display = 'block';
+            if (autoHide > 0) {
+                setTimeout(() => { bar.style.display = 'none'; }, autoHide);
             }
         }
 
-        async function loadProducts() {
+        // 3. Завантаження актуального списку товарів
+        async function syncWithGitHub() {
+            showStatus('⏳ Pobieranie aktualnych ogłoszeń...');
             try {
-                // Додаємо анти-кеш, щоб завжди бачити свіжі товари
-                let res = await fetch('/content/home.json?v=' + Date.now());
-                if (!res.ok) throw new Error('Błąd pliku');
-                db = await res.json();
-                renderList();
-            } catch(e) {
-                document.getElementById('listDiv').innerHTML = '<p style="color:red; font-weight:bold;">Błąd ładowania! Upewnij się, że plik home.json na GitHubie nie ma błędów (np. brakuje przecinka lub nawiasu).</p>';
+                const token = getToken();
+                let headers = { 'Accept': 'application/vnd.github.v3+json' };
+                if (token) headers['Authorization'] = 'token ' + token;
+
+                const apiRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${JSON_PATH}?t=${Date.now()}`, { headers });
+                if (apiRes.ok) {
+                    const data = await apiRes.json();
+                    homeJsonSha = data.sha;
+                    const decoded = new TextDecoder('utf-8').decode(Uint8Array.from(atob(data.content), c => c.charCodeAt(0)));
+                    catalogData = JSON.parse(decoded);
+                } else {
+                    // Резервне завантаження напряму з сайту
+                    const directRes = await fetch(`/${JSON_PATH}?v=${Date.now()}`);
+                    catalogData = await directRes.json();
+                }
+                if (!catalogData.products) catalogData.products = [];
+                renderProductsList();
+                showStatus('✅ Załadowano listę ogłoszeń!', 2000);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('productsContainer').innerHTML = '<p style="color:red;">Błąd wczytywania. Sprawdź połączenie lub klucz GitHub.</p>';
+                showStatus('❌ Błąd pobierania danych', 3000);
             }
         }
 
-        function renderList() {
-            document.getElementById('pCount').textContent = db.products.length;
-            let html = '';
-            db.products.forEach((p, i) => {
-                html += `
-                <div class="row">
-                    <div>
-                        <strong>${p.name || p.title}</strong><br>
-                        <span style="color:var(--accent); font-size:14px; font-weight:bold;">${p.price}</span> | 
-                        <span style="color:var(--text-muted); font-size:13px;">${p.category || 'inne'}</span>
+        // 4. Відображення списку товарів з кнопками Edytuj, Закріпити (📌), Usuń
+        function renderProductsList() {
+            const container = document.getElementById('productsContainer');
+            document.getElementById('countBadge').textContent = catalogData.products.length;
+
+            if (catalogData.products.length === 0) {
+                container.innerHTML = '<p style="color:#666;">Brak ogłoszeń w bazie.</p>';
+                return;
+            }
+
+            container.innerHTML = catalogData.products.map((p, idx) => {
+                const firstImg = (p.image || (p.images ? p.images.split(',')[0] : '')).trim();
+                const thumbSrc = firstImg ? '/' + firstImg.replace(/^\//, '') : '';
+                const imgCount = p.images ? p.images.split(',').filter(Boolean).length : (p.image ? 1 : 0);
+
+                return `
+                <div class="prod-item">
+                    <div class="prod-info">
+                        ${thumbSrc ? `<img src="${thumbSrc}" class="prod-thumb" onerror="this.style.display='none'">` : ''}
+                        <div>
+                            <strong style="font-size:16px;">${p.name || p.title || 'Bez nazwy'}</strong>
+                            <div style="font-size:13px; margin-top:3px;">
+                                <span style="color:var(--accent); font-weight:bold;">${p.price || ''}</span> • 
+                                <span style="color:#666;">Kategoria: ${p.category || 'inne'}</span> • 
+                                <span style="color:#2e7d32;">📷 Zdjęć: ${imgCount}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="actions">
-                        <button class="btn-edit" onclick="editProd(${i})">Edytuj</button>
-                        <button class="btn-del" onclick="delProd(${i})">Usuń</button>
+                    <div class="prod-actions">
+                        ${idx > 0 ? `<button class="btn-sm btn-pin" title="Przypnij na samą górę" onclick="pinToTop(${idx})">📌 Na górę</button>` : ''}
+                        <button class="btn-sm btn-edit" onclick="startEditProduct(${idx})">✏️ Edytuj</button>
+                        <button class="btn-sm btn-del" onclick="removeProduct(${idx})">🗑️ Usuń</button>
                     </div>
                 </div>`;
-            });
-            document.getElementById('listDiv').innerHTML = html || '<p>Brak dodanych produktów.</p>';
+            }).join('');
         }
 
-        function editProd(i) {
-            let p = db.products[i];
-            document.getElementById('editIndex').value = i;
-            document.getElementById('pName').value = p.name || p.title || '';
-            document.getElementById('pCat').value = p.category || 'fotele';
-            document.getElementById('pPrice').value = p.price || '';
-            document.getElementById('pDesc').value = p.description || '';
-            
-            // Витягуємо чисті назви фотографій без "images/" для зручності
-            let rawImgs = (p.images || p.image || '').split(',').map(s => s.trim().replace('images/', '')).join(', ');
-            document.getElementById('pImgs').value = rawImgs;
+        // 5. Стиснення фото у браузері та пряма відправка в папку images/ на GitHub
+        async function handlePhotoUpload(event) {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
 
-            document.getElementById('formTitle').textContent = '✏️ Edytuj ogłoszenie';
-            document.getElementById('saveBtn').textContent = '💾 Zaktualizuj';
-            document.getElementById('cancelBtn').style.display = 'inline-block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function resetForm() {
-            document.getElementById('editIndex').value = '-1';
-            document.getElementById('pName').value = '';
-            document.getElementById('pPrice').value = '';
-            document.getElementById('pImgs').value = '';
-            document.getElementById('pDesc').value = '';
-            document.getElementById('formTitle').textContent = '2️⃣ Krok 2: Dodaj / Edytuj ogłoszenie';
-            document.getElementById('saveBtn').textContent = '💾 Zapisz ogłoszenie';
-            document.getElementById('cancelBtn').style.display = 'none';
-        }
-
-        function saveData() {
-            let i = parseInt(document.getElementById('editIndex').value);
-            let name = document.getElementById('pName').value.trim();
-            let cat = document.getElementById('pCat').value;
-            let price = document.getElementById('pPrice').value.trim();
-            let desc = document.getElementById('pDesc').value.trim();
-            let imgsInput = document.getElementById('pImgs').value.trim();
-
-            if(!name || !price) { 
-                alert('Wpisz nazwę i cenę!'); 
-                return; 
+            const token = getToken();
+            if (!token) {
+                alert('Najpierw wklej swój Klucz GitHub (przycisk "🔑 Klucz GitHub" u góry), aby móc automatycznie wgrywać zdjęcia z telefonu!');
+                document.getElementById('tokenBox').style.display = 'block';
+                return;
             }
 
-            // Обробляємо список фото, автоматично додаючи "images/" до кожної
-            if(!imgsInput) imgsInput = "default.jpg";
-            let imgArray = imgsInput.split(',').map(s => {
-                let clean = s.trim();
-                return clean.startsWith('images/') ? clean : 'images/' + clean;
-            });
+            for (let i = 0; i < files.length; i++) {
+                showStatus(`⏳ Zmniejszanie i wysyłanie zdjęcia ${i + 1} z ${files.length}...`);
+                try {
+                    const compressedBase64 = await compressPhotoFile(files[i]);
+                    const cleanBase64 = compressedBase64.split(',')[1];
+                    const fileName = `meble-${Date.now()}-${Math.floor(Math.random()*900+100)}.jpg`;
+                    const filePath = `images/${fileName}`;
 
-            let newProd = {
+                    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': 'token ' + token,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Upload photo ${fileName}`,
+                            content: cleanBase64
+                        })
+                    });
+
+                    if (!res.ok) throw new Error('Błąd wysyłania zdjęcia na GitHub');
+                    currentPhotos.push(filePath);
+                    renderPhotoPreviews();
+                } catch (err) {
+                    console.error(err);
+                    alert('Błąd podczas wysyłania zdjęcia nr ' + (i + 1) + '. Sprawdź klucz GitHub.');
+                }
+            }
+            event.target.value = '';
+            showStatus('✅ Wszystkie wybrane zdjęcia zostały pomniejszone i wgrane!', 3500);
+        }
+
+        function compressPhotoFile(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_DIM = 1200; // Оптимальний розмір для швидкого сайту
+                        let w = img.width;
+                        let h = img.height;
+
+                        if (w > h && w > MAX_DIM) { h *= MAX_DIM / w; w = MAX_DIM; }
+                        else if (h > MAX_DIM) { w *= MAX_DIM / h; h = MAX_DIM; }
+
+                        canvas.width = Math.round(w);
+                        canvas.height = Math.round(h);
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.82));
+                    };
+                };
+            });
+        }
+
+        function renderPhotoPreviews() {
+            const box = document.getElementById('photoPreviewList');
+            box.innerHTML = currentPhotos.map((path, idx) => {
+                const src = '/' + path.replace(/^\//, '');
+                return `
+                <div class="photo-item">
+                    <img src="${src}" onerror="this.src='https://via.placeholder.com/85?text=OK'">
+                    <button class="remove-photo" title="Usuń to zdjęcie" onclick="removePhotoFromCurrent(${idx})">×</button>
+                </div>`;
+            }).join('');
+        }
+
+        function removePhotoFromCurrent(idx) {
+            currentPhotos.splice(idx, 1);
+            renderPhotoPreviews();
+        }
+
+        // 6. Збереження нового або відредагованого товару
+        async function saveProductToList() {
+            const name = document.getElementById('fName').value.trim();
+            const price = document.getElementById('fPrice').value.trim();
+            const cat = document.getElementById('fCat').value;
+            const pos = document.getElementById('fPin').value;
+            const desc = document.getElementById('fDesc').value.trim();
+            const editIdx = parseInt(document.getElementById('editIdx').value);
+
+            if (!name || !price) {
+                alert('Wpisz nazwę mebla oraz cenę!');
+                return;
+            }
+
+            const mainImage = currentPhotos[0] || '';
+            const allImages = currentPhotos.join(', ');
+
+            const itemObj = {
                 title: name,
                 name: name,
                 category: cat,
                 price: price,
-                image: imgArray[0],
-                images: imgArray.join(', '),
-                fabric_images: "",
+                image: mainImage,
+                images: allImages,
+                fabric_images: editIdx >= 0 ? (catalogData.products[editIdx].fabric_images || "") : "",
                 description: desc
             };
 
-            if(i === -1) {
-                db.products.unshift(newProd); // Новий товар іде на початок
+            if (editIdx === -1) {
+                if (pos === 'top') catalogData.products.unshift(itemObj);
+                else catalogData.products.push(itemObj);
             } else {
-                db.products[i] = newProd; // Оновлюємо існуючий
+                catalogData.products[editIdx] = itemObj;
             }
 
-            renderList();
-            resetForm();
-
-            alert('Gotowe! Skopiuj wygenerowany kod JSON і wklej w plik content/home.json na GitHubie.');
-            prompt("Skopiuj ten kod:", JSON.stringify(db, null, 2));
+            const ok = await pushJsonToGitHub('Zaktualizowano katalog produktów z panelu SLM24');
+            if (ok) {
+                clearForm();
+                renderProductsList();
+            }
         }
 
-        function delProd(i) {
-            if(confirm('Na pewno usunąć to ogłoszenie?')) {
-                db.products.splice(i, 1);
-                renderList();
-                prompt("Skopiuj zaktualizowany kod JSON:", JSON.stringify(db, null, 2));
+        // 7. Редагування існуючого оголошення
+        function startEditProduct(idx) {
+            const p = catalogData.products[idx];
+            document.getElementById('editIdx').value = idx;
+            document.getElementById('fName').value = p.name || p.title || '';
+            document.getElementById('fPrice').value = p.price || '';
+            document.getElementById('fCat').value = p.category || 'fotele';
+            document.getElementById('fDesc').value = p.description || '';
+
+            const rawImgs = p.images || p.image || '';
+            currentPhotos = rawImgs.split(',').map(s => s.trim()).filter(Boolean);
+            renderPhotoPreviews();
+
+            document.getElementById('formHeader').textContent = '✏️ Edycja ogłoszenia: ' + (p.name || p.title);
+            document.getElementById('submitFormBtn').textContent = '💾 Zapisz zmiany w ogłoszeniu';
+            document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 8. Закріплення на горі та видалення
+        async function pinToTop(idx) {
+            const item = catalogData.products.splice(idx, 1)[0];
+            catalogData.products.unshift(item);
+            renderProductsList();
+            await pushJsonToGitHub('Przypięto ogłoszenie na górę listy');
+        }
+
+        async function removeProduct(idx) {
+            const p = catalogData.products[idx];
+            if (!confirm(`Czy na pewno chcesz całkowicie usunąć "${p.name || p.title}"?`)) return;
+            catalogData.products.splice(idx, 1);
+            renderProductsList();
+            await pushJsonToGitHub('Usunięto ogłoszenie z katalogu');
+        }
+
+        function clearForm() {
+            document.getElementById('editIdx').value = '-1';
+            document.getElementById('fName').value = '';
+            document.getElementById('fPrice').value = '';
+            document.getElementById('fDesc').value = '';
+            currentPhotos = [];
+            renderPhotoPreviews();
+            document.getElementById('formHeader').textContent = '➕ Dodaj nowe ogłoszenie';
+            document.getElementById('submitFormBtn').textContent = '💾 Zapisz ogłoszenie i wyślij na stronę';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        }
+
+        // 9. Автоматичний запис home.json на сервер GitHub
+        async function pushJsonToGitHub(commitMsg) {
+            const token = getToken();
+            if (!token) {
+                alert('Wklej najpierw swój Klucz GitHub (przycisk "🔑 Klucz GitHub" na górze), aby zapisać zmiany automatycznie!');
+                document.getElementById('tokenBox').style.display = 'block';
+                return false;
+            }
+
+            showStatus('⏳ Zapisywanie zmian na serwerze GitHub...');
+            try {
+                // Отримуємо актуальний SHA перед записом, щоб ніколи не було конфліктів
+                const getRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${JSON_PATH}?t=${Date.now()}`, {
+                    headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+                });
+                if (getRes.ok) {
+                    const getJson = await getRes.json();
+                    homeJsonSha = getJson.sha;
+                }
+
+                const jsonString = JSON.stringify(catalogData, null, 2);
+                const utf8Bytes = new TextEncoder().encode(jsonString);
+                let binaryStr = "";
+                for (let i = 0; i < utf8Bytes.length; i++) {
+                    binaryStr += String.fromCharCode(utf8Bytes[i]);
+                }
+                const base64Content = btoa(binaryStr);
+
+                const putRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${JSON_PATH}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'token ' + token,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: commitMsg,
+                        content: base64Content,
+                        sha: homeJsonSha
+                    })
+                });
+
+                if (!putRes.ok) throw new Error('Błąd zapisu pliku home.json');
+                const putData = await putRes.json();
+                homeJsonSha = putData.content.sha;
+
+                showStatus('✅ Zapisano! Zmiany pojawią się na stronie za ok. 1 minutę.', 4500);
+                return true;
+            } catch (err) {
+                console.error(err);
+                alert('Wystąpił błąd podczas zapisywania na GitHub. Sprawdź czy Twój klucz GitHub ma uprawnienia "repo".');
+                showStatus('❌ Błąd zapisu', 3000);
+                return false;
             }
         }
     </script>
