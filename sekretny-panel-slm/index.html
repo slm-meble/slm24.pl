@@ -262,8 +262,12 @@
                 document.getElementById('pinErr').style.display = 'block';
             }
         }
-        document.getElementById('pinInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') loginPin();
+        
+        document.getElementById('pinInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                loginPin();
+            }
         });
 
         function getToken() { return (localStorage.getItem('slm_gh_token') || '').trim(); }
@@ -347,7 +351,6 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
             try {
                 let generatedText = "";
 
-                // Використовуємо універсальну і швидку модель llama-3.1-70b-versatile від Groq
                 const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
                     headers: {
@@ -570,4 +573,101 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
         function startEditProduct(idx) {
             const p = catalogData.products[idx];
             document.getElementById('editIdx').value = idx;
-            document.getElementById('fName').value =
+            document.getElementById('fName').value = p.name || p.title || '';
+            document.getElementById('fPrice').value = p.price || '';
+            document.getElementById('fCat').value = p.category || 'fotele';
+            document.getElementById('fDesc').value = p.description || '';
+
+            const rawImgs = p.images || p.image || '';
+            currentPhotos = rawImgs.split(',').map(s => s.trim()).filter(Boolean);
+            renderPhotoPreviews();
+
+            document.getElementById('formHeader').textContent = '✏️ Edycja ogłoszenia: ' + (p.name || p.title);
+            document.getElementById('submitFormBtn').textContent = '💾 Zapisz zmiany w ogłoszeniu';
+            document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function pinToTop(idx) {
+            const item = catalogData.products.splice(idx, 1)[0];
+            catalogData.products.unshift(item);
+            renderProductsList();
+            await pushJsonToGitHub('Przypięto ogłoszenie na górę listy');
+        }
+
+        async function removeProduct(idx) {
+            const p = catalogData.products[idx];
+            if (!confirm(`Czy na pewno chcesz całkowicie usunąć "${p.name || p.title}"?`)) return;
+            catalogData.products.splice(idx, 1);
+            renderProductsList();
+            await pushJsonToGitHub('Usunięto ogłoszenie z katalogu');
+        }
+
+        function clearForm() {
+            document.getElementById('editIdx').value = '-1';
+            document.getElementById('fName').value = '';
+            document.getElementById('fPrice').value = '';
+            document.getElementById('fDesc').value = '';
+            currentPhotos = [];
+            renderPhotoPreviews();
+            document.getElementById('formHeader').textContent = '➕ Dodaj nowe ogłoszenie';
+            document.getElementById('submitFormBtn').textContent = '💾 Zapisz ogłoszenie i wyślij na stronę';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        }
+
+        async function pushJsonToGitHub(commitMsg) {
+            const token = getToken();
+            if (!token) {
+                alert('Wklej najpierw swój Klucz GitHub!');
+                document.getElementById('tokenBox').style.display = 'block';
+                return false;
+            }
+
+            showStatus('⏳ Zapisywanie zmian na serwerze GitHub...');
+            try {
+                const getRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${JSON_PATH}?t=${Date.now()}`, {
+                    headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+                });
+                if (getRes.ok) {
+                    const getJson = await getRes.json();
+                    homeJsonSha = getJson.sha;
+                }
+
+                const jsonString = JSON.stringify(catalogData, null, 2);
+                const utf8Bytes = new TextEncoder().encode(jsonString);
+                let binaryStr = "";
+                for (let i = 0; i < utf8Bytes.length; i++) {
+                    binaryStr += String.fromCharCode(utf8Bytes[i]);
+                }
+                const base64Content = btoa(binaryStr);
+
+                const putRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${JSON_PATH}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'token ' + token,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: commitMsg,
+                        content: base64Content,
+                        sha: homeJsonSha
+                    })
+                });
+
+                if (!putRes.ok) throw new Error('Błąd zapisu pliku home.json');
+                const putData = await putRes.json();
+                homeJsonSha = putData.content.sha;
+
+                showStatus('✅ Zapisano! Zmiany pojawią się na stronie za ok. 1 minutę.', 4500);
+                return true;
+            } catch (err) {
+                console.error(err);
+                alert('Wystąpił błąd podczas zapisywania na GitHub.');
+                showStatus('❌ Błąd zapisu', 3000);
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>
