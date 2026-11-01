@@ -5,309 +5,205 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administracyjny - SLM24.pl</title>
     <style>
-        :root {
-            --bg-main: #faf8f5;
-            --bg-card: #ffffff;
-            --text-dark: #1f1d1a;
-            --text-muted: #6e6a64;
-            --accent: #9e2a48;
-            --accent-hover: #7d1e37;
-            --border-color: #e6dfd5;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-dark);
-            padding: 20px;
-            max-width: 960px;
-            margin: 0 auto;
-            line-height: 1.5;
-        }
-        .login-box, .admin-panel { display: none; }
-        .login-box.active, .admin-panel.active { display: block; }
-        
-        .login-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 40px;
-            max-width: 400px;
-            margin: 80px auto;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-        .login-card h2 { margin-bottom: 20px; color: var(--accent); }
-        .login-card input {
-            width: 100%; padding: 12px; font-size: 18px; text-align: center;
-            letter-spacing: 5px; border: 1px solid var(--border-color);
-            border-radius: 8px; margin-bottom: 15px; background: var(--bg-main);
-        }
-        .btn {
-            background: var(--accent); color: #fff; border: none; padding: 12px 20px;
-            border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
-        }
-        .btn:hover { background: var(--accent-hover); }
-        .error-msg { color: #d01f58; font-size: 13px; margin-top: 10px; display: none; }
-
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
-        h1 { color: var(--accent); font-size: 24px; }
-        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-        .card h3 { margin-bottom: 15px; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }
-        .form-control { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--bg-main); }
-        textarea.form-control { height: 150px; resize: vertical; }
-        
-        .product-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border-color); gap: 10px; }
-        .product-row:last-child { border-bottom: none; }
-        .actions button { padding: 6px 12px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; margin-left: 5px; }
-        .btn-edit { background: #f0ede8; color: var(--text-dark); }
-        .btn-delete { background: #f8eff1; color: var(--accent); }
-        .btn-success { background: #2e7d32; color: #fff; margin-top: 10px; }
-        .btn-cancel { background: #6e6a64; color: #fff; margin-top: 10px; display: none; }
-        #loadingText { color: var(--accent); font-weight: bold; display: none; margin-bottom: 10px; }
-        .preview-thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-        .preview-thumbs span { background: #f2ece4; padding: 6px 10px; border-radius: 6px; font-size: 12px; border: 1px solid var(--border-color); }
+        :root { --bg-main: #faf8f5; --bg-card: #ffffff; --text-dark: #1f1d1a; --text-muted: #6e6a64; --accent: #9e2a48; --border-color: #e6dfd5; }
+        body { font-family: sans-serif; background: var(--bg-main); color: var(--text-dark); padding: 20px; max-width: 900px; margin: 0 auto; line-height: 1.5; }
+        .box { display: none; }
+        .box.active { display: block; }
+        .card { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit; font-size: 14px; }
+        textarea { height: 150px; resize: vertical; }
+        .btn { background: var(--accent); color: #fff; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-green { background: #2e7d32; }
+        .btn-gray { background: #6e6a64; }
+        .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+        .actions button { margin-left: 5px; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-edit { background: #f0ede8; color: #000; }
+        .btn-del { background: #f8eff1; color: var(--accent); }
     </style>
 </head>
 <body>
 
-    <div class="login-box active" id="loginBox">
-        <div class="login-card">
-            <h2>🔒 Podaj PIN</h2>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Wprowadź 4-cyfrowy PIN administratora</p>
-            <input type="password" id="pinInput" maxlength="4" placeholder="••••">
-            <button class="btn" onclick="checkPin()">Wejdź do panelu</button>
-            <div class="error-msg" id="errorMsg">Nieprawidłowy PIN!</div>
+    <div class="box active" id="loginBox" style="text-align:center; margin-top:100px;">
+        <div class="card" style="max-width:400px; margin:auto;">
+            <h2 style="color:var(--accent);">🔒 Podaj PIN</h2>
+            <input type="password" id="pinInput" placeholder="" style="text-align:center; font-size:20px; letter-spacing:5px;">
+            <button class="btn" style="width:100%;" onclick="checkPin()">Wejdź</button>
+            <p id="pinError" style="color:red; display:none; margin-top:10px;">Zły PIN!</p>
         </div>
     </div>
 
-    <div class="admin-panel" id="adminPanel">
-        <header>
-            <h1>⚙️ Panel Zarządzania SLM24</h1>
-            <a href="/" target="_blank" class="btn" style="width: auto; padding: 8px 15px; text-decoration: none;">🌐 Zobacz Sklep</a>
-        </header>
+    <div class="box" id="adminBox">
+        <h1 style="color:var(--accent); margin-bottom:20px;">⚙️ Panel SLM24</h1>
 
+        <!-- КРОК 1: КНОПКА ЗАВАНТАЖЕННЯ ФОТО -->
         <div class="card">
-            <h3 id="formTitle">➕ Dodaj nowe ogłoszenie</h3>
-            <input type="hidden" id="editIndex" value="-1">
-            
-            <div class="form-group">
-                <label>Nazwa mebla:</label>
-                <input type="text" id="newName" class="form-control" value="">
-            </div>
-            <div class="form-group">
-                <label>Kategoria:</label>
-                <select id="newCat" class="form-control">
-                    <option value="fotele">Fotele</option>
-                    <option value="sofy">Sofy</option>
-                    <option value="narozniki">Narożniki</option>
-                    <option value="chesterfield">Chesterfield</option>
-                    <option value="lozka">Łóżka</option>
-                    <option value="tkaniny">Tkaniny</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Cena (np. 950.00 zł):</label>
-                <input type="text" id="newPrice" class="form-control" value="">
-            </div>
-            
-            <div class="form-group">
-                <label>Wybierz zdjęcia (nieograniczona ilość):</label>
-                <input type="file" id="imageFiles" class="form-control" accept="image/*" multiple onchange="compressMultipleImages(event)">
-                <input type="hidden" id="newImgs">
-            </div>
-            <div id="loadingText">⏳ Trwa zmniejszanie i optymalizacja zdjęć...</div>
-            <div class="preview-thumbs" id="previewThumbs"></div>
-
-            <div class="form-group" style="margin-top: 15px;">
-                <label>Opis mebla (nieograniczona długość):</label>
-                <textarea id="newDesc" class="form-control"></textarea>
-            </div>
-            
-            <button class="btn btn-success" id="saveBtn" onclick="saveProduct()">💾 Zapisz ogłoszenie</button>
-            <button class="btn btn-cancel" id="cancelBtn" onclick="resetForm()">Anuluj edycję</button>
+            <h3>1️⃣ Krok 1: Wgraj zdjęcia</h3>
+            <p style="font-size:14px; color:var(--text-muted); margin-bottom: 10px;">Najpierw prześlij zdjęcia mebli na serwer GitHub (otworzy się bezpiecznie w nowej karcie). Zapamiętaj nazwy plików, które wgrywasz.</p>
+            <a href="https://github.com/slm-meble/slm24.pl/upload/main/images" target="_blank" class="btn btn-green">📁 Prześlij zdjęcia z telefonu na serwer</a>
         </div>
 
+        <!-- КРОК 2: ФОРМА ДОДАВАННЯ/РЕДАГУВАННЯ -->
         <div class="card">
-            <h3>📦 Lista aktywnych ogłoszeń (<span id="prodCount">0</span>)</h3>
-            <div id="productList">Ładowanie produktów...</div>
+            <h3 id="formTitle">2️⃣ Krok 2: Dodaj / Edytuj ogłoszenie</h3>
+            <input type="hidden" id="editIndex" value="-1">
+
+            <label>Nazwa mebla:</label>
+            <input type="text" id="pName" placeholder="">
+
+            <label>Kategoria:</label>
+            <select id="pCat">
+                <option value="fotele">Fotele</option>
+                <option value="sofy">Sofy</option>
+                <option value="narozniki">Narożniki</option>
+                <option value="chesterfield">Chesterfield</option>
+                <option value="lozka">Łóżka</option>
+                <option value="tkaniny">Tkaniny</option>
+            </select>
+
+            <label>Cena (np. 950.00 zł):</label>
+            <input type="text" id="pPrice" placeholder="">
+
+            <label>Nazwy zdjęć (oddziel przecinkiem, jeśli jest ich więcej. Np: <b>fotel1.jpg, fotel2.jpg</b>):</label>
+            <input type="text" id="pImgs" placeholder="">
+
+            <label>Opis mebla (dowolna długość, enter robi akapit):</label>
+            <textarea id="pDesc" placeholder=""></textarea>
+
+            <button class="btn" id="saveBtn" onclick="saveData()">💾 Zapisz ogłoszenie</button>
+            <button class="btn btn-gray" id="cancelBtn" onclick="resetForm()" style="display:none;">Anuluj edycję</button>
+        </div>
+
+        <!-- КРОК 3: СПИСОК АКТИВНИХ ОГОЛОШЕНЬ -->
+        <div class="card">
+            <h3>📦 Aktywne ogłoszenia (<span id="pCount">0</span>)</h3>
+            <div id="listDiv">Ładowanie produktów...</div>
         </div>
     </div>
 
     <script>
-        const ADMIN_PIN = "1234";
+        const PIN = "0709";
+        let db = { products: [] };
 
         function checkPin() {
-            if (document.getElementById('pinInput').value === ADMIN_PIN) {
+            if(document.getElementById('pinInput').value === PIN) {
                 document.getElementById('loginBox').classList.remove('active');
-                document.getElementById('adminPanel').classList.add('active');
-                loadData();
+                document.getElementById('adminBox').classList.add('active');
+                loadProducts();
             } else {
-                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('pinError').style.display = 'block';
             }
         }
 
-        let siteData = { products: [] };
-        let currentImagesArray = [];
-
-        async function loadData() {
+        async function loadProducts() {
             try {
-                const res = await fetch('/content/home.json?v=' + Date.now());
-                siteData = await res.json();
-                renderProductsAdmin();
-            } catch (e) {
-                alert('Błąd ładowania danych ze sklepu.');
+                // Додаємо анти-кеш, щоб завжди бачити свіжі товари
+                let res = await fetch('/content/home.json?v=' + Date.now());
+                if (!res.ok) throw new Error('Błąd pliku');
+                db = await res.json();
+                renderList();
+            } catch(e) {
+                document.getElementById('listDiv').innerHTML = '<p style="color:red; font-weight:bold;">Błąd ładowania! Upewnij się, że plik home.json na GitHubie nie ma błędów (np. brakuje przecinka lub nawiasu).</p>';
             }
         }
 
-        function renderProductsAdmin() {
-            const list = document.getElementById('productList');
-            document.getElementById('prodCount').textContent = siteData.products.length;
-            
-            if (siteData.products.length === 0) {
-                list.innerHTML = '<p>Brak produktów.</p>';
-                return;
-            }
-
-            list.innerHTML = siteData.products.map((p, index) => `
-                <div class="product-row">
+        function renderList() {
+            document.getElementById('pCount').textContent = db.products.length;
+            let html = '';
+            db.products.forEach((p, i) => {
+                html += `
+                <div class="row">
                     <div>
                         <strong>${p.name || p.title}</strong><br>
-                        <span style="font-size: 12px; color: var(--accent); font-weight: bold;">${p.price}</span> | <span style="font-size: 12px; color: var(--text-muted);">${p.category || 'inne'}</span>
+                        <span style="color:var(--accent); font-size:14px; font-weight:bold;">${p.price}</span> | 
+                        <span style="color:var(--text-muted); font-size:13px;">${p.category || 'inne'}</span>
                     </div>
                     <div class="actions">
-                        <button class="btn-edit" onclick="editProduct(${index})">Edytuj</button>
-                        <button class="btn-delete" onclick="deleteProduct(${index})">Usuń</button>
+                        <button class="btn-edit" onclick="editProd(${i})">Edytuj</button>
+                        <button class="btn-del" onclick="delProd(${i})">Usuń</button>
                     </div>
-                </div>
-            `).join('');
-        }
-
-        function compressMultipleImages(event) {
-            const files = event.target.files;
-            if (!files.length) return;
-
-            document.getElementById('loadingText').style.display = 'block';
-            let processedCount = 0;
-
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = function (e) {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = function () {
-                        const canvas = document.createElement('canvas');
-                        const MAX_SIZE = 1000;
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > height) {
-                            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
-                        } else {
-                            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        const uniqueName = "images/meble-" + Date.now() + "-" + Math.floor(Math.random()*1000) + ".jpg";
-                        currentImagesArray.push(uniqueName);
-
-                        updateThumbs();
-                        processedCount++;
-
-                        if (processedCount === files.length) {
-                            document.getElementById('loadingText').style.display = 'none';
-                        }
-                    }
-                }
+                </div>`;
             });
+            document.getElementById('listDiv').innerHTML = html || '<p>Brak dodanych produktów.</p>';
         }
 
-        function updateThumbs() {
-            const thumbs = document.getElementById('previewThumbs');
-            document.getElementById('newImgs').value = currentImagesArray.join(', ');
-            thumbs.innerHTML = currentImagesArray.map(img => `<span>📷 ${img.split('/').pop()}</span>`).join('');
-        }
-
-        function saveProduct() {
-            const index = parseInt(document.getElementById('editIndex').value);
-            const name = document.getElementById('newName').value.trim();
-            const category = document.getElementById('newCat').value;
-            const price = document.getElementById('newPrice').value.trim();
-            const description = document.getElementById('newDesc').value.trim();
-            const imagesStr = currentImagesArray.join(', ') || "images/default.jpg";
-            const mainImg = currentImagesArray[0] || "images/default.jpg";
-
-            if (!name || !price) {
-                alert('Wypełnij nazwę i cenę produktu!');
-                return;
-            }
-
-            const productData = {
-                title: name,
-                name: name,
-                category: category,
-                price: price,
-                image: mainImg,
-                images: imagesStr,
-                fabric_images: "",
-                description: description
-            };
-
-            if (index === -1) {
-                siteData.products.unshift(productData);
-            } else {
-                siteData.products[index] = productData;
-            }
-
-            renderProductsAdmin();
-            resetForm();
+        function editProd(i) {
+            let p = db.products[i];
+            document.getElementById('editIndex').value = i;
+            document.getElementById('pName').value = p.name || p.title || '';
+            document.getElementById('pCat').value = p.category || 'fotele';
+            document.getElementById('pPrice').value = p.price || '';
+            document.getElementById('pDesc').value = p.description || '';
             
-            alert('Gotowe! Skopiuj wygenerowany kod JSON і встав його у файл content/home.json na GitHub.');
-            prompt("Skopiuj ten gotowy kod JSON і wklej w plik content/home.json:", JSON.stringify(siteData, null, 2));
-        }
-
-        function editProduct(index) {
-            const p = siteData.products[index];
-            document.getElementById('editIndex').value = index;
-            document.getElementById('newName').value = p.name || p.title || '';
-            document.getElementById('newCat').value = p.category || 'fotele';
-            document.getElementById('newPrice').value = p.price || '';
-            document.getElementById('newDesc').value = p.description || '';
-            
-            currentImagesArray = (p.images || p.image || '').split(',').map(s => s.trim()).filter(Boolean);
-            updateThumbs();
+            // Витягуємо чисті назви фотографій без "images/" для зручності
+            let rawImgs = (p.images || p.image || '').split(',').map(s => s.trim().replace('images/', '')).join(', ');
+            document.getElementById('pImgs').value = rawImgs;
 
             document.getElementById('formTitle').textContent = '✏️ Edytuj ogłoszenie';
-            document.getElementById('saveBtn').textContent = '💾 Zaktualizuj ogłoszenie';
-            document.getElementById('cancelBtn').style.display = 'block';
+            document.getElementById('saveBtn').textContent = '💾 Zaktualizuj';
+            document.getElementById('cancelBtn').style.display = 'inline-block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function resetForm() {
             document.getElementById('editIndex').value = '-1';
-            document.getElementById('newName').value = '';
-            document.getElementById('newPrice').value = '';
-            document.getElementById('newDesc').value = '';
-            document.getElementById('imageFiles').value = '';
-            currentImagesArray = [];
-            document.getElementById('previewThumbs').innerHTML = '';
-            document.getElementById('formTitle').textContent = '➕ Dodaj nowe ogłoszenie';
+            document.getElementById('pName').value = '';
+            document.getElementById('pPrice').value = '';
+            document.getElementById('pImgs').value = '';
+            document.getElementById('pDesc').value = '';
+            document.getElementById('formTitle').textContent = '2️⃣ Krok 2: Dodaj / Edytuj ogłoszenie';
             document.getElementById('saveBtn').textContent = '💾 Zapisz ogłoszenie';
             document.getElementById('cancelBtn').style.display = 'none';
         }
 
-        function deleteProduct(index) {
-            if (confirm('Czy na pewno chcesz usunąć ten produkt?')) {
-                siteData.products.splice(index, 1);
-                renderProductsAdmin();
-                prompt("Skopiuj zaktualizowany kod JSON і wklej w plik content/home.json:", JSON.stringify(siteData, null, 2));
+        function saveData() {
+            let i = parseInt(document.getElementById('editIndex').value);
+            let name = document.getElementById('pName').value.trim();
+            let cat = document.getElementById('pCat').value;
+            let price = document.getElementById('pPrice').value.trim();
+            let desc = document.getElementById('pDesc').value.trim();
+            let imgsInput = document.getElementById('pImgs').value.trim();
+
+            if(!name || !price) { 
+                alert('Wpisz nazwę i cenę!'); 
+                return; 
+            }
+
+            // Обробляємо список фото, автоматично додаючи "images/" до кожної
+            if(!imgsInput) imgsInput = "default.jpg";
+            let imgArray = imgsInput.split(',').map(s => {
+                let clean = s.trim();
+                return clean.startsWith('images/') ? clean : 'images/' + clean;
+            });
+
+            let newProd = {
+                title: name,
+                name: name,
+                category: cat,
+                price: price,
+                image: imgArray[0],
+                images: imgArray.join(', '),
+                fabric_images: "",
+                description: desc
+            };
+
+            if(i === -1) {
+                db.products.unshift(newProd); // Новий товар іде на початок
+            } else {
+                db.products[i] = newProd; // Оновлюємо існуючий
+            }
+
+            renderList();
+            resetForm();
+
+            alert('Gotowe! Skopiuj wygenerowany kod JSON і wklej w plik content/home.json na GitHubie.');
+            prompt("Skopiuj ten kod:", JSON.stringify(db, null, 2));
+        }
+
+        function delProd(i) {
+            if(confirm('Na pewno usunąć to ogłoszenie?')) {
+                db.products.splice(i, 1);
+                renderList();
+                prompt("Skopiuj zaktualizowany kod JSON:", JSON.stringify(db, null, 2));
             }
         }
     </script>
