@@ -27,7 +27,6 @@
         .login-box, .admin-panel { display: none; }
         .login-box.active, .admin-panel.active { display: block; }
         
-        /* Екран входу з пін-кодом */
         .login-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -51,26 +50,30 @@
         .btn:hover { background: var(--accent-hover); }
         .error-msg { color: #d01f58; font-size: 13px; margin-top: 10px; display: none; }
 
-        /* Адмін панель */
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
         h1 { color: var(--accent); font-size: 24px; }
         .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-        .card h3 { margin-bottom: 15px; font-size: 18px; }
+        .card h3 { margin-bottom: 15px; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }
         .form-control { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--bg-main); }
-        textarea.form-control { height: 100px; resize: vertical; }
+        textarea.form-control { height: 150px; resize: vertical; }
+        
         .product-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border-color); gap: 10px; }
         .product-row:last-child { border-bottom: none; }
         .actions button { padding: 6px 12px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; margin-left: 5px; }
         .btn-edit { background: #f0ede8; color: var(--text-dark); }
         .btn-delete { background: #f8eff1; color: var(--accent); }
         .btn-success { background: #2e7d32; color: #fff; margin-top: 10px; }
+        .btn-cancel { background: #6e6a64; color: #fff; margin-top: 10px; display: none; }
+        #loadingText { color: var(--accent); font-weight: bold; display: none; margin-bottom: 10px; }
+        .preview-thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .preview-thumbs span { background: #f2ece4; padding: 6px 10px; border-radius: 6px; font-size: 12px; border: 1px solid var(--border-color); }
     </style>
 </head>
 <body>
 
-    <!-- ЕКРАН ВХОДУ ЗА ПІН-КОДОМ -->
+    <!-- ЕКРАН ВХОДУ З ПІН-КОДОМ -->
     <div class="login-box active" id="loginBox">
         <div class="login-card">
             <h2>🔒 Podaj PIN</h2>
@@ -81,19 +84,20 @@
         </div>
     </div>
 
-    <!-- ГОЛОВНА ПАНЕЛЬ КЕРУВАННЯ -->
+    <!-- АДМІН-ПАНЕЛЬ -->
     <div class="admin-panel" id="adminPanel">
         <header>
             <h1>⚙️ Panel Zarządzania SLM24</h1>
             <a href="/" target="_blank" class="btn" style="width: auto; padding: 8px 15px; text-decoration: none;">🌐 Zobacz Sklep</a>
         </header>
 
-        <!-- Кнопка додавання нового товару -->
         <div class="card">
-            <h3>➕ Dodaj nowe ogłoszenie</h3>
+            <h3 id="formTitle">➕ Dodaj nowe ogłoszenie</h3>
+            <input type="hidden" id="editIndex" value="-1">
+            
             <div class="form-group">
                 <label>Nazwa mebla:</label>
-                <input type="text" id="newName" class="form-control" placeholder="np. Fotel Uszak Lux">
+                <input type="text" id="newName" class="form-control" placeholder="">
             </div>
             <div class="form-group">
                 <label>Kategoria:</label>
@@ -108,20 +112,27 @@
             </div>
             <div class="form-group">
                 <label>Cena (np. 950.00 zł):</label>
-                <input type="text" id="newPrice" class="form-control" placeholder="950.00 zł">
+                <input type="text" id="newPrice" class="form-control" placeholder="">
             </div>
+            
+            <!-- НЕОБМЕЖЕНА КІЛЬКІСТЬ ФОТОГРАФІЙ -->
             <div class="form-group">
-                <label>Zdjęcie główne (Link lub ścieżka np. images/fotel.jpg):</label>
-                <input type="text" id="newImg" class="form-control" placeholder="images/foto.jpg або https://...">
+                <label>Wybierz zdjęcia (możesz zaznaczyć od razu kilka z galerii):</label>
+                <input type="file" id="imageFiles" class="form-control" accept="image/*" multiple onchange="compressMultipleImages(event)">
+                <input type="hidden" id="newImgs">
             </div>
-            <div class="form-group">
-                <label>Opis mebla:</label>
-                <textarea id="newDesc" class="form-control" placeholder="Opis, wymiary, personalizacja..."></textarea>
+            <div id="loadingText">⏳ Trwa zmniejszanie i optymalizacja zdjęć...</div>
+            <div class="preview-thumbs" id="previewThumbs"></div>
+
+            <div class="form-group" style="margin-top: 15px;">
+                <label>Opis mebla (nieograniczona długość):</label>
+                <textarea id="newDesc" class="form-control" placeholder=""></textarea>
             </div>
-            <button class="btn btn-success" onclick="addProduct()">💾 Dodaj produkt do bazy</button>
+            
+            <button class="btn btn-success" id="saveBtn" onclick="saveProduct()">💾 Zapisz ogłoszenie</button>
+            <button class="btn btn-cancel" id="cancelBtn" onclick="resetForm()">Anuluj edycję</button>
         </div>
 
-        <!-- Список існуючих товарів -->
         <div class="card">
             <h3>📦 Lista aktywnych ogłoszeń (<span id="prodCount">0</span>)</h3>
             <div id="productList">Ładowanie produktów...</div>
@@ -129,12 +140,10 @@
     </div>
 
     <script>
-        // ТРІЙКА ПІН-КОД (можеш змінити цифри "1234" на свій власний пін)
-        const ADMIN_PIN = "1234"; 
+        const ADMIN_PIN = "1234"; // Можеш змінити на свій пін
 
         function checkPin() {
-            const entered = document.getElementById('pinInput').value;
-            if (entered === ADMIN_PIN) {
+            if (document.getElementById('pinInput').value === ADMIN_PIN) {
                 document.getElementById('loginBox').classList.remove('active');
                 document.getElementById('adminPanel').classList.add('active');
                 loadData();
@@ -144,6 +153,7 @@
         }
 
         let siteData = { products: [] };
+        let currentImagesArray = [];
 
         async function loadData() {
             try {
@@ -171,51 +181,137 @@
                         <span style="font-size: 12px; color: var(--accent); font-weight: bold;">${p.price}</span> | <span style="font-size: 12px; color: var(--text-muted);">${p.category || 'inne'}</span>
                     </div>
                     <div class="actions">
+                        <button class="btn-edit" onclick="editProduct(${index})">Edytuj</button>
                         <button class="btn-delete" onclick="deleteProduct(${index})">Usuń</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function addProduct() {
+        // Автоматичне зменшення та накопичення необмеженої кількості фото
+        function compressMultipleImages(event) {
+            const files = event.target.files;
+            if (!files.length) return;
+
+            document.getElementById('loadingText').style.display = 'block';
+            let processedCount = 0;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        const MAX_SIZE = 1000;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+                        } else {
+                            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const uniqueName = "images/meble-" + Date.now() + "-" + Math.floor(Math.random()*1000) + ".jpg";
+                        currentImagesArray.push(uniqueName);
+
+                        updateThumbs();
+                        processedCount++;
+
+                        if (processedCount === files.length) {
+                            document.getElementById('loadingText').style.display = 'none';
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateThumbs() {
+            const thumbs = document.getElementById('previewThumbs');
+            document.getElementById('newImgs').value = currentImagesArray.join(', ');
+            thumbs.innerHTML = currentImagesArray.map(img => `<span>📷 ${img.split('/').pop()}</span>`).join('');
+        }
+
+        function saveProduct() {
+            const index = parseInt(document.getElementById('editIndex').value);
             const name = document.getElementById('newName').value.trim();
             const category = document.getElementById('newCat').value;
             const price = document.getElementById('newPrice').value.trim();
-            const image = document.getElementById('newImg').value.trim();
             const description = document.getElementById('newDesc').value.trim();
+            const imagesStr = currentImagesArray.join(', ') || "images/default.jpg";
+            const mainImg = currentImagesArray[0] || "images/default.jpg";
 
             if (!name || !price) {
-                alert('Wypełnij nazwę i cenę!');
+                alert('Wypełnij nazwę i cenę produktu!');
                 return;
             }
 
-            const newProduct = {
+            const productData = {
                 title: name,
                 name: name,
                 category: category,
                 price: price,
-                image: image,
-                images: image,
+                image: mainImg,
+                images: imagesStr,
                 fabric_images: "",
                 description: description
             };
 
-            siteData.products.unshift(newProduct);
+            if (index === -1) {
+                siteData.products.unshift(productData); // Додавання нового
+            } else {
+                siteData.products[index] = productData; // Оновлення існуючого
+            }
+
             renderProductsAdmin();
+            resetForm();
             
-            // Генерація JSON для копіювання (оскільки на GitHub Pages файли не оновлюються автоматично без GitHub API)
-            alert('Produkt dodany w pamięci panelu!\n\nPonieważ strona działa na GitHub Pages, aby zapisać zmiany na stałe, skopiuj wygenerowany kod JSON і встав його у файл content/home.json на GitHub.');
+            alert('Gotowe! Skopiuj wygenerowany kod JSON і встав його у файл content/home.json na GitHub.');
+            prompt("Skopiuj ten gotowy kod JSON і встав у файл content/home.json:", JSON.stringify(siteData, null, 2));
+        }
+
+        function editProduct(index) {
+            const p = siteData.products[index];
+            document.getElementById('editIndex').value = index;
+            document.getElementById('newName').value = p.name || p.title || '';
+            document.getElementById('newCat').value = p.category || 'fotele';
+            document.getElementById('newPrice').value = p.price || '';
+            document.getElementById('newDesc').value = p.description || '';
             
-            // Показуємо готовий JSON для зручності
-            navigator.clipboard.writeText(JSON.stringify(siteData, null, 2));
-            prompt("Skopiuj ten gotowy kod JSON (skopiował się do schowka) і встав його в файл content/home.json на GitHub:", JSON.stringify(siteData, null, 2));
+            currentImagesArray = (p.images || p.image || '').split(',').map(s => s.trim()).filter(Boolean);
+            updateThumbs();
+
+            document.getElementById('formTitle').textContent = '✏️ Edytuj ogłoszenie';
+            document.getElementById('saveBtn').textContent = '💾 Zaktualizuj ogłoszenie';
+            document.getElementById('cancelBtn').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            document.getElementById('editIndex').value = '-1';
+            document.getElementById('newName').value = '';
+            document.getElementById('newPrice').value = '';
+            document.getElementById('newDesc').value = '';
+            document.getElementById('imageFiles').value = '';
+            currentImagesArray = [];
+            document.getElementById('previewThumbs').innerHTML = '';
+            document.getElementById('formTitle').textContent = '➕ Dodaj nowe ogłoszenie';
+            document.getElementById('saveBtn').textContent = '💾 Zapisz ogłoszenie';
+            document.getElementById('cancelBtn').style.display = 'none';
         }
 
         function deleteProduct(index) {
             if (confirm('Czy na pewno chcesz usunąć ten produkt?')) {
                 siteData.products.splice(index, 1);
                 renderProductsAdmin();
-                prompt("Skopiuj zaktualizowany kod JSON і встав його в файл content/home.json на GitHub:", JSON.stringify(siteData, null, 2));
+                prompt("Skopiuj zaktualizowany kod JSON і встав у файл content/home.json:", JSON.stringify(siteData, null, 2));
             }
         }
     </script>
