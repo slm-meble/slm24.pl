@@ -162,7 +162,7 @@
         <div class="card" id="geminiBox" style="display:none; background:#f3e8ff; border-color:#d8b4fe;">
             <h3 style="color:var(--ai-purple);">🤖 Klucz sztucznej inteligencji AI (jednorazowo)</h3>
             <p style="font-size:13px; color:#555; margin-bottom:10px;">
-                Wklej darmowy klucz z <a href="https://console.groq.com/keys" target="_blank" style="color:var(--ai-purple); font-weight:bold;">console.groq.com/keys</a> (zaczyna się od <b>gsk_...</b> — działa w Polsce w 100% za darmo bez karty) LUB klucz Gemini (<b>AIzaSy...</b>):
+                Wklej darmowy klucz z <a href="https://console.groq.com/keys" target="_blank" style="color:var(--ai-purple); font-weight:bold;">console.groq.com/keys</a> (zaczyna się od <b>gsk_...</b>):
             </p>
             <div style="display:flex; gap:10px;">
                 <input type="password" id="geminiKeyInput" class="form-control" style="margin:0;">
@@ -308,7 +308,6 @@
             }
         }
 
-        // УНІВЕРСАЛЬНИЙ ГЕНЕРАТОР ТЕКСТУ (ПІДТРИМУЄ GROQ gsk_... ТА GEMINI AIzaSy...)
         async function generateDescriptionWithAI() {
             const apiKey = getGeminiKey();
             if (!apiKey) {
@@ -323,7 +322,7 @@
             const rawDesc = document.getElementById('fDesc').value.trim();
 
             if (!name && !rawDesc) {
-                alert('Wpisz chociaż nazwę mebla lub kilka słów w polu opisu (może być po ukraińsku lub polsku), aby sztuczna inteligencja wiedziała, o czym pisać!');
+                alert('Wpisz chociaż nazwę mebla lub kilka słów w polu opisu!');
                 return;
             }
 
@@ -348,56 +347,28 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
             try {
                 let generatedText = "";
 
-                // 1. Якщо це ключ Groq (починається на gsk_) — працює без лімітів ЄС
-                if (apiKey.startsWith('gsk_')) {
-                    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + apiKey,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            model: 'llama-3.3-70b-versatile',
-                            messages: [{ role: 'user', content: promptText }],
-                            temperature: 0.7
-                        })
-                    });
-                    const data = await res.json();
-                    if (!res.ok) throw new Error(data.error?.message || 'Błąd serwera Groq');
-                    generatedText = data.choices?.[0]?.message?.content || '';
-                } 
-                // 2. Якщо це ключ Google Gemini (починається на AIza) — пробуємо кілька моделей по черзі
-                else {
-                    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
-                    let lastError = '';
-
-                    for (const model of models) {
-                        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                contents: [{ parts: [{ text: promptText }] }]
-                            })
-                        });
-                        const data = await res.json();
-                        if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-                            generatedText = data.candidates[0].content.parts[0].text;
-                            break;
-                        } else {
-                            lastError = data.error?.message || `Kod błędu: ${res.status}`;
-                        }
-                    }
-
-                    if (!generatedText) {
-                        throw new Error(lastError);
-                    }
-                }
+                // Використовуємо універсальну і швидку модель llama-3.1-70b-versatile від Groq
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + apiKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.1-70b-versatile',
+                        messages: [{ role: 'user', content: promptText }],
+                        temperature: 0.7
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error?.message || 'Błąd serwera Groq');
+                generatedText = data.choices?.[0]?.message?.content || '';
 
                 document.getElementById('fDesc').value = generatedText.replace(/\*\*/g, '').trim();
                 showStatus('✨ Gotowe! Opis został napisany i wstawiony.', 3500);
             } catch (err) {
                 console.error(err);
-                alert('Szczegóły błędu AI: ' + err.message + '\n\nWskazówka: Jeśli Google blokuje darmowy klucz w Polsce (błąd Quota / limit: 0), weź darmowy klucz ze strony console.groq.com/keys (zaczyna się od gsk_...) i wklej go w "🤖 Klucz AI".');
+                alert('Szczegóły błędu AI: ' + err.message);
                 showStatus('❌ Błąd generowania opisu AI', 3500);
             } finally {
                 aiBtn.disabled = false;
@@ -474,7 +445,7 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
 
             const token = getToken();
             if (!token) {
-                alert('Najpierw wklej swój Klucz GitHub (przycisk "🔑 Klucz GitHub" u góry)!');
+                alert('Najpierw wklej swój Klucz GitHub!');
                 document.getElementById('tokenBox').style.display = 'block';
                 return;
             }
@@ -599,101 +570,4 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
         function startEditProduct(idx) {
             const p = catalogData.products[idx];
             document.getElementById('editIdx').value = idx;
-            document.getElementById('fName').value = p.name || p.title || '';
-            document.getElementById('fPrice').value = p.price || '';
-            document.getElementById('fCat').value = p.category || 'fotele';
-            document.getElementById('fDesc').value = p.description || '';
-
-            const rawImgs = p.images || p.image || '';
-            currentPhotos = rawImgs.split(',').map(s => s.trim()).filter(Boolean);
-            renderPhotoPreviews();
-
-            document.getElementById('formHeader').textContent = '✏️ Edycja ogłoszenia: ' + (p.name || p.title);
-            document.getElementById('submitFormBtn').textContent = '💾 Zapisz zmiany w ogłoszeniu';
-            document.getElementById('cancelEditBtn').style.display = 'inline-flex';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        async function pinToTop(idx) {
-            const item = catalogData.products.splice(idx, 1)[0];
-            catalogData.products.unshift(item);
-            renderProductsList();
-            await pushJsonToGitHub('Przypięto ogłoszenie na górę listy');
-        }
-
-        async function removeProduct(idx) {
-            const p = catalogData.products[idx];
-            if (!confirm(`Czy na pewno chcesz całkowicie usunąć "${p.name || p.title}"?`)) return;
-            catalogData.products.splice(idx, 1);
-            renderProductsList();
-            await pushJsonToGitHub('Usunięto ogłoszenie z katalogu');
-        }
-
-        function clearForm() {
-            document.getElementById('editIdx').value = '-1';
-            document.getElementById('fName').value = '';
-            document.getElementById('fPrice').value = '';
-            document.getElementById('fDesc').value = '';
-            currentPhotos = [];
-            renderPhotoPreviews();
-            document.getElementById('formHeader').textContent = '➕ Dodaj nowe ogłoszenie';
-            document.getElementById('submitFormBtn').textContent = '💾 Zapisz ogłoszenie i wyślij na stronę';
-            document.getElementById('cancelEditBtn').style.display = 'none';
-        }
-
-        async function pushJsonToGitHub(commitMsg) {
-            const token = getToken();
-            if (!token) {
-                alert('Wklej najpierw swój Klucz GitHub!');
-                document.getElementById('tokenBox').style.display = 'block';
-                return false;
-            }
-
-            showStatus('⏳ Zapisywanie zmian na serwerze GitHub...');
-            try {
-                const getRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${JSON_PATH}?t=${Date.now()}`, {
-                    headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
-                });
-                if (getRes.ok) {
-                    const getJson = await getRes.json();
-                    homeJsonSha = getJson.sha;
-                }
-
-                const jsonString = JSON.stringify(catalogData, null, 2);
-                const utf8Bytes = new TextEncoder().encode(jsonString);
-                let binaryStr = "";
-                for (let i = 0; i < utf8Bytes.length; i++) {
-                    binaryStr += String.fromCharCode(utf8Bytes[i]);
-                }
-                const base64Content = btoa(binaryStr);
-
-                const putRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${JSON_PATH}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': 'token ' + token,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: commitMsg,
-                        content: base64Content,
-                        sha: homeJsonSha
-                    })
-                });
-
-                if (!putRes.ok) throw new Error('Błąd zapisu pliku home.json');
-                const putData = await putRes.json();
-                homeJsonSha = putData.content.sha;
-
-                showStatus('✅ Zapisano! Zmiany pojawią się na stronie za ok. 1 minutę.', 4500);
-                return true;
-            } catch (err) {
-                console.error(err);
-                alert('Wystąpił błąd podczas zapisywania na GitHub.');
-                showStatus('❌ Błąd zapisu', 3000);
-                return false;
-            }
-        }
-    </script>
-</body>
-</html>
+            document.getElementById('fName').value =
