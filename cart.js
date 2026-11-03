@@ -82,14 +82,13 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.body.appendChild(askModal);
 
-    // 4. Очищення карток каталогу та модальних вікон (точний збір реальних цін без помилок)
+    // 4. Очищення карток каталогу та модальних вікон
     function enhanceProductCards() {
         const buttons = Array.from(document.querySelectorAll("button, a")).filter(el => el.innerText.includes("Zapytaj o cenę"));
         buttons.forEach((btn, index) => {
             if (btn.dataset.slmEnhanced) return;
             btn.dataset.slmEnhanced = "true";
 
-            // Шукаємо найближчий контейнер (працює як для карток у каталозі, так і для модальних вікон детального перегляду)
             const card = btn.closest("div") || btn.parentElement;
             if (!card) return;
 
@@ -98,7 +97,6 @@ document.addEventListener("DOMContentLoaded", function() {
             
             const skipButtons = /caterpillar|chesterfield/i.test(title);
             
-            // ПОКРАЩЕНИЙ ПОШУК ЦІНИ: шукаємо точне число зі знаком zł і беремо вартість >= 400
             let basePrice = 0;
             const allTextMatches = card.innerText.match(/(\d{3,4}(?:[,\.]\d{2})?)\s*zł/gi);
             if (allTextMatches) {
@@ -110,7 +108,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
             }
-            // Якщо не знайшли в межах картки, шукаємо на всій сторінці або ставимо реальний дефолт
             if (!basePrice || isNaN(basePrice)) basePrice = 1030;
 
             const actionsDiv = document.createElement("div");
@@ -288,7 +285,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("slm-ask-modal").style.display = "none";
     });
 
-    // 6. Відправка замовлення адміністратору (на ваші дані: 666688298 / slmmble2022@gmail.com)
+    // 6. Відправка замовлення адміністратору
     function buildOrderMessage() {
         const name = document.getElementById("slm-name").value.trim();
         const phone = document.getElementById("slm-phone").value.trim();
@@ -307,11 +304,11 @@ document.addEventListener("DOMContentLoaded", function() {
             total += item.totalPrice;
             let buttonsText = item.skipButtons ? "Nie dotyczy" : item.buttons;
             return `${idx + 1}. *${item.name}* (${item.cardId})\n` +
-                   `   - Ilość: ${item.qty} szt. - ${item.totalPrice.toFixed(2)} zł\n` +
-                   `   - 🪑 Siedzisko: ${item.spring}\n` +
-                   `   - 🦵 Nóżka nr: ${item.leg}\n` +
-                   `   - 🔘 Układ guzików: ${buttonsText}\n` +
-                   `   - 🎨 Tkanina / kolor: *${item.fabric || "Jak na zdjęciu"}*`;
+                   `    - Ilość: ${item.qty} szt. - ${item.totalPrice.toFixed(2)} zł\n` +
+                   `    - 🪑 Siedzisko: ${item.spring}\n` +
+                   `    - 🦵 Nóżka nr: ${item.leg}\n` +
+                   `    - 🔘 Układ guzików: ${buttonsText}\n` +
+                   `    - 🎨 Tkanina / kolor: *${item.fabric || "Jak na zdjęciu"}*`;
         }).join("\n\n");
 
         const fullMsg = `NOWE ZAMÓWIENIE - SLM24.PL\n========================\n` +
@@ -334,9 +331,10 @@ document.addEventListener("DOMContentLoaded", function() {
         window.open(`https://wa.me/48666688298?text=${encodeURIComponent(msg)}`, "_blank");
     });
 
+    // ВИПРАВЛЕНО ТУТ: прибрано помилкову стрілку "if -> (!msg)"
     document.getElementById("slm-order-email").addEventListener("click", () => {
         const msg = buildOrderMessage();
-        if -> (!msg) return;
+        if (!msg) return;
         window.location.href = `mailto:slmmble2022@gmail.com?subject=${encodeURIComponent("Nowe zamówienie ze sklepu SLM24.pl")}&body=${encodeURIComponent(msg)}`;
     });
 
