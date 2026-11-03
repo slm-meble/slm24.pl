@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const title = titleEl.innerText.trim();
             const cardText = card.innerText;
 
-            const priceMatch = cardText.match(/(\d+[\.,]?\d*)\s*zł/i);
+            const priceMatch = card.innerText.match(/(\d{3,4}[\.,]?\d*)/);
             const basePrice = priceMatch ? parseFloat(priceMatch[1].replace(",", ".")) : 0;
 
             const optionsDiv = document.createElement("div");
