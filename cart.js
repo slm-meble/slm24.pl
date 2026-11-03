@@ -108,7 +108,19 @@ document.addEventListener("DOMContentLoaded", function() {
             const title = titleEl.innerText.trim();
             const cardText = card.innerText;
 
-            const priceMatch = card.innerText.match(/(\d{3,4}[\.,]?\d*)/);
+            let basePrice = 0;
+const priceMatch = card.innerText.match(/(\d+[\.,]?\d*)\s*(?:zł|PLN)/i);
+if (priceMatch) {
+    basePrice = parseFloat(priceMatch[1].replace(",", "."));
+} else {
+    // Якщо раптом "zł" немає на тому ж рядку, беремо перше велике число більше 300
+    const nums = card.innerText.match(/\d+[\.,]?\d*/g);
+    if (nums) {
+        const validNums = nums.map(n => parseFloat(n.replace(",", "."))).filter(n => n > 300);
+        if (validNums.length > 0) basePrice = validNums[0];
+    }
+}
+if (!basePrice || basePrice < 100) basePrice = 800;
             const basePrice = priceMatch ? parseFloat(priceMatch[1].replace(",", ".")) : 0;
 
             const optionsDiv = document.createElement("div");
