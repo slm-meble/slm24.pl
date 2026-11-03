@@ -1,6 +1,4 @@
 // Повнофункціональний кошик для SLM24.pl
-// Усі опції (пружина, ніжки 1-6, ґудзики A-F, палітра тканин) доступні на всіх поточних і нових оголошеннях та всередині кошика
-
 document.addEventListener("DOMContentLoaded", function() {
     let cart = JSON.parse(localStorage.getItem("slm_cart")) || [];
 
@@ -94,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.body.appendChild(askModal);
 
-    // 5. Додаємо повний набір опцій на КОЖНУ картку товару (існуючу та майбутню)
+    // 5. Опції та точний збір ціни (пошук чітко біля слова zł)
     function enhanceProductCards() {
         const buttons = Array.from(document.querySelectorAll("button, a")).filter(el => el.innerText.includes("Zapytaj o cenę"));
         buttons.forEach((btn) => {
@@ -106,22 +104,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const titleEl = card.querySelector("h3, h2, h4, strong") || { innerText: "Mebel SLM24" };
             const title = titleEl.innerText.trim();
-            const cardText = card.innerText;
-
+            
+            // Чіткий пошук ціни біля слова zł
             let basePrice = 0;
-const priceMatch = card.innerText.match(/(\d+[\.,]?\d*)\s*(?:zł|PLN)/i);
-if (priceMatch) {
-    basePrice = parseFloat(priceMatch[1].replace(",", "."));
-} else {
-    // Якщо раптом "zł" немає на тому ж рядку, беремо перше велике число більше 300
-    const nums = card.innerText.match(/\d+[\.,]?\d*/g);
-    if (nums) {
-        const validNums = nums.map(n => parseFloat(n.replace(",", "."))).filter(n => n > 300);
-        if (validNums.length > 0) basePrice = validNums[0];
-    }
-}
-if (!basePrice || basePrice < 100) basePrice = 800;
-            const basePrice = priceMatch ? parseFloat(priceMatch[1].replace(",", ".")) : 0;
+            const priceMatch = card.innerText.match(/(\d+[\.,]?\d*)\s*zł/i);
+            if (priceMatch) {
+                basePrice = parseFloat(priceMatch[1].replace(",", "."));
+            }
+            if (!basePrice || basePrice < 100) basePrice = 800; // Страховка
 
             const optionsDiv = document.createElement("div");
             optionsDiv.className = "slm-prod-options";
@@ -235,11 +225,10 @@ if (!basePrice || basePrice < 100) basePrice = 800;
 
     setInterval(enhanceProductCards, 800);
 
-    // 6. Відображення та редагування опцій прямо всередині Кошика
+    // 6. Відображення та редагування опцій в Кошику
     function saveAndRenderCart() {
-        // Перерахунок цін перед збереженням
         cart.forEach(item => {
-            const base = item.basePrice !== undefined ? item.basePrice : item.unitPrice;
+            const base = item.basePrice !== undefined ? item.basePrice : 800;
             const spExtra = parseFloat(item.springVal) || 0;
             const crExtra = (item.buttons && item.buttons.includes("+50")) ? 50 : 0;
             item.unitPrice = base + spExtra + crExtra;
