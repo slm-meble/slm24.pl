@@ -1,21 +1,18 @@
-// Повнофункціональний кошик для SLM24.pl (Виправлена версія)
+// Оновлений повнофункціональний кошик для SLM24.pl (Без гудзиків для Caterpillar та Chesterfield)
 document.addEventListener("DOMContentLoaded", function() {
     let cart = JSON.parse(localStorage.getItem("slm_cart")) || [];
 
-    // 1. Стилі для кошика, карток та вікон
+    // 1. Стилі для карток та вікон (верхній плаваючий кошик приховано)
     const style = document.createElement("style");
     style.innerHTML = `
-        #slm-top-cart { position: fixed; top: 18px; right: 85px; background: #9e2a48; color: #fff; padding: 8px 16px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 14px; z-index: 9999; box-shadow: 0 3px 10px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 6px; transition: 0.2s; }
-        #slm-top-cart:hover { background: #7d1e37; transform: scale(1.03); }
-        .slm-prod-options { background: #fdfaf9; border: 1px solid #eadcd9; border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 13px; color: #333; text-align: left; }
-        .slm-prod-options label { display: block; font-weight: bold; margin-bottom: 3px; color: #555; font-size: 12px; }
-        .slm-prod-options select, .slm-prod-options input[type="text"] { width: 100%; padding: 6px; margin-bottom: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; background: #fff; box-sizing: border-box; }
-        .slm-qty-box { display: flex; align-items: center; justify-content: space-between; margin: 10px 0; }
+        #slm-top-cart { display: none !important; }
+        .slm-prod-actions { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+        .slm-qty-box { display: flex; align-items: center; justify-content: space-between; margin: 8px 0; font-size: 13px; }
         .slm-qty-controls { display: flex; align-items: center; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; background: #fff; }
-        .slm-qty-btn { background: #f5f5f5; border: none; width: 30px; height: 30px; font-size: 16px; font-weight: bold; cursor: pointer; color: #333; }
+        .slm-qty-btn { background: #f5f5f5; border: none; width: 28px; height: 28px; font-size: 15px; font-weight: bold; cursor: pointer; color: #333; }
         .slm-qty-btn:hover { background: #e0e0e0; }
-        .slm-qty-input { width: 40px; text-align: center; border: none; font-size: 14px; font-weight: bold; }
-        .slm-add-btn { width: 100%; background: #9e2a48; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; margin-bottom: 6px; transition: 0.2s; }
+        .slm-qty-input { width: 38px; text-align: center; border: none; font-size: 13px; font-weight: bold; }
+        .slm-add-btn { width: 100%; background: #9e2a48; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.2s; }
         .slm-add-btn:hover { background: #7d1e37; }
         .slm-ask-btn { width: 100%; background: transparent; color: #666; border: 1px solid #ccc; padding: 7px; border-radius: 6px; font-size: 13px; cursor: pointer; }
         .slm-ask-btn:hover { background: #f2f2f2; color: #333; }
@@ -23,17 +20,10 @@ document.addEventListener("DOMContentLoaded", function() {
         .slm-modal-box { background: #fff; width: 100%; max-width: 600px; border-radius: 12px; padding: 22px; max-height: 92vh; overflow-y: auto; box-shadow: 0 8px 25px rgba(0,0,0,0.3); position: relative; box-sizing: border-box; }
         .slm-input { width: 100%; padding: 9px; margin-bottom: 9px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
         .slm-cart-item-edit select, .slm-cart-item-edit input { padding: 4px 6px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; margin-top: 3px; }
-        @media (max-width: 768px) { #slm-top-cart { top: auto; bottom: 20px; right: 20px; padding: 12px 18px; font-size: 15px; } }
     `;
     document.head.appendChild(style);
 
-    // 2. Кнопка кошика у верхній шапці
-    const topCart = document.createElement("div");
-    topCart.id = "slm-top-cart";
-    topCart.innerHTML = `🛒 Koszyk (<span id="slm-cart-count">0</span>) - <span id="slm-cart-HeaderTotal">0</span> zł`;
-    document.body.appendChild(topCart);
-
-    // 3. Модальне вікно Кошика
+    // 2. Модальне вікно Кошика
     const cartModal = document.createElement("div");
     cartModal.className = "slm-modal-overlay";
     cartModal.id = "slm-cart-modal";
@@ -70,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.body.appendChild(cartModal);
 
-    // 4. Модальне вікно "Zapytaj o produkt"
+    // 3. Модальне вікно "Zapytaj o produkt"
     const askModal = document.createElement("div");
     askModal.className = "slm-modal-overlay";
     askModal.id = "slm-ask-modal";
@@ -92,10 +82,10 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.body.appendChild(askModal);
 
-    // 5. Опції та точний збір ціни з картки товару
+    // 4. Очищення карток каталогу
     function enhanceProductCards() {
         const buttons = Array.from(document.querySelectorAll("button, a")).filter(el => el.innerText.includes("Zapytaj o cenę"));
-        buttons.forEach((btn) => {
+        buttons.forEach((btn, index) => {
             if (btn.dataset.slmEnhanced) return;
             btn.dataset.slmEnhanced = "true";
 
@@ -105,58 +95,25 @@ document.addEventListener("DOMContentLoaded", function() {
             const titleEl = card.querySelector("h3, h2, h4, strong") || { innerText: "Mebel SLM24" };
             const title = titleEl.innerText.trim();
             
-            // ПОКРАЩЕНИЙ ПОШУК ЦІНИ: шукаємо точний блок ціни на картці
-            let basePrice = 0;
-            const priceEl = card.querySelector(".price, [class*='price'], span[style*='color'], b");
+            // Перевірка на наявність Caterpillar або Chesterfield у назві
+            const skipButtons = /caterpillar|chesterfield/i.test(title);
             
-            // Пробуємо витягнути з основного елемента ціни або за допомогою точнішого регулярного виразу
-            const allText = card.innerText;
-            // Шукаємо шаблон на кшталт "1030.00 zł" або "950 zł"
-            const matches = allText.match(/(\d{3,4}(?:[,\.]\d{2})?)\s*zł/gi);
-            if (matches && matches.length > 0) {
-                // Беремо останнє знайдене значення (зазвичай поточна ціна йде останньою)
-                const cleanNum = matches[matches.length - 1].replace(/[^\d,\.]/g, "").replace(",", ".");
-                basePrice = parseFloat(cleanNum);
+            let basePrice = 0;
+            const allTextMatches = card.innerText.match(/(\d{3,4}(?:[,\.]\d{2})?)\s*zł/gi);
+            if (allTextMatches) {
+                for (let match of allTextMatches) {
+                    const val = parseFloat(match.replace(/[^\d,\.]/g, "").replace(",", "."));
+                    if (val >= 400) {
+                        basePrice = val;
+                        break;
+                    }
+                }
             }
+            if (!basePrice || isNaN(basePrice)) basePrice = 1000;
 
-            // Якщо ціну все ж не знайдено, зупиняємось або виводимо попередження в консоль замість підстановки 800
-            if (!basePrice || isNaN(basePrice)) {
-                basePrice = 1000; // Адекватний дефолт для меблів, якщо сталася помилка верстки
-            }
-
-            const optionsDiv = document.createElement("div");
-            optionsDiv.className = "slm-prod-options";
-            optionsDiv.innerHTML = `
-                <label>Wybierz wariant siedziska (Sprężyna):</label>
-                <select class="slm-opt-spring">
-                    <option value="0" data-label="Bez sprężyny falistej (standard)">Bez sprężyny falistej (w cenie)</option>
-                    <option value="69" data-label="Ze sprężyną falistą (+69 zł)">Siedzisko ze sprężyną falistą (+69 zł)</option>
-                </select>
-
-                <label>Wybierz numer nóżek (1 - 6):</label>
-                <select class="slm-opt-leg">
-                    <option value="1">Nóżka nr 1</option>
-                    <option value="2">Nóżka nr 2</option>
-                    <option value="3">Nóżka nr 3</option>
-                    <option value="4">Nóżka nr 4</option>
-                    <option value="5">Nóżka nr 5</option>
-                    <option value="6">Nóżka nr 6</option>
-                </select>
-
-                <label>Układ guzików (A - F):</label>
-                <select class="slm-opt-buttons">
-                    <option value="A">Układ A</option>
-                    <option value="B">Układ B</option>
-                    <option value="C">Układ C</option>
-                    <option value="D">Układ D</option>
-                    <option value="E">Układ E</option>
-                    <option value="F">Układ F</option>
-                    <option value="Kryształki (+50 zł)">Zamiast guzików: Kryształki (+50 zł)</option>
-                </select>
-
-                <label>Paleta tkanin (Podaj nazwę / numer koloru):</label>
-                <input type="text" class="slm-opt-fabric" placeholder="np. Jak na zdjęciu / Monolith 37 / Poso 47">
-
+            const actionsDiv = document.createElement("div");
+            actionsDiv.className = "slm-prod-actions";
+            actionsDiv.innerHTML = `
                 <div class="slm-qty-box">
                     <span style="font-weight:bold;">Ilość (szt.):</span>
                     <div class="slm-qty-controls">
@@ -165,68 +122,52 @@ document.addEventListener("DOMContentLoaded", function() {
                         <button type="button" class="slm-qty-btn slm-plus">+</button>
                     </div>
                 </div>
-
                 <button type="button" class="slm-add-btn">🛒 Dodaj do koszyka (<span class="slm-live-price">${basePrice.toFixed(2)}</span> zł)</button>
                 <button type="button" class="slm-ask-btn">✉️ Zapytaj o produkt (Zostaw e-mail)</button>
             `;
 
             btn.style.display = "none";
-            btn.parentNode.insertBefore(optionsDiv, btn);
+            btn.parentNode.insertBefore(actionsDiv, btn);
 
-            const qtyInput = optionsDiv.querySelector(".slm-qty-input");
-            const springSelect = optionsDiv.querySelector(".slm-opt-spring");
-            const buttonsSelect = optionsDiv.querySelector(".slm-opt-buttons");
-            const fabricInput = optionsDiv.querySelector(".slm-opt-fabric");
-            const livePriceEl = optionsDiv.querySelector(".slm-live-price");
+            const qtyInput = actionsDiv.querySelector(".slm-qty-input");
+            const livePriceEl = actionsDiv.querySelector(".slm-live-price");
 
             function updateCardPrice() {
                 const qty = parseInt(qtyInput.value) || 1;
-                const springExtra = parseFloat(springSelect.value) || 0;
-                const crystalExtra = buttonsSelect.value.includes("+50") ? 50 : 0;
-                const total = (basePrice + springExtra + crystalExtra) * qty;
+                const total = basePrice * qty;
                 livePriceEl.innerText = total.toFixed(2);
             }
 
-            optionsDiv.querySelector(".slm-minus").addEventListener("click", () => {
+            actionsDiv.querySelector(".slm-minus").addEventListener("click", () => {
                 let v = parseInt(qtyInput.value);
                 if (v > 1) { qtyInput.value = v - 1; updateCardPrice(); }
             });
-            optionsDiv.querySelector(".slm-plus").addEventListener("click", () => {
+            actionsDiv.querySelector(".slm-plus").addEventListener("click", () => {
                 let v = parseInt(qtyInput.value);
                 qtyInput.value = v + 1;
                 updateCardPrice();
             });
-            springSelect.addEventListener("change", updateCardPrice);
-            buttonsSelect.addEventListener("change", updateCardPrice);
 
-            // Додавання в кошик з фіксацією точної базової ціни
-            optionsDiv.querySelector(".slm-add-btn").addEventListener("click", () => {
+            actionsDiv.querySelector(".slm-add-btn").addEventListener("click", () => {
                 const qty = parseInt(qtyInput.value) || 1;
-                const springVal = parseFloat(springSelect.value) || 0;
-                const springLabel = springSelect.options[springSelect.selectedIndex].dataset.label;
-                const leg = optionsDiv.querySelector(".slm-opt-leg").value;
-                const btns = buttonsSelect.value;
-                const fabric = fabricInput.value.trim() || "Jak na zdjęciu";
-                const crystalExtra = btns.includes("+50") ? 50 : 0;
-                const unitPrice = basePrice + springVal + crystalExtra;
 
                 cart.push({
                     name: title,
-                    basePrice: basePrice, // Фіксуємо правильну базу без 800 zł
-                    unitPrice: unitPrice,
+                    skipButtons: skipButtons,
+                    cardId: "Kreslo #" + (index + 1),
+                    basePrice: basePrice,
                     qty: qty,
-                    totalPrice: unitPrice * qty,
-                    springVal: springVal,
-                    spring: springLabel,
-                    leg: leg,
-                    buttons: btns,
-                    fabric: fabric
+                    springVal: 0,
+                    spring: "Bez sprężyny falistej (standard)",
+                    leg: "1",
+                    buttons: skipButtons ? "Nie dotyczy" : "A",
+                    fabric: "Jak na zdjęciu"
                 });
                 saveAndRenderCart();
                 document.getElementById("slm-cart-modal").style.display = "flex";
             });
 
-            optionsDiv.querySelector(".slm-ask-btn").addEventListener("click", () => {
+            actionsDiv.querySelector(".slm-ask-btn").addEventListener("click", () => {
                 document.getElementById("slm-ask-prod-name").innerText = "Produkt: " + title;
                 document.getElementById("slm-ask-modal").style.display = "flex";
             });
@@ -235,14 +176,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     setInterval(enhanceProductCards, 800);
 
-    // 6. Відображення та редагування опцій в Кошику (БЕЗ ЖОРСТКИХ ПРИВ'ЯЗОК ДО 800)
+    // 5. Відображення кошика
     function saveAndRenderCart() {
         cart.forEach(item => {
-            // Якщо basePrice відсутній або дорівнює помилковому 800, відновлюємо з unitPrice або ставимо мінімум
-            if (item.basePrice === undefined || item.basePrice === 800) {
-                item.basePrice = item.unitPrice ? item.unitPrice - (item.springVal || 0) - ((item.buttons && item.buttons.includes("+50")) ? 50 : 0) : 1030;
-            }
-            const base = item.basePrice;
+            const base = item.basePrice || 1000;
             const spExtra = parseFloat(item.springVal) || 0;
             const crExtra = (item.buttons && item.buttons.includes("+50")) ? 50 : 0;
             item.unitPrice = base + spExtra + crExtra;
@@ -257,9 +194,6 @@ document.addEventListener("DOMContentLoaded", function() {
         let totalSum = 0;
         let totalQty = 0;
         cart.forEach(item => { totalSum += item.totalPrice; totalQty += item.qty; });
-
-        document.getElementById("slm-cart-count").innerText = totalQty;
-        document.getElementById("slm-cart-HeaderTotal").innerText = totalSum.toFixed(0);
 
         if (cart.length === 0) {
             container.innerHTML = "<p style='color:#777; text-align:center; padding:15px 0;'>Twój koszyk jest pusty.</p>";
@@ -292,12 +226,17 @@ document.addEventListener("DOMContentLoaded", function() {
                             ${[1,2,3,4,5,6].map(n => `<option value="${n}" ${item.leg == n ? 'selected' : ''}>Nóżka nr ${n}</option>`).join('')}
                         </select>
                     </div>
+                    ${!item.skipButtons ? `
                     <div>
                         <b>🔘 Układ guzików:</b><br>
                         <select onchange="window.slmUpdateCartItem(${i}, 'buttons', this.value)" style="width:100%;">
                             ${['A','B','C','D','E','F','Kryształki (+50 zł)'].map(b => `<option value="${b}" ${item.buttons === b ? 'selected' : ''}>${b.length === 1 ? 'Układ ' + b : b}</option>`).join('')}
                         </select>
-                    </div>
+                    </div>` : `
+                    <div>
+                        <b>🔘 Układ guzików:</b><br>
+                        <span style="font-size:11px; color:#888; font-style:italic;">Nie dotyczy (Model klasyczny)</span>
+                    </div>`}
                     <div>
                         <b>🎨 Tkanina / Kolor:</b><br>
                         <input type="text" value="${item.fabric || 'Jak na zdjęciu'}" onchange="window.slmUpdateCartItem(${i}, 'fabric', this.value)" style="width:100%; box-sizing:border-box;">
@@ -340,10 +279,6 @@ document.addEventListener("DOMContentLoaded", function() {
         saveAndRenderCart();
     };
 
-    document.getElementById("slm-top-cart").addEventListener("click", () => {
-        saveAndRenderCart();
-        document.getElementById("slm-cart-modal").style.display = "flex";
-    });
     document.getElementById("slm-close-cart").addEventListener("click", () => {
         document.getElementById("slm-cart-modal").style.display = "none";
     });
@@ -351,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("slm-ask-modal").style.display = "none";
     });
 
-    // 7. Відправка замовлення адміністратору
+    // 6. Відправка замовлення адміністратору
     function buildOrderMessage() {
         const name = document.getElementById("slm-name").value.trim();
         const phone = document.getElementById("slm-phone").value.trim();
@@ -368,18 +303,27 @@ document.addEventListener("DOMContentLoaded", function() {
         let total = 0;
         let itemsText = cart.map((item, idx) => {
             total += item.totalPrice;
-            return `${idx + 1}. ${item.name} (${item.qty} szt.) - ${item.totalPrice.toFixed(2)} zł\n` +
-                   `   - Siedzisko: ${item.spring}\n` +
-                   `   - Nóżka nr: ${item.leg}\n` +
-                   `   - Układ guzików: ${item.buttons}\n` +
-                   `   - Tkanina / kolor: ${item.fabric || "Jak na zdjęciu"}`;
+            let buttonsText = item.skipButtons ? "Nie dotyczy" : item.buttons;
+            return `${idx + 1}. *${item.name}* (${item.cardId})\n` +
+                   `   - Ilość: ${item.qty} szt. - ${item.totalPrice.toFixed(2)} zł\n` +
+                   `   - 🪑 Siedzisko: ${item.spring}\n` +
+                   `   - 🦵 Nóżka nr: ${item.leg}\n` +
+                   `   - 🔘 Układ guzików: ${buttonsText}\n` +
+                   `   - 🎨 Tkanina / kolor: *${item.fabric || "Jak na zdjęciu"}*`;
         }).join("\n\n");
 
-        return `NOWE ZAMÓWIENIE - SLM24.PL\n========================\n` +
-               `PRODUKTI:\n${itemsText}\n\n` +
-               `RAZEM DO ZAPŁATY: ${total.toFixed(2)} zł\n` +
-               `SPOSÓB PŁATNOŚCI: ${payment}\n========================\n` +
-               `DANE KLIENTA:\nImię i nazwisko: ${name}\nTelefon: ${phone}\nE-mail: ${email}\nAdres dostawy: ${address}\nUwagi: ${notes || "Brak"}`;
+        const fullMsg = `NOWE ZAMÓWIENIE - SLM24.PL\n========================\n` +
+                        `PRODUKTY:\n${itemsText}\n\n` +
+                        `RAZEM DO ZAPŁATY: ${total.toFixed(2)} zł\n` +
+                        `SPOSÓB PŁATNOŚCI: ${payment}\n========================\n` +
+                        `DANE KLIENTA:\nImię i nazwisko: ${name}\nTelefon: ${phone}\nE-mail: ${email}\nAdres dostawy: ${address}\nUwagi: ${notes || "Brak"}`;
+
+        cart = [];
+        localStorage.removeItem("slm_cart");
+        saveAndRenderCart();
+        document.getElementById("slm-cart-modal").style.display = "none";
+
+        return fullMsg;
     }
 
     document.getElementById("slm-order-whatsapp").addEventListener("click", () => {
@@ -407,7 +351,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("slm-send-ask-email").addEventListener("click", () => {
         const prod = document.getElementById("slm-ask-prod-name").innerText;
         const email = document.getElementById("slm-ask-email").value.trim();
-        const phone = document.getElementById("slm-ask-phone, ").value.trim();
+        const phone = document.getElementById("slm-ask-phone").value.trim();
         const q = document.getElementById("slm-ask-question").value.trim();
         if (!email || !q) { alert("Podaj swój adres e-mail oraz wpisz pytanie!"); return; }
         const text = `${prod}\nOdpowiedz na e-mail klienta: ${email}\nTelefon: ${phone || "Brak"}\n\nPytanie:\n${q}`;
