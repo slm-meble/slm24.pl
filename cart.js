@@ -106,8 +106,21 @@ document.addEventListener("DOMContentLoaded", function() {
             const title = titleEl.innerText.trim();
             
             // Чіткий пошук ціни біля слова zł
-            let basePrice = 0;
-            const priceMatch = card.innerText.match(/(\d+[\.,]?\d*)\s*zł/i);
+           let basePrice = 0;
+// Шукаємо спочатку елемент, де вказана ціна (наприклад, червоний текст із сумою)
+const priceEl = card.querySelector("p, span, div") && Array.from(card.querySelectorAll("*")).find(el => el.innerText.match(/^\d+[\.,]?\d*\s*zł/i));
+if (priceEl) {
+    const m = priceEl.innerText.match(/(\d+[\.,]?\d*)/);
+    if (m) basePrice = parseFloat(m[1].replace(",", "."));
+}
+// Якщо раптом не знайшлося через селектор, шукаємо перше вкраплення суми з zł на картці
+if (!basePrice) {
+    const priceMatch = card.innerText.match(/(\d{3,4}[\.,]?\d*)\s*zł/i);
+    if (priceMatch) {
+        basePrice = parseFloat(priceMatch[1].replace(",", "."));
+    }
+}
+if (!basePrice || basePrice < 100) basePrice = 800;
             if (priceMatch) {
                 basePrice = parseFloat(priceMatch[1].replace(",", "."));
             }
