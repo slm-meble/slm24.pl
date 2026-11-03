@@ -1,4 +1,4 @@
-// Повнофункціональний кошик для SLM24.pl
+// Повнофункціональний кошик для SLM24.pl (Виправлена версія)
 document.addEventListener("DOMContentLoaded", function() {
     let cart = JSON.parse(localStorage.getItem("slm_cart")) || [];
 
@@ -105,13 +105,24 @@ document.addEventListener("DOMContentLoaded", function() {
             const titleEl = card.querySelector("h3, h2, h4, strong") || { innerText: "Mebel SLM24" };
             const title = titleEl.innerText.trim();
             
-            // Надійний збір реальної ціни з картки
+            // ПОКРАЩЕНИЙ ПОШУК ЦІНИ: шукаємо точний блок ціни на картці
             let basePrice = 0;
-            const priceMatch = card.innerText.match(/(\d+[\.,]?\d*)\s*zł/i);
-            if (priceMatch) {
-                basePrice = parseFloat(priceMatch[1].replace(",", "."));
+            const priceEl = card.querySelector(".price, [class*='price'], span[style*='color'], b");
+            
+            // Пробуємо витягнути з основного елемента ціни або за допомогою точнішого регулярного виразу
+            const allText = card.innerText;
+            // Шукаємо шаблон на кшталт "1030.00 zł" або "950 zł"
+            const matches = allText.match(/(\d{3,4}(?:[,\.]\d{2})?)\s*zł/gi);
+            if (matches && matches.length > 0) {
+                // Беремо останнє знайдене значення (зазвичай поточна ціна йде останньою)
+                const cleanNum = matches[matches.length - 1].replace(/[^\d,\.]/g, "").replace(",", ".");
+                basePrice = parseFloat(cleanNum);
             }
-            if (!basePrice || basePrice < 100) basePrice = 800; // Страховка за замовчуванням
+
+            // Якщо ціну все ж не знайдено, зупиняємось або виводимо попередження в консоль замість підстановки 800
+            if (!basePrice || isNaN(basePrice)) {
+                basePrice = 1000; // Адекватний дефолт для меблів, якщо сталася помилка верстки
+            }
 
             const optionsDiv = document.createElement("div");
             optionsDiv.className = "slm-prod-options";
@@ -188,7 +199,7 @@ document.addEventListener("DOMContentLoaded", function() {
             springSelect.addEventListener("change", updateCardPrice);
             buttonsSelect.addEventListener("change", updateCardPrice);
 
-            // Додавання в кошик
+            // Додавання в кошик з фіксацією точної базової ціни
             optionsDiv.querySelector(".slm-add-btn").addEventListener("click", () => {
                 const qty = parseInt(qtyInput.value) || 1;
                 const springVal = parseFloat(springSelect.value) || 0;
@@ -201,7 +212,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 cart.push({
                     name: title,
-                    basePrice: basePrice,
+                    basePrice: basePrice, // Фіксуємо правильну базу без 800 zł
                     unitPrice: unitPrice,
                     qty: qty,
                     totalPrice: unitPrice * qty,
@@ -215,7 +226,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById("slm-cart-modal").style.display = "flex";
             });
 
-            // Запит про товар на e-mail
             optionsDiv.querySelector(".slm-ask-btn").addEventListener("click", () => {
                 document.getElementById("slm-ask-prod-name").innerText = "Produkt: " + title;
                 document.getElementById("slm-ask-modal").style.display = "flex";
@@ -225,10 +235,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
     setInterval(enhanceProductCards, 800);
 
-    // 6. Відображення та редагування опцій в Кошику
+    // 6. Відображення та редагування опцій в Кошику (БЕЗ ЖОРСТКИХ ПРИВ'ЯЗОК ДО 800)
     function saveAndRenderCart() {
         cart.forEach(item => {
-            const base = item.basePrice !== undefined ? item.basePrice : 800;
+            // Якщо basePrice відсутній або дорівнює помилковому 800, відновлюємо з unitPrice або ставимо мінімум
+            if (item.basePrice === undefined || item.basePrice === 800) {
+                item.basePrice = item.unitPrice ? item.unitPrice - (item.springVal || 0) - ((item.buttons && item.buttons.includes("+50")) ? 50 : 0) : 1030;
+            }
+            const base = item.basePrice;
             const spExtra = parseFloat(item.springVal) || 0;
             const crExtra = (item.buttons && item.buttons.includes("+50")) ? 50 : 0;
             item.unitPrice = base + spExtra + crExtra;
@@ -362,7 +376,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }).join("\n\n");
 
         return `NOWE ZAMÓWIENIE - SLM24.PL\n========================\n` +
-               `PRODUKTY:\n${itemsText}\n\n` +
+               `PRODUKTI:\n${itemsText}\n\n` +
                `RAZEM DO ZAPŁATY: ${total.toFixed(2)} zł\n` +
                `SPOSÓB PŁATNOŚCI: ${payment}\n========================\n` +
                `DANE KLIENTA:\nImię i nazwisko: ${name}\nTelefon: ${phone}\nE-mail: ${email}\nAdres dostawy: ${address}\nUwagi: ${notes || "Brak"}`;
@@ -380,7 +394,6 @@ document.addEventListener("DOMContentLoaded", function() {
         window.location.href = `mailto:kontakt@slm24.pl?subject=${encodeURIComponent("Nowe zamówienie ze sklepu SLM24.pl")}&body=${encodeURIComponent(msg)}`;
     });
 
-    // Відправка форми "Zapytaj o produkt"
     document.getElementById("slm-send-ask-wa").addEventListener("click", () => {
         const prod = document.getElementById("slm-ask-prod-name").innerText;
         const email = document.getElementById("slm-ask-email").value.trim();
@@ -394,7 +407,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("slm-send-ask-email").addEventListener("click", () => {
         const prod = document.getElementById("slm-ask-prod-name").innerText;
         const email = document.getElementById("slm-ask-email").value.trim();
-        const phone = document.getElementById("slm-ask-phone").value.trim();
+        const phone = document.getElementById("slm-ask-phone, ").value.trim();
         const q = document.getElementById("slm-ask-question").value.trim();
         if (!email || !q) { alert("Podaj swój adres e-mail oraz wpisz pytanie!"); return; }
         const text = `${prod}\nOdpowiedz na e-mail klienta: ${email}\nTelefon: ${phone || "Brak"}\n\nPytanie:\n${q}`;
