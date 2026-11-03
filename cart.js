@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.body.appendChild(askModal);
 
-    // 5. Опції та точний збір ціни (пошук чітко біля слова zł)
+    // 5. Опції та точний збір ціни з картки товару
     function enhanceProductCards() {
         const buttons = Array.from(document.querySelectorAll("button, a")).filter(el => el.innerText.includes("Zapytaj o cenę"));
         buttons.forEach((btn) => {
@@ -105,26 +105,13 @@ document.addEventListener("DOMContentLoaded", function() {
             const titleEl = card.querySelector("h3, h2, h4, strong") || { innerText: "Mebel SLM24" };
             const title = titleEl.innerText.trim();
             
-            // Чіткий пошук ціни біля слова zł
-           let basePrice = 0;
-// Шукаємо спочатку елемент, де вказана ціна (наприклад, червоний текст із сумою)
-const priceEl = card.querySelector("p, span, div") && Array.from(card.querySelectorAll("*")).find(el => el.innerText.match(/^\d+[\.,]?\d*\s*zł/i));
-if (priceEl) {
-    const m = priceEl.innerText.match(/(\d+[\.,]?\d*)/);
-    if (m) basePrice = parseFloat(m[1].replace(",", "."));
-}
-// Якщо раптом не знайшлося через селектор, шукаємо перше вкраплення суми з zł на картці
-if (!basePrice) {
-    const priceMatch = card.innerText.match(/(\d{3,4}[\.,]?\d*)\s*zł/i);
-    if (priceMatch) {
-        basePrice = parseFloat(priceMatch[1].replace(",", "."));
-    }
-}
-if (!basePrice || basePrice < 100) basePrice = 800;
+            // Надійний збір реальної ціни з картки
+            let basePrice = 0;
+            const priceMatch = card.innerText.match(/(\d+[\.,]?\d*)\s*zł/i);
             if (priceMatch) {
                 basePrice = parseFloat(priceMatch[1].replace(",", "."));
             }
-            if (!basePrice || basePrice < 100) basePrice = 800; // Страховка
+            if (!basePrice || basePrice < 100) basePrice = 800; // Страховка за замовчуванням
 
             const optionsDiv = document.createElement("div");
             optionsDiv.className = "slm-prod-options";
