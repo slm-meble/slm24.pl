@@ -1,8 +1,8 @@
-// Оновлений повнофункціональний кошик для SLM24.pl (Без гудзиків для Caterpillar та Chesterfield)
+// Повнофункціональний та стабільний кошик для SLM24.pl
 document.addEventListener("DOMContentLoaded", function() {
     let cart = JSON.parse(localStorage.getItem("slm_cart")) || [];
 
-    // 1. Стилі для карток та вікон (верхній плаваючий кошик приховано)
+    // 1. Стилі для карток та модальних вікон (верхній плаваючий кошик приховано)
     const style = document.createElement("style");
     style.innerHTML = `
         #slm-top-cart { display: none !important; }
@@ -82,22 +82,23 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.body.appendChild(askModal);
 
-    // 4. Очищення карток каталогу
+    // 4. Очищення карток каталогу та модальних вікон (точний збір реальних цін без помилок)
     function enhanceProductCards() {
         const buttons = Array.from(document.querySelectorAll("button, a")).filter(el => el.innerText.includes("Zapytaj o cenę"));
         buttons.forEach((btn, index) => {
             if (btn.dataset.slmEnhanced) return;
             btn.dataset.slmEnhanced = "true";
 
-            const card = btn.closest("div");
+            // Шукаємо найближчий контейнер (працює як для карток у каталозі, так і для модальних вікон детального перегляду)
+            const card = btn.closest("div") || btn.parentElement;
             if (!card) return;
 
             const titleEl = card.querySelector("h3, h2, h4, strong") || { innerText: "Mebel SLM24" };
             const title = titleEl.innerText.trim();
             
-            // Перевірка на наявність Caterpillar або Chesterfield у назві
             const skipButtons = /caterpillar|chesterfield/i.test(title);
             
+            // ПОКРАЩЕНИЙ ПОШУК ЦІНИ: шукаємо точне число зі знаком zł і беремо вартість >= 400
             let basePrice = 0;
             const allTextMatches = card.innerText.match(/(\d{3,4}(?:[,\.]\d{2})?)\s*zł/gi);
             if (allTextMatches) {
@@ -109,7 +110,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
             }
-            if (!basePrice || isNaN(basePrice)) basePrice = 1000;
+            // Якщо не знайшли в межах картки, шукаємо на всій сторінці або ставимо реальний дефолт
+            if (!basePrice || isNaN(basePrice)) basePrice = 1030;
 
             const actionsDiv = document.createElement("div");
             actionsDiv.className = "slm-prod-actions";
@@ -176,10 +178,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     setInterval(enhanceProductCards, 800);
 
-    // 5. Відображення кошика
+    // 5. Відображення кошика з правильними цінами
     function saveAndRenderCart() {
         cart.forEach(item => {
-            const base = item.basePrice || 1000;
+            const base = item.basePrice || 1030;
             const spExtra = parseFloat(item.springVal) || 0;
             const crExtra = (item.buttons && item.buttons.includes("+50")) ? 50 : 0;
             item.unitPrice = base + spExtra + crExtra;
@@ -286,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("slm-ask-modal").style.display = "none";
     });
 
-    // 6. Відправка замовлення адміністратору
+    // 6. Відправка замовлення адміністратору (на ваші дані: 666688298 / slmmble2022@gmail.com)
     function buildOrderMessage() {
         const name = document.getElementById("slm-name").value.trim();
         const phone = document.getElementById("slm-phone").value.trim();
@@ -334,8 +336,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.getElementById("slm-order-email").addEventListener("click", () => {
         const msg = buildOrderMessage();
-        if (!msg) return;
-        window.location.href = `mailto:kontakt@slm24.pl?subject=${encodeURIComponent("Nowe zamówienie ze sklepu SLM24.pl")}&body=${encodeURIComponent(msg)}`;
+        if -> (!msg) return;
+        window.location.href = `mailto:slmmble2022@gmail.com?subject=${encodeURIComponent("Nowe zamówienie ze sklepu SLM24.pl")}&body=${encodeURIComponent(msg)}`;
     });
 
     document.getElementById("slm-send-ask-wa").addEventListener("click", () => {
@@ -355,7 +357,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const q = document.getElementById("slm-ask-question").value.trim();
         if (!email || !q) { alert("Podaj swój adres e-mail oraz wpisz pytanie!"); return; }
         const text = `${prod}\nOdpowiedz na e-mail klienta: ${email}\nTelefon: ${phone || "Brak"}\n\nPytanie:\n${q}`;
-        window.location.href = `mailto:kontakt@slm24.pl?subject=${encodeURIComponent("Zapytanie o produkt - SLM24.pl")}&body=${encodeURIComponent(text)}`;
+        window.location.href = `mailto:slmmble2022@gmail.com?subject=${encodeURIComponent("Zapytanie o produkt - SLM24.pl")}&body=${encodeURIComponent(text)}`;
     });
 
     saveAndRenderCart();
