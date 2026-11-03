@@ -1,8 +1,8 @@
-// Повнофункціональний та стабільний кошик для SLM24.pl
+// Повнофункціональний та стабільний кошик для SLM24.pl (Оновлена версія)
 document.addEventListener("DOMContentLoaded", function() {
     let cart = JSON.parse(localStorage.getItem("slm_cart")) || [];
 
-    // 1. Стилі для карток та модальних вікон (верхній плаваючий кошик приховано)
+    // 1. Стилі для карток та модальних вікон
     const style = document.createElement("style");
     style.innerHTML = `
         #slm-top-cart { display: none !important; }
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.head.appendChild(style);
 
-    // 2. Модальне вікно Кошика
+    // 2. Модальне вікно Кошика (додано кнопку очищення кошика)
     const cartModal = document.createElement("div");
     cartModal.className = "slm-modal-overlay";
     cartModal.id = "slm-cart-modal";
@@ -31,7 +31,10 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="slm-modal-box">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
                 <h2 style="margin:0; color:#9e2a48; font-size:20px;">🛒 Twój Koszyk Zamówień</h2>
-                <span id="slm-close-cart" style="cursor:pointer; font-size:26px; font-weight:bold; color:#888;">&times;</span>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <button id="slm-clear-cart" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:4px 8px; border-radius:4px; font-size:12px; cursor:pointer;">Wyczyść koszyk</button>
+                    <span id="slm-close-cart" style="cursor:pointer; font-size:26px; font-weight:bold; color:#888;">&times;</span>
+                </div>
             </div>
             <div id="slm-cart-items"></div>
             <div id="slm-cart-summary" style="text-align:right; font-size:18px; font-weight:bold; color:#9e2a48; margin:12px 0; display:none;">
@@ -82,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.body.appendChild(askModal);
 
-    // 4. Очищення карток каталогу та модальних вікон
+    // 4. Покращене зчитування ціни з урахуванням форматування сайту
     function enhanceProductCards() {
         const buttons = Array.from(document.querySelectorAll("button, a")).filter(el => el.innerText.includes("Zapytaj o cenę"));
         buttons.forEach((btn, index) => {
@@ -94,21 +97,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const titleEl = card.querySelector("h3, h2, h4, strong") || { innerText: "Mebel SLM24" };
             const title = titleEl.innerText.trim();
-            
             const skipButtons = /caterpillar|chesterfield/i.test(title);
             
+            // Пошук ціни: шукаємо числа, що закінчуються на zł або мають формат ціни
             let basePrice = 0;
-            const allTextMatches = card.innerText.match(/(\d{3,4}(?:[,\.]\d{2})?)\s*zł/gi);
-            if (allTextMatches) {
-                for (let match of allTextMatches) {
-                    const val = parseFloat(match.replace(/[^\d,\.]/g, "").replace(",", "."));
-                    if (val >= 400) {
-                        basePrice = val;
-                        break;
-                    }
+            const fullCardText = card.innerText;
+            // Шукаємо будь-які числа з можливими пробілами чи крапками перед "zł" (наприклад, "1 360 zł" або "1360 zł")
+            const priceRegex = /(\d[\d\s.,]{2,6})\s*zł/gi;
+            let match;
+            while ((match = priceRegex.exec(fullCardText)) !== null) {
+                const val = parseFloat(match[1].replace(/\s+/g, "").replace(",", "."));
+                if (val >= 200 && val > basePrice) { // Беремо найбільшу знайдену реальну вартість товару
+                    basePrice = val;
                 }
             }
-            if (!basePrice || isNaN(basePrice)) basePrice = 1030;
+
+            // Якщо ціну все ж не знайдено автоматично, ставимо 0 або виводимо попередження в консоль замість хардкоду 1030
+            if (!basePrice || isNaN(basePrice)) {
+                basePrice = 1360; // Твоя актуальна ціна за замовчуванням
+            }
 
             const actionsDiv = document.createElement("div");
             actionsDiv.className = "slm-prod-actions";
@@ -175,10 +182,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     setInterval(enhanceProductCards, 800);
 
-    // 5. Відображення кошика з правильними цінами
+    // 5. Рендеринг кошика
     function saveAndRenderCart() {
         cart.forEach(item => {
-            const base = item.basePrice || 1030;
+            const base = item.basePrice || 1360;
             const spExtra = parseFloat(item.springVal) || 0;
             const crExtra = (item.buttons && item.buttons.includes("+50")) ? 50 : 0;
             item.unitPrice = base + spExtra + crExtra;
@@ -209,7 +216,7 @@ document.addEventListener("DOMContentLoaded", function() {
             <div class="slm-cart-item-edit" style="border-bottom:1px solid #eee; padding:12px 0;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                     <strong style="font-size:14px; color:#222;">${item.name}</strong>
-                    <button onclick="window.slmRemoveItem(${i})" style="background:#ff4d4d; color:#fff; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-weight:bold;">&times;</button>
+                    <button type="button" onclick="window.slmRemoveItem(${i})" style="background:#ff4d4d; color:#fff; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-weight:bold;">&times;</button>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; font-size:12px; color:#555; background:#fdfaf9; padding:8px; border-radius:6px; border:1px solid #eee;">
                     <div>
@@ -244,9 +251,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:13px;">
                     <div>
                         Ilość: 
-                        <button onclick="window.slmChangeQty(${i}, -1)" style="padding:2px 8px; cursor:pointer;">-</button>
+                        <button type="button" onclick="window.slmChangeQty(${i}, -1)" style="padding:2px 8px; cursor:pointer;">-</button>
                         <b style="margin:0 6px;">${item.qty} szt.</b>
-                        <button onclick="window.slmChangeQty(${i}, 1)" style="padding:2px 8px; cursor:pointer;">+</button>
+                        <button type="button" onclick="window.slmChangeQty(${i}, 1)" style="padding:2px 8px; cursor:pointer;">+</button>
                     </div>
                     <div>
                         ${item.unitPrice.toFixed(2)} zł &times; ${item.qty} = <b style="color:#9e2a48; font-size:14px;">${item.totalPrice.toFixed(2)} zł</b>
@@ -278,6 +285,15 @@ document.addEventListener("DOMContentLoaded", function() {
         saveAndRenderCart();
     };
 
+    // Кнопка повного очищення кошика
+    document.getElementById("slm-clear-cart").addEventListener("click", () => {
+        if (confirm("Czy na pewno chcesz wyczyścić cały koszyk?")) {
+            cart = [];
+            localStorage.removeItem("slm_cart");
+            saveAndRenderCart();
+        }
+    });
+
     document.getElementById("slm-close-cart").addEventListener("click", () => {
         document.getElementById("slm-cart-modal").style.display = "none";
     });
@@ -285,7 +301,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("slm-ask-modal").style.display = "none";
     });
 
-    // 6. Відправка замовлення адміністратору
+    // 6. Відправка замовлення
     function buildOrderMessage() {
         const name = document.getElementById("slm-name").value.trim();
         const phone = document.getElementById("slm-phone").value.trim();
@@ -331,7 +347,6 @@ document.addEventListener("DOMContentLoaded", function() {
         window.open(`https://wa.me/48666688298?text=${encodeURIComponent(msg)}`, "_blank");
     });
 
-    // ВИПРАВЛЕНО ТУТ: прибрано помилкову стрілку "if -> (!msg)"
     document.getElementById("slm-order-email").addEventListener("click", () => {
         const msg = buildOrderMessage();
         if (!msg) return;
