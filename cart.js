@@ -1,32 +1,16 @@
-<!-- ================== ЄДИНИЙ МОДУЛЬ КОШИКА SLM24.PL (PRO) ================== -->
-<script>
+// ================== SLM24.PL UNIFIED CART SCRIPT (CART.JS) ==================
 (function() {
-  // 1. ЗАХИСТ ВІД ДВОХ ВІКОН (Якщо код випадково підключено двічі — другий раз він не запуститься)
-  if (window.__SLM24_CART_LOADED__) return;
-  window.__SLM24_CART_LOADED__ = true;
-
-  // =========================================================================
-  // 2. НАЛАШТУВАННЯ МАГАЗИНУ (Твої контакти та тарифи)
-  // =========================================================================
   const SHOP_CONFIG = {
-    whatsappNumber: "48666688298",           // Твій реальний WhatsApp
-    ownerEmail: "slmmble2022@gmail.com",     // Твій реальний E-mail
-    defaultPriceFallback: 1360,              // Ціна за замовчуванням, якщо в оголошенні не вказана
-    defaultCourierPrice: 30,                 // Базова ціна доставки Kurier за 1 шт. (zł) — можеш змінити тут
-    shippingCalculationMode: "per_item",     // "per_item" (множити на кожну шт.) або "flat" (фіксована ціна)
-
+    whatsappNumber: "48666688298",
+    ownerEmail: "slmmble2022@gmail.com",
+    defaultPriceFallback: 1360,
+    defaultCourierPrice: 30,
+    shippingCalculationMode: "per_item",
     seatOptions: [
       { label: "Bez sprężyny falistej (w cenie)", price: 0 },
       { label: "Sprężyna falista (+69 zł)", price: 69 }
     ],
-    legsOptions: [
-      "Nóżka nr 1",
-      "Nóżka nr 2",
-      "Nóżka nr 3",
-      "Nóżka nr 4",
-      "Nóżka nr 5",
-      "Nóżka nr 6"
-    ],
+    legsOptions: ["Nóżka nr 1", "Nóżka nr 2", "Nóżka nr 3", "Nóżka nr 4", "Nóżka nr 5", "Nóżka nr 6"],
     buttonsOptions: [
       { label: "Układ A (+0 zł)", value: "Układ A", price: 0 },
       { label: "Układ B (+0 zł)", value: "Układ B", price: 0 },
@@ -38,299 +22,155 @@
     ]
   };
 
-  // =========================================================================
-  // 3. ЗБЕРЕЖЕННЯ КОШИКА ЗА КЛІЄНТОМ (LocalStorage + Cookie на 30 днів)
-  // =========================================================================
   const STORAGE_KEY = "slm24_unified_cart_v3";
+  let slmCart = [];
+  try {
+    const localData = localStorage.getItem(STORAGE_KEY);
+    if (localData) slmCart = JSON.parse(localData);
+  } catch (e) { slmCart = []; }
 
-  function loadCartFromDevice() {
-    try {
-      const localData = localStorage.getItem(STORAGE_KEY);
-      if (localData) return JSON.parse(localData);
-      const match = document.cookie.match(new RegExp('(^| )' + STORAGE_KEY + '=([^;]+)'));
-      if (match) return JSON.parse(decodeURIComponent(match[2]));
-    } catch (e) {}
-    return [];
+  let courierRate = parseFloat(localStorage.getItem("slm24_courier_rate")) || SHOP_CONFIG.defaultCourierPrice;
+  let shippingMode = localStorage.getItem("slm_shipping_mode") || SHOP_CONFIG.shippingCalculationMode;
+
+  function saveCart() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(slmCart)); } catch (e) {}
   }
-
-  function saveCartToDevice(cartData) {
-    try {
-      const str = JSON.stringify(cartData);
-      localStorage.setItem(STORAGE_KEY, str);
-      const expires = new Date(Date.now() + 30 * 864e5).toUTCString();
-      document.cookie = STORAGE_KEY + "=" + encodeURIComponent(str) + "; expires=" + expires + "; path=/; SameSite=Lax";
-    } catch (e) {}
-  }
-
-  let slmCart = loadCartFromDevice();
-  let savedRate = parseFloat(localStorage.getItem("slm24_courier_rate"));
-  let courierRate = !isNaN(savedRate) ? savedRate : SHOP_CONFIG.defaultCourierPrice;
-  let shippingMode = localStorage.getItem("slm24_shipping_mode") || SHOP_CONFIG.shippingCalculationMode;
 
   function escapeHtml(str) {
-    return String(str || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
+    return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
-  // =========================================================================
-  // 4. ЗЧИТУВАННЯ НОМЕРА ОГОЛОШЕННЯ (#001 ... #999)
-  // =========================================================================
-  function extractAdCode(titleText, fullText, fallbackIndex) {
-    const combined = (titleText || "") + " " + (fullText || "");
-    // Шукаємо #001, #002, #15, #A1 тощо
-    const match = combined.match(/#\s*([0-9A-Za-z_-]{1,10})/);
-    if (match) {
-      const rawCode = match[1];
-      // Якщо це число (напр. 1 або 01), форматуємо красиво як #001
-      if (/^\d+$/.test(rawCode)) {
-        return "#" + rawCode.padStart(3, "0");
-      }
-      return "#" + rawCode.toUpperCase();
-    }
-    // Якщо в тексті забули написати #, ставимо порядковий номер картки (#001, #002...)
-    return "#" + String(fallbackIndex).padStart(3, "0");
-  }
-
-  function cleanTitleFromCode(titleText) {
-    return String(titleText || "")
-      .replace(/#\s*[0-9A-Za-z_-]{1,10}\s*[-–—:]?\s*/g, "")
-      .trim() || "Mebel SLM24";
-  }
-
-  // =========================================================================
-  // 5. СТИЛІ КОШИКА ТА КАРТОК ТОВАРІВ
-  // =========================================================================
-  const css = `
-    #slm-top-cart, #slm-cart-modal, #slm-ask-modal { display: none !important; }
-    :root {
-      --slm-burgundy: #8b1e41;
-      --slm-black: #111111;
-      --slm-green: #25D366;
-      --slm-border: #e2e8f0;
-      --slm-bg: #f8fafc;
-    }
-
-    /* Кнопки під кожним оголошенням на сайті */
-    .slm-prod-actions { margin-top: 10px; display: flex; flex-direction: column; gap: 7px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    .slm-card-code-tag { display: inline-block; align-self: flex-start; background: #111; color: #fff; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 4px; letter-spacing: 0.5px; }
-    .slm-qty-box { display: flex; align-items: center; justify-content: space-between; margin: 4px 0; font-size: 13px; color: #222; }
-    .slm-qty-controls { display: flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 5px; overflow: hidden; background: #fff; }
-    .slm-qty-btn-card { background: #f1f5f9; border: none; width: 30px; height: 30px; font-size: 16px; font-weight: bold; cursor: pointer; color: #111; }
-    .slm-qty-btn-card:hover { background: #e2e8f0; }
-    .slm-qty-input-card { width: 40px; text-align: center; border: none; font-size: 14px; font-weight: 700; color: #111; background: #fff; }
-    .slm-add-btn { width: 100%; background: var(--slm-burgundy); color: #fff; border: none; padding: 11px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.2s; }
-    .slm-add-btn:hover { background: #6e1532; }
-    .slm-ask-btn { width: 100%; background: #fff; color: #475569; border: 1px solid #cbd5e1; padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .slm-ask-btn:hover { background: #f1f5f9; color: #111; }
-
-    /* Плаваюча кнопка кошика у правому нижньому кутку */
-    .slm-floating-cart {
-      position: fixed; bottom: 22px; right: 22px;
-      background: var(--slm-black); color: #fff;
-      padding: 13px 20px; border-radius: 50px; cursor: pointer;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-      display: flex; align-items: center; gap: 10px;
-      z-index: 99990; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-weight: 700; font-size: 14px; transition: transform 0.2s;
-    }
-    .slm-floating-cart:hover { transform: scale(1.04); }
-    .slm-cart-badge {
-      background: #e11d48; color: #fff; border-radius: 50px;
-      padding: 2px 9px; font-size: 13px; font-weight: 800;
-    }
-
-    /* Єдине модальне вікно кошика */
-    .slm-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.65);
-      display: none; justify-content: center; align-items: flex-start;
-      overflow-y: auto; padding: 20px 10px; z-index: 99999;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      box-sizing: border-box;
-    }
-    .slm-overlay.active { display: flex; }
-    .slm-modal-window {
-      background: #fff; width: 100%; max-width: 660px;
-      border-radius: 12px; box-shadow: 0 20px 45px rgba(0,0,0,0.35);
-      overflow: hidden; margin: 20px auto; color: #1e293b; box-sizing: border-box;
-    }
-
-    .slm-modal-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 20px; border-bottom: 1px solid var(--slm-border); background: #fff;
-    }
-    .slm-modal-title { font-size: 18px; font-weight: 800; color: var(--slm-burgundy); cursor: pointer; user-select: none; }
-    .slm-header-btns { display: flex; align-items: center; gap: 10px; }
-    .slm-btn-clear {
-      background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3;
-      padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;
-    }
-    .slm-btn-close { background: none; border: none; font-size: 26px; color: #64748b; cursor: pointer; line-height: 1; }
-
-    .slm-modal-body { padding: 18px 20px; }
-
-    /* Прихована панель тарифу доставки (5 кліків на заголовок кошика) */
-    .slm-admin-bar {
-      display: none; background: #fffbeb; border: 1px dashed #f59e0b;
-      padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 12px;
-    }
-    .slm-admin-bar.open { display: block; }
-
-    /* Картка товару всередині кошика */
-    .slm-cart-item {
-      border: 1px solid var(--slm-border); border-radius: 8px;
-      padding: 14px; margin-bottom: 14px; background: var(--slm-bg);
-    }
-    .slm-cart-item-head {
-      display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px;
-    }
-    .slm-item-left { display: flex; gap: 12px; align-items: center; }
-    .slm-item-thumb {
-      width: 60px; height: 60px; object-fit: cover; border-radius: 6px;
-      border: 1px solid var(--slm-border); background: #fff; flex-shrink: 0;
-    }
-    .slm-code-pill {
-      display: inline-block; background: var(--slm-black); color: #fff;
-      font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 4px; margin-right: 6px;
-    }
-    .slm-item-title { font-weight: 700; font-size: 15px; color: #0f172a; }
-    .slm-btn-del {
-      background: #ef4444; color: #fff; border: none; width: 26px; height: 26px;
-      border-radius: 5px; cursor: pointer; font-weight: bold; flex-shrink: 0;
-    }
-
-    .slm-opt-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 9px;
-      background: #fff; padding: 10px; border-radius: 6px; border: 1px solid var(--slm-border); margin-bottom: 10px;
-    }
-    .slm-opt-cell label { display: block; font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 3px; }
-    .slm-opt-cell select, .slm-opt-cell input {
-      width: 100%; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px;
-      font-size: 12px; box-sizing: border-box; background: #fff;
-    }
-
-    .slm-cart-item-foot {
-      display: flex; justify-content: space-between; align-items: center; font-size: 13px;
-    }
-    .slm-qty-inline {
-      display: inline-flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff;
-    }
-    .slm-qty-inline button { border: none; background: none; padding: 4px 10px; font-size: 15px; font-weight: 700; cursor: pointer; }
-    .slm-qty-inline span { padding: 0 8px; font-weight: 700; }
-
-    /* Підсумок та доставка */
-    .slm-summary-block { border-top: 2px solid var(--slm-border); padding-top: 14px; margin-top: 8px; }
-    .slm-sum-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 8px 0; border-bottom: 1px solid var(--slm-border); font-size: 14px;
-    }
-    .slm-ship-options { display: flex; flex-direction: column; gap: 6px; text-align: right; font-size: 13px; }
-    .slm-ship-options label { display: flex; align-items: center; justify-content: flex-end; gap: 6px; cursor: pointer; }
-    .slm-grand-total {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 14px 0; font-size: 19px; font-weight: 800; color: var(--slm-burgundy);
-    }
-
-    /* Форма замовлення */
-    .slm-form-title { font-size: 15px; font-weight: 700; margin: 14px 0 10px; color: #111; }
-    .slm-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-    .slm-full { grid-column: 1 / -1; }
-    .slm-field {
-      width: 100%; box-sizing: border-box; padding: 9px 11px;
-      border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;
-    }
-
-    .slm-order-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-    .slm-btn-wa {
-      background: var(--slm-green); color: #fff; border: none; padding: 13px;
-      border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px;
-    }
-    .slm-btn-email {
-      background: var(--slm-burgundy); color: #fff; border: none; padding: 13px;
-      border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px;
-    }
-
-    @media (max-width: 540px) {
-      .slm-opt-grid, .slm-form-grid, .slm-order-btns { grid-template-columns: 1fr; }
-    }
-  `;
-
-  const styleNode = document.createElement("style");
-  styleNode.id = "slm24-unified-styles";
-  styleNode.innerHTML = css;
-  document.head.appendChild(styleNode);
-
-  // =========================================================================
-  // 6. СТВОРЕННЯ ЄДИНОГО ВІКНА КОШИКА ТА ВІКНА ЗАПИТАННЯ
-  // =========================================================================
-  function mountModals() {
-    // Видаляємо будь-які старі дублікати, якщо вони залишилися на сайті
-    document.querySelectorAll("#slm-cart-modal, #slm-ask-modal, #slmCartOverlay, .slm-floating-cart").forEach(el => el.remove());
+  // Створення HTML-каркаса кошика прямо через JS, щоб не захаращувати HTML
+  function injectCartUI() {
+    if (document.getElementById("slm24-root-container")) return;
 
     const wrapper = document.createElement("div");
     wrapper.id = "slm24-root-container";
     wrapper.innerHTML = `
-      <!-- Плаваюча кнопка кошика -->
+      <style>
+        #slm24-root-container { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; z-index: 999999; position: relative; }
+        .slm-floating-cart {
+          position: fixed !important; bottom: 25px !important; right: 25px !important;
+          background: #111 !important; color: #fff !important; padding: 14px 22px !important;
+          border-radius: 50px !important; cursor: pointer !important; box-shadow: 0 8px 25px rgba(0,0,0,0.35) !important;
+          display: flex !important; align-items: center !important; gap: 10px !important; z-index: 999999 !important;
+          font-weight: 700 !important; font-size: 15px !important;
+        }
+        .slm-floating-cart:hover { transform: scale(1.05); }
+        .slm-cart-badge { background: #e11d48 !important; color: #fff !important; border-radius: 50px !important; padding: 2px 9px !important; font-size: 13px !important; font-weight: 800 !important; }
+        
+        .slm-overlay {
+          position: fixed !important; inset: 0 !important; background: rgba(0,0,0,0.7) !important;
+          display: none; justify-content: center !important; align-items: flex-start !important;
+          overflow-y: auto !important; padding: 20px 10px !important; z-index: 1000000 !important;
+        }
+        .slm-overlay.active { display: flex !important; }
+        .slm-modal-window {
+          background: #fff !important; width: 100% !important; max-width: 660px !important;
+          border-radius: 12px !important; box-shadow: 0 20px 45px rgba(0,0,0,0.4) !important;
+          overflow: hidden !important; margin: 20px auto !important; color: #1e293b !important;
+        }
+        .slm-modal-header {
+          display: flex !important; justify-content: space-between !important; align-items: center !important;
+          padding: 16px 20px !important; border-bottom: 1px solid #e2e8f0 !important; background: #fff !important;
+        }
+        .slm-modal-title { font-size: 18px !important; font-weight: 800 !important; color: #8b1e41 !important; cursor: pointer !important; }
+        .slm-header-btns { display: flex !important; align-items: center !important; gap: 10px !important; }
+        .slm-btn-clear { background: #fff1f2 !important; color: #e11d48 !important; border: 1px solid #fecdd3 !important; padding: 6px 12px !important; border-radius: 6px !important; font-size: 12px !important; font-weight: 700 !important; cursor: pointer !important; }
+        .slm-btn-close { background: none !important; border: none !important; font-size: 28px !important; color: #64748b !important; cursor: pointer !important; line-height: 1 !important; }
+        .slm-modal-body { padding: 18px 20px !important; }
+        .slm-admin-bar { display: none; background: #fffbeb !important; border: 1px dashed #f59e0b !important; padding: 12px !important; border-radius: 8px !important; margin-bottom: 15px !important; font-size: 12px !important; }
+        .slm-admin-bar.open { display: block !important; }
+        
+        .slm-cart-item { border: 1px solid #e2e8f0 !important; border-radius: 8px !important; padding: 14px !important; margin-bottom: 14px !important; background: #f8fafc !important; }
+        .slm-cart-item-head { display: flex !important; justify-content: space-between !important; align-items: flex-start !important; gap: 10px !important; margin-bottom: 10px !important; }
+        .slm-item-left { display: flex !important; gap: 12px !important; align-items: center !important; }
+        .slm-item-thumb { width: 60px !important; height: 60px !important; object-fit: cover !important; border-radius: 6px !important; border: 1px solid #e2e8f0 !important; background: #fff !important; }
+        .slm-code-pill { background: #111 !important; color: #fff !important; font-size: 12px !important; font-weight: 800 !important; padding: 2px 8px !important; border-radius: 4px !important; margin-right: 6px !important; }
+        .slm-item-title { font-weight: 700 !important; font-size: 15px !important; color: #0f172a !important; }
+        .slm-btn-del { background: #ef4444 !important; color: #fff !important; border: none !important; width: 26px !important; height: 26px !important; border-radius: 5px !important; cursor: pointer !important; font-weight: bold !important; }
+        
+        .slm-opt-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 9px !important; background: #fff !important; padding: 10px !important; border-radius: 6px !important; border: 1px solid #e2e8f0 !important; margin-bottom: 10px !important; }
+        .slm-opt-cell label { display: block !important; font-size: 11px !important; font-weight: 700 !important; color: #475569 !important; margin-bottom: 3px !important; }
+        .slm-opt-cell select, .slm-opt-cell input { width: 100% !important; padding: 6px 8px !important; border: 1px solid #cbd5e1 !important; border-radius: 5px !important; font-size: 12px !important; background: #fff !important; box-sizing: border-box !important; }
+        
+        .slm-cart-item-foot { display: flex !important; justify-content: space-between !important; align-items: center !important; font-size: 13px !important; }
+        .slm-qty-inline { display: inline-flex !important; align-items: center !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; background: #fff !important; }
+        .slm-qty-inline button { border: none !important; background: none !important; padding: 4px 10px !important; font-size: 15px !important; font-weight: 700 !important; cursor: pointer !important; }
+        .slm-qty-inline span { padding: 0 8px !important; font-weight: 700 !important; }
+        
+        .slm-summary-block { border-top: 2px solid #e2e8f0 !important; padding-top: 14px !important; margin-top: 8px !important; }
+        .slm-sum-row { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 8px 0 !important; border-bottom: 1px solid #e2e8f0 !important; font-size: 14px !important; }
+        .slm-ship-options { display: flex !important; flex-direction: column !important; gap: 6px !important; text-align: right !important; font-size: 13px !important; }
+        .slm-ship-options label { display: flex !important; align-items: center !important; justify-content: flex-end !important; gap: 6px !important; cursor: pointer !important; }
+        .slm-grand-total { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 14px 0 !important; font-size: 19px !important; font-weight: 800 !important; color: #8b1e41 !important; }
+        
+        .slm-form-title { font-size: 15px !important; font-weight: 700 !important; margin: 14px 0 10px !important; color: #111 !important; }
+        .slm-form-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 9px !important; }
+        .slm-full { grid-column: 1 / -1 !important; }
+        .slm-field { width: 100% !important; box-sizing: border-box !important; padding: 9px 11px !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; font-size: 13px !important; background: #fff !important; }
+        
+        .slm-order-btns { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; margin-top: 14px !important; }
+        .slm-btn-wa { background: #25D366 !important; color: #fff !important; border: none !important; padding: 13px !important; border-radius: 6px !important; font-weight: 700 !important; cursor: pointer !important; font-size: 14px !important; }
+        .slm-btn-email { background: #8b1e41 !important; color: #fff !important; border: none !important; padding: 13px !important; border-radius: 6px !important; font-weight: 700 !important; cursor: pointer !important; font-size: 14px !important; }
+
+        .slm-prod-actions { margin-top: 10px !important; display: flex !important; flex-direction: column !important; gap: 7px !important; }
+        .slm-card-code-tag { display: inline-block !important; background: #111 !important; color: #fff !important; font-size: 12px !important; font-weight: 700 !important; padding: 3px 9px !important; border-radius: 4px !important; width: fit-content !important; }
+        .slm-qty-box { display: flex !important; align-items: center !important; justify-content: space-between !important; margin: 4px 0 !important; font-size: 13px !important; color: #222 !important; }
+        .slm-qty-controls { display: flex !important; align-items: center !important; border: 1px solid #cbd5e1 !important; border-radius: 5px !important; overflow: hidden !important; background: #fff !important; }
+        .slm-qty-btn-card { background: #f1f5f9 !important; border: none !important; width: 30px !important; height: 30px !important; font-size: 16px !important; font-weight: bold !important; cursor: pointer !important; }
+        .slm-qty-input-card { width: 40px !important; text-align: center !important; border: none !important; font-size: 14px !important; font-weight: 700 !important; background: #fff !important; }
+        .slm-add-btn { width: 100% !important; background: #8b1e41 !important; color: #fff !important; border: none !important; padding: 11px !important; border-radius: 6px !important; font-weight: 700 !important; cursor: pointer !important; font-size: 14px !important; }
+        .slm-ask-btn { width: 100% !important; background: #fff !important; color: #475569 !important; border: 1px solid #cbd5e1 !important; padding: 8px !important; border-radius: 6px !important; font-size: 13px !important; font-weight: 600 !important; cursor: pointer !important; }
+
+        @media (max-width: 540px) {
+          .slm-opt-grid, .slm-form-grid, .slm-order-btns { grid-template-columns: 1fr !important; }
+        }
+      </style>
+
       <div class="slm-floating-cart" id="slmFloatBtn">
         <span>🛒 Twój Koszyk</span>
         <span class="slm-cart-badge" id="slmBadgeCount">0</span>
         <span id="slmBadgeSum" style="font-size:12px; opacity:0.9;">(0.00 zł)</span>
       </div>
 
-      <!-- Єдине модальне вікно кошика -->
       <div class="slm-overlay" id="slmMainCartModal">
         <div class="slm-modal-window">
           <div class="slm-modal-header">
-            <div class="slm-modal-title" id="slmAdminSecretTrigger" title="Натисніть 5 разів для налаштування доставки">
-              🛒 Twój Koszyk Zamówień
-            </div>
+            <div class="slm-modal-title" id="slmAdminSecretTrigger">🛒 Twój Koszyk Zamówień</div>
             <div class="slm-header-btns">
               <button type="button" class="slm-btn-clear" id="slmClearAllBtn">Wyczyść koszyk</button>
               <button type="button" class="slm-btn-close" id="slmCloseCartBtn">&times;</button>
             </div>
           </div>
-
           <div class="slm-modal-body">
-            <!-- Секретна панель власника (5 кліків по заголовку) -->
             <div class="slm-admin-bar" id="slmAdminBar">
               <strong>⚙️ Тариф доставки Kurier:</strong>
               <div style="display:flex; gap:10px; align-items:center; margin-top:6px; flex-wrap:wrap;">
                 <label>Ціна (zł): <input type="number" id="slmAdminRate" style="width:70px; padding:4px;"></label>
                 <label>Режим:
                   <select id="slmAdminMode" style="padding:4px;">
-                    <option value="per_item">За кожну шт. (1 шт = X zł, 2 шт = 2X zł)</option>
-                    <option value="flat">Фіксована сума за все замовлення</option>
+                    <option value="per_item">За кожну шт.</option>
+                    <option value="flat">Фіксована сума</option>
                   </select>
                 </label>
               </div>
             </div>
 
-            <!-- Список товарів -->
             <div id="slmCartListContainer"></div>
 
-            <!-- Блок підрахунку та анкети -->
             <div class="slm-summary-block" id="slmCartSummaryBlock" style="display:none;">
               <div class="slm-sum-row">
-                <span style="color:#64748b;">Suma częściowa (Produkty):</span>
+                <span style="color:#64748b;">Suma częściowa:</span>
                 <strong id="slmSubtotalText">0.00 zł</strong>
               </div>
-
               <div class="slm-sum-row">
-                <span style="color:#64748b;">Dostawa (Przesyłka):</span>
+                <span style="color:#64748b;">Przesyłka:</span>
                 <div class="slm-ship-options">
-                  <label>
-                    <input type="radio" name="slmShipRadio" value="courier" checked>
-                    <span>Kurier: <strong id="slmCourierText">0.00 zł</strong></span>
-                  </label>
-                  <label>
-                    <input type="radio" name="slmShipRadio" value="pickup">
-                    <span>Odbiór osobisty (0.00 zł)</span>
-                  </label>
+                  <label><input type="radio" name="slmShipRadio" value="courier" checked> Kurier: <strong id="slmCourierText">0.00 zł</strong></label>
+                  <label><input type="radio" name="slmShipRadio" value="pickup"> Odbiór osobisty (0.00 zł)</label>
                 </div>
               </div>
-
               <div class="slm-grand-total">
                 <span>Razem do zapłaty:</span>
                 <span id="slmGrandTotalText">0.00 zł</span>
@@ -344,10 +184,9 @@
                 <input type="text" id="slmInStreet" class="slm-field slm-full" placeholder="* Ulica, numer domu / lokalu" required>
                 <input type="text" id="slmInZip" class="slm-field" placeholder="* Kod pocztowy (np. 00-001)" required>
                 <input type="text" id="slmInCity" class="slm-field" placeholder="* Miasto" required>
-                <textarea id="slmInNotes" class="slm-field slm-full" rows="2" placeholder="Uwagi do zamówienia (np. piętro, dodatkowe życzenia)"></textarea>
-
+                <textarea id="slmInNotes" class="slm-field slm-full" rows="2" placeholder="Uwagi do zamówienia"></textarea>
                 <div class="slm-full">
-                  <label style="font-size:13px; font-weight:700; display:block; margin-bottom:4px;">Wybierz sposób płatności:</label>
+                  <label style="font-size:13px; font-weight:700; display:block; margin-bottom:4px;">Sposób płatności:</label>
                   <select id="slmInPayment" class="slm-field" style="font-weight:700;">
                     <option value="Płatność przy odbiorze (Za pobraniem)">🚚 Płatność przy odbiorze (Za pobraniem)</option>
                     <option value="Zapłać teraz (Przelewy24 / BLIK / Przelew)">💳 Zapłać teraz (Przelewy24 / BLIK / Przelew)</option>
@@ -364,7 +203,6 @@
         </div>
       </div>
 
-      <!-- Модальне вікно "Zapytaj o produkt" -->
       <div class="slm-overlay" id="slmAskProductModal">
         <div class="slm-modal-window" style="max-width:430px;">
           <div class="slm-modal-header">
@@ -373,9 +211,9 @@
           </div>
           <div class="slm-modal-body">
             <p id="slmAskProdTitle" style="font-weight:700; color:#8b1e41; margin:0 0 12px 0; font-size:14px;"></p>
-            <input type="email" id="slmAskEmail" class="slm-field" style="margin-bottom:8px;" placeholder="* Twój adres e-mail (na ten adres odpowiemy)">
-            <input type="tel" id="slmAskPhone" class="slm-field" style="margin-bottom:8px;" placeholder="Numer telefonu (opcjonalnie)">
-            <textarea id="slmAskQuestion" class="slm-field" rows="3" style="margin-bottom:10px;" placeholder="* Twoje pytanie (np. czas realizacji, próbki tkanin...)"></textarea>
+            <input type="email" id="slmAskEmail" class="slm-field" style="margin-bottom:8px;" placeholder="* Twój e-mail">
+            <input type="tel" id="slmAskPhone" class="slm-field" style="margin-bottom:8px;" placeholder="Telefon (opcjonalnie)">
+            <textarea id="slmAskQuestion" class="slm-field" rows="3" style="margin-bottom:10px;" placeholder="* Twoje pytanie"></textarea>
             <div class="slm-order-btns" style="margin-top:4px;">
               <button type="button" class="slm-btn-wa" id="slmSendAskWa">📲 WhatsApp</button>
               <button type="button" class="slm-btn-email" id="slmSendAskMail">✉️ Wyślij E-mail</button>
@@ -385,36 +223,26 @@
       </div>
     `;
     document.body.appendChild(wrapper);
+    initCartEvents();
+  }
 
-    // Події відкриття та закриття
-    document.getElementById("slmFloatBtn").addEventListener("click", () => toggleCartModal(true));
-    document.getElementById("slmCloseCartBtn").addEventListener("click", () => toggleCartModal(false));
-    document.getElementById("slmMainCartModal").addEventListener("click", (e) => {
-      if (e.target.id === "slmMainCartModal") toggleCartModal(false);
-    });
-
-    document.getElementById("slmCloseAskBtn").addEventListener("click", () => {
-      document.getElementById("slmAskProductModal").classList.remove("active");
-    });
-    document.getElementById("slmAskProductModal").addEventListener("click", (e) => {
-      if (e.target.id === "slmAskProductModal") document.getElementById("slmAskProductModal").classList.remove("active");
-    });
-
-    document.getElementById("slmClearAllBtn").addEventListener("click", () => {
+  function initCartEvents() {
+    document.getElementById("slmFloatBtn").onclick = () => document.getElementById("slmMainCartModal").classList.add("active");
+    document.getElementById("slmCloseCartBtn").onclick = () => document.getElementById("slmMainCartModal").classList.remove("active");
+    document.getElementById("slmMainCartModal").onclick = (e) => { if (e.target.id === "slmMainCartModal") e.target.classList.remove("active"); };
+    document.getElementById("slmClearAllBtn").onclick = () => {
       if (confirm("Czy na pewno chcesz wyczyścić cały koszyk?")) {
         slmCart = [];
-        saveCartToDevice(slmCart);
+        saveCart();
         renderCart();
       }
-    });
+    };
 
-    document.querySelectorAll('input[name="slmShipRadio"]').forEach(r => {
-      r.addEventListener("change", renderCart);
-    });
+    document.getElementById("slmCloseAskBtn").onclick = () => document.getElementById("slmAskProductModal").classList.remove("active");
+    document.getElementById("slmAskProductModal").onclick = (e) => { if (e.target.id === "slmAskProductModal") e.target.classList.remove("active"); };
 
-    // Секретний вхід в адмін-панель доставки (5 кліків)
     let clicks = 0, timer = null;
-    document.getElementById("slmAdminSecretTrigger").addEventListener("click", () => {
+    document.getElementById("slmAdminSecretTrigger").onclick = () => {
       clicks++;
       clearTimeout(timer);
       timer = setTimeout(() => { clicks = 0; }, 1500);
@@ -422,76 +250,54 @@
         clicks = 0;
         document.getElementById("slmAdminBar").classList.toggle("open");
       }
-    });
+    };
 
     const rateIn = document.getElementById("slmAdminRate");
     const modeIn = document.getElementById("slmAdminMode");
-    rateIn.value = courierRate;
-    modeIn.value = shippingMode;
+    if (rateIn) rateIn.value = courierRate;
+    if (modeIn) modeIn.value = shippingMode;
 
-    const updateAdminShip = () => {
-      const val = parseFloat(rateIn.value);
-      if (!isNaN(val) && val >= 0) {
-        courierRate = val;
-        localStorage.setItem("slm24_courier_rate", courierRate);
-      }
-      shippingMode = modeIn.value;
-      localStorage.setItem("slm24_shipping_mode", shippingMode);
+    if (rateIn) rateIn.onchange = () => {
+      courierRate = parseFloat(rateIn.value) || 0;
+      localStorage.setItem("slm24_courier_rate", courierRate);
       renderCart();
     };
-    rateIn.addEventListener("change", updateAdminShip);
-    modeIn.addEventListener("change", updateAdminShip);
+    if (modeIn) modeIn.onchange = () => {
+      shippingMode = modeIn.value;
+      localStorage.setItem("slm_shipping_mode", shippingMode);
+      renderCart();
+    };
 
-    // Відправка замовлень
-    document.getElementById("slmSubmitWaBtn").addEventListener("click", () => submitOrder("whatsapp"));
-    document.getElementById("slmSubmitEmailBtn").addEventListener("click", () => submitOrder("email"));
+    document.querySelectorAll('input[name="slmShipRadio"]').forEach(r => r.onchange = renderCart);
 
-    // Відправка запитань про товар
-    document.getElementById("slmSendAskWa").addEventListener("click", () => sendProductQuestion("whatsapp"));
-    document.getElementById("slmSendAskMail").addEventListener("click", () => sendProductQuestion("email"));
+    document.getElementById("slmSubmitWaBtn").onclick = () => submitOrder("whatsapp");
+    document.getElementById("slmSubmitEmailBtn").onclick = () => submitOrder("email");
+    document.getElementById("slmSendAskWa").onclick = () => sendProductQuestion("whatsapp");
+    document.getElementById("slmSendAskMail").onclick = () => sendProductQuestion("email");
   }
 
-  function toggleCartModal(show) {
-    const modal = document.getElementById("slmMainCartModal");
-    if (!modal) return;
-    if (show) modal.classList.add("active");
-    else modal.classList.remove("active");
-  }
-
-  // =========================================================================
-  // 7. ДОДАВАННЯ ТОВАРІВ У КОШИК ТА ОБРАХУНОК СУМИ
-  // =========================================================================
-  function addItemToCart({ code, title, basePrice, qty, img, skipButtons }) {
-    // Перевіряємо, чи вже є в кошику точно таке саме крісло (#код) зі стандартними параметрами
-    const existing = slmCart.find(item =>
-      item.code === code &&
-      item.seatIdx === 0 &&
-      item.leg === SHOP_CONFIG.legsOptions[0] &&
-      item.buttons === (skipButtons ? "Nie dotyczy" : SHOP_CONFIG.buttonsOptions[0].value) &&
-      item.fabric.trim().toLowerCase() === "jak na zdjęciu"
-    );
-
+  function addItemToCart(prod) {
+    const existing = slmCart.find(i => i.code === prod.code && i.seatIdx === 0 && i.leg === SHOP_CONFIG.legsOptions[0] && i.fabric.toLowerCase() === "jak na zdjęciu");
     if (existing) {
-      existing.qty += qty;
+      existing.qty += prod.qty;
     } else {
       slmCart.push({
         id: Date.now() + Math.random(),
-        code: code,
-        title: title,
-        basePrice: basePrice,
-        qty: qty,
-        img: img || "https://via.placeholder.com/80?text=SLM24",
-        skipButtons: skipButtons,
+        code: prod.code,
+        title: prod.title,
+        basePrice: prod.basePrice,
+        qty: prod.qty,
+        img: prod.img || "",
+        skipButtons: prod.skipButtons,
         seatIdx: 0,
         leg: SHOP_CONFIG.legsOptions[0],
-        buttons: skipButtons ? "Nie dotyczy" : SHOP_CONFIG.buttonsOptions[0].value,
+        buttons: prod.skipButtons ? "Nie dotyczy" : SHOP_CONFIG.buttonsOptions[0].value,
         fabric: "Jak na zdjęciu"
       });
     }
-
-    saveCartToDevice(slmCart);
+    saveCart();
     renderCart();
-    toggleCartModal(true);
+    document.getElementById("slmMainCartModal").classList.add("active");
   }
 
   function getUnitPrice(item) {
@@ -509,9 +315,7 @@
     const badgeSum = document.getElementById("slmBadgeSum");
     if (!listEl) return;
 
-    let totalQty = 0;
-    let subtotal = 0;
-
+    let totalQty = 0, subtotal = 0;
     slmCart.forEach(item => {
       const unit = getUnitPrice(item);
       item.unitPrice = unit;
@@ -524,27 +328,16 @@
     badgeSum.innerText = `(${subtotal.toFixed(2)} zł)`;
 
     if (slmCart.length === 0) {
-      listEl.innerHTML = `<div style="text-align:center; padding:35px 10px; color:#64748b; font-size:14px;">
-        Twój koszyk jest pusty. Wybierz fotel lub poduszkę z ogłoszeń na stronie!
-      </div>`;
+      listEl.innerHTML = `<div style="text-align:center; padding:30px 10px; color:#64748b; font-size:14px;">Twój koszyk jest pusty.</div>`;
       summaryEl.style.display = "none";
       return;
     }
 
     summaryEl.style.display = "block";
-
     listEl.innerHTML = slmCart.map((item, i) => {
-      const seatSelectHtml = SHOP_CONFIG.seatOptions.map((opt, idx) =>
-        `<option value="${idx}" ${Number(item.seatIdx) === idx ? "selected" : ""}>${escapeHtml(opt.label)}</option>`
-      ).join("");
-
-      const legsSelectHtml = SHOP_CONFIG.legsOptions.map(legName =>
-        `<option value="${escapeHtml(legName)}" ${item.leg === legName ? "selected" : ""}>${escapeHtml(legName)}</option>`
-      ).join("");
-
-      const buttonsSelectHtml = SHOP_CONFIG.buttonsOptions.map(b =>
-        `<option value="${escapeHtml(b.value)}" ${item.buttons === b.value ? "selected" : ""}>${escapeHtml(b.label)}</option>`
-      ).join("");
+      const seatOpts = SHOP_CONFIG.seatOptions.map((o, idx) => `<option value="${idx}" ${Number(item.seatIdx) === idx ? "selected" : ""}>${escapeHtml(o.label)}</option>`).join("");
+      const legOpts = SHOP_CONFIG.legsOptions.map(l => `<option value="${escapeHtml(l)}" ${item.leg === l ? "selected" : ""}>${escapeHtml(l)}</option>`).join("");
+      const btnOpts = SHOP_CONFIG.buttonsOptions.map(b => `<option value="${escapeHtml(b.value)}" ${item.buttons === b.value ? "selected" : ""}>${escapeHtml(b.label)}</option>`).join("");
 
       return `
         <div class="slm-cart-item">
@@ -554,58 +347,24 @@
               <div>
                 <span class="slm-code-pill">${escapeHtml(item.code)}</span>
                 <span class="slm-item-title">${escapeHtml(item.title)}</span>
-                <div style="font-size:12px; color:#64748b; margin-top:2px;">
-                  Cena bazowa: ${Number(item.basePrice).toFixed(2)} zł / szt.
-                </div>
+                <div style="font-size:12px; color:#64748b; margin-top:2px;">Cena bazowa: ${Number(item.basePrice).toFixed(2)} zł</div>
               </div>
             </div>
-            <button type="button" class="slm-btn-del" onclick="window.__slmRemove(${i})" title="Usuń pozycję">&times;</button>
+            <button type="button" class="slm-btn-del" onclick="window.__slmDel(${i})">&times;</button>
           </div>
-
           <div class="slm-opt-grid">
-            <div class="slm-opt-cell">
-              <label>🪑 Siedzisko:</label>
-              <select onchange="window.__slmUpdate(${i}, 'seatIdx', this.value)">
-                ${seatSelectHtml}
-              </select>
-            </div>
-
-            <div class="slm-opt-cell">
-              <label>🦵 Nóżka (1-6):</label>
-              <select onchange="window.__slmUpdate(${i}, 'leg', this.value)">
-                ${legsSelectHtml}
-              </select>
-            </div>
-
-            <div class="slm-opt-cell">
-              <label>🔘 Układ guzików:</label>
-              ${!item.skipButtons ? `
-                <select onchange="window.__slmUpdate(${i}, 'buttons', this.value)">
-                  ${buttonsSelectHtml}
-                </select>
-              ` : `
-                <input type="text" value="Nie dotyczy ( bez guzików )" disabled style="color:#64748b; background:#f1f5f9;">
-              `}
-            </div>
-
-            <div class="slm-opt-cell">
-              <label>🎨 Tkanina / Kolor (wpisz):</label>
-              <input type="text" value="${escapeHtml(item.fabric)}"
-                placeholder="np. Jak na zdjęciu / Monolith 77"
-                onchange="window.__slmUpdate(${i}, 'fabric', this.value)">
-            </div>
+            <div class="slm-opt-cell"><label>🪑 Siedzisko:</label><select onchange="window.__slmUpd(${i}, 'seatIdx', this.value)">${seatOpts}</select></div>
+            <div class="slm-opt-cell"><label>🦵 Nóżka:</label><select onchange="window.__slmUpd(${i}, 'leg', this.value)">${legOpts}</select></div>
+            <div class="slm-opt-cell"><label>🔘 Guziki:</label>${!item.skipButtons ? `<select onchange="window.__slmUpd(${i}, 'buttons', this.value)">${btnOpts}</select>` : `<input type="text" value="Nie dotyczy" disabled>`}</div>
+            <div class="slm-opt-cell"><label>🎨 Tkanina:</label><input type="text" value="${escapeHtml(item.fabric)}" onchange="window.__slmUpd(${i}, 'fabric', this.value)"></div>
           </div>
-
           <div class="slm-cart-item-foot">
             <div class="slm-qty-inline">
               <button type="button" onclick="window.__slmQty(${i}, -1)">-</button>
               <span>${item.qty} szt.</span>
               <button type="button" onclick="window.__slmQty(${i}, 1)">+</button>
             </div>
-            <div>
-              ${item.unitPrice.toFixed(2)} zł &times; ${item.qty} =
-              <strong style="color:#8b1e41; font-size:15px;">${item.totalPrice.toFixed(2)} zł</strong>
-            </div>
+            <div>${item.unitPrice.toFixed(2)} zł &times; ${item.qty} = <strong style="color:#8b1e41;">${item.totalPrice.toFixed(2)} zł</strong></div>
           </div>
         </div>
       `;
@@ -616,91 +375,151 @@
     document.getElementById("slmCourierText").innerText = courierCost.toFixed(2) + " zł";
 
     const shipMethod = document.querySelector('input[name="slmShipRadio"]:checked')?.value || "courier";
-    const finalShipping = shipMethod === "pickup" ? 0 : courierCost;
-    const grandTotal = subtotal + finalShipping;
-
-    document.getElementById("slmGrandTotalText").innerText = grandTotal.toFixed(2) + " zł";
+    const finalShip = shipMethod === "pickup" ? 0 : courierCost;
+    document.getElementById("slmGrandTotalText").innerText = (subtotal + finalShip).toFixed(2) + " zł";
   }
 
-  window.__slmUpdate = function(idx, field, val) {
-    if (!slmCart[idx]) return;
-    if (field === "seatIdx") slmCart[idx].seatIdx = parseInt(val) || 0;
-    else slmCart[idx][field] = val;
-    saveCartToDevice(slmCart);
-    renderCart();
-  };
+  window.__slmUpd = (idx, f, v) => { if(slmCart[idx]){ if(f==='seatIdx') slmCart[idx].seatIdx = parseInt(v)||0; else slmCart[idx][f] = v; saveCart(); renderCart(); } };
+  window.__slmQty = (idx, d) => { if(slmCart[idx]){ slmCart[idx].qty += d; if(slmCart[idx].qty<=0) slmCart.splice(idx,1); saveCart(); renderCart(); } };
+  window.__slmDel = (idx) => { slmCart.splice(idx,1); saveCart(); renderCart(); };
 
-  window.__slmQty = function(idx, delta) {
-    if (!slmCart[idx]) return;
-    slmCart[idx].qty += delta;
-    if (slmCart[idx].qty <= 0) slmCart.splice(idx, 1);
-    saveCartToDevice(slmCart);
-    renderCart();
-  };
-
-  window.__slmRemove = function(idx) {
-    slmCart.splice(idx, 1);
-    saveCartToDevice(slmCart);
-    renderCart();
-  };
-
-  // =========================================================================
-  // 8. АВТОМАТИЧНА ОБРОБКА ОГОЛОШЕНЬ НА СТОРІНЦІ (#001, #002...)
-  // =========================================================================
-  function enhanceProductCards() {
-    const allButtons = Array.from(document.querySelectorAll("button, a")).filter(el => {
-      if (el.closest("#slm24-root-container") || el.closest(".slm-prod-actions")) return false;
-      const txt = (el.innerText || "").toLowerCase();
-      return txt.includes("zapytaj o cenę") || txt.includes("dodaj do koszyka") || txt.includes("zamów");
-    });
-
-    allButtons.forEach((btn, idx) => {
+  function enhanceCards() {
+    document.querySelectorAll("button, a").forEach((btn, idx) => {
       if (btn.dataset.slmEnhanced === "true") return;
-      btn.dataset.slmEnhanced = "true";
+      const txt = (btn.innerText || "").toLowerCase();
+      if (!txt.includes("zapytaj o cenę") && !txt.includes("dodaj do koszyka") && !txt.includes("zamów")) return;
+      if (btn.closest("#slm24-root-container") || btn.closest(".slm-prod-actions")) return;
 
-      // Знаходимо картку оголошення
-      const card = btn.closest(".product, .card, .item, .ogloszenie, article, li") || btn.closest("div")?.parentElement || btn.parentElement;
+      btn.dataset.slmEnhanced = "true";
+      const card = btn.closest(".product, .card, .item, .ogloszenie, article, li") || btn.parentElement;
       if (!card) return;
 
       const titleEl = card.querySelector("h1, h2, h3, h4, .title, strong");
       const rawTitle = titleEl ? titleEl.innerText.trim() : "Mebel SLM24";
-      const fullCardText = card.innerText || "";
+      const fullText = card.innerText || "";
 
-      // Витягуємо код #001...#999 з початку заголовка або тексту картки
-      const adCode = extractAdCode(rawTitle, fullCardText, idx + 1);
-      const cleanName = cleanTitleFromCode(rawTitle);
+      let adCode = "#001";
+      const match = (rawTitle + " " + fullText).match(/#\s*([0-9A-Za-z_-]{1,10})/);
+      if (match) {
+        adCode = /^\d+$/.test(match[1]) ? "#" + match[1].padStart(3, "0") : "#" + match[1].toUpperCase();
+      } else {
+        adCode = "#" + String(idx + 1).padStart(3, "0");
+      }
 
-      // Якщо це Caterpillar, Chesterfield або подушка (Poduszka) — вимикаємо ґудзики
-      const skipButtons = /caterpillar|chesterfield|poduszka/i.test(rawTitle + " " + fullCardText);
+      const cleanTitle = rawTitle.replace(/#\s*[0-9A-Za-z_-]{1,10}\s*[-–—:]?\s*/g, "").trim() || "Mebel SLM24";
+      const skipButtons = /caterpillar|chesterfield|poduszka/i.test(rawTitle + " " + fullText);
 
-      // Шукаємо ціну в картці (підтримує як подушки від 20 zł, так і крісла 1 360 zł)
       let basePrice = 0;
       const priceRegex = /(\d[\d\s.,]{0,6})\s*zł/gi;
-      let match;
-      while ((match = priceRegex.exec(fullCardText)) !== null) {
-        const val = parseFloat(match[1].replace(/\s+/g, "").replace(",", "."));
-        if (!isNaN(val) && val >= 15 && val > basePrice) {
-          basePrice = val;
-        }
+      let m;
+      while ((m = priceRegex.exec(fullText)) !== null) {
+        const val = parseFloat(m[1].replace(/\s+/g, "").replace(",", "."));
+        if (!isNaN(val) && val >= 15 && val > basePrice) basePrice = val;
       }
       if (!basePrice) basePrice = SHOP_CONFIG.defaultPriceFallback;
 
       const imgEl = card.querySelector("img");
       const imgSrc = imgEl && imgEl.src ? imgEl.src : "";
 
-      const actionsDiv = document.createElement("div");
-      actionsDiv.className = "slm-prod-actions";
-      actionsDiv.innerHTML = `
+      const box = document.createElement("div");
+      box.className = "slm-prod-actions";
+      box.innerHTML = `
         <span class="slm-card-code-tag">Ogłoszenie ${escapeHtml(adCode)}</span>
         <div class="slm-qty-box">
           <span style="font-weight:700;">Ilość (szt.):</span>
           <div class="slm-qty-controls">
-            <button type="button" class="slm-qty-btn-card slm-minus">-</button>
+            <button type="button" class="slm-qty-btn-card slm-m">-</button>
             <input type="text" class="slm-qty-input-card" value="1" readonly>
-            <button type="button" class="slm-qty-btn-card slm-plus">+</button>
+            <button type="button" class="slm-qty-btn-card slm-p">+</button>
           </div>
         </div>
-        <button type="button" class="slm-add-btn">
-          🛒 Dodaj do koszyka (<span class="slm-live-price">${basePrice.toFixed(2)}</span> zł)
-        </button>
-        <button type="button" class="slm-
+        <button type="button" class="slm-add-btn">🛒 Dodaj do koszyka (${basePrice.toFixed(2)} zł)</button>
+        <button type="button" class="slm-ask-btn">✉️ Zapytaj o produkt (${escapeHtml(adCode)})</button>
+      `;
+
+      btn.style.display = "none";
+      btn.parentNode.insertBefore(box, btn);
+
+      const qInput = box.querySelector(".slm-qty-input-card");
+      box.querySelector(".slm-m").onclick = () => { let v = parseInt(qInput.value)||1; if(v>1) qInput.value = v-1; };
+      box.querySelector(".slm-p").onclick = () => { qInput.value = (parseInt(qInput.value)||1) + 1; };
+
+      box.querySelector(".slm-add-btn").onclick = () => {
+        addItemToCart({ code: adCode, title: cleanTitle, basePrice: basePrice, qty: parseInt(qInput.value)||1, img: imgSrc, skipButtons: skipButtons });
+      };
+
+      box.querySelector(".slm-ask-btn").onclick = () => {
+        document.getElementById("slmAskProdTitle").innerText = `Produkt: [${adCode}] ${cleanTitle}`;
+        document.getElementById("slmAskProductModal").classList.add("active");
+      };
+    });
+  }
+
+  function submitOrder(ch) {
+    if (slmCart.length === 0) { alert("Twój koszyk jest pusty!"); return; }
+    const name = document.getElementById("slmInName").value.trim();
+    const phone = document.getElementById("slmInPhone").value.trim();
+    const email = document.getElementById("slmInEmail").value.trim();
+    const street = document.getElementById("slmInStreet").value.trim();
+    const zip = document.getElementById("slmInZip").value.trim();
+    const city = document.getElementById("slmInCity").value.trim();
+    const notes = document.getElementById("slmInNotes").value.trim();
+    const payment = document.getElementById("slmInPayment").value;
+
+    if (!name || !phone || !email || !street || !zip || !city) {
+      alert("Proszę wypełnić wszystkie wymagane pola oznaczone gwiazdką (*)!");
+      return;
+    }
+
+    let subtotal = 0, totalQty = 0;
+    const codes = slmCart.map(i => `${i.code} (${i.qty} szt.)`).join(", ");
+    const lines = slmCart.map((item, idx) => {
+      const unit = getUnitPrice(item);
+      const rowT = unit * item.qty;
+      subtotal += rowT; totalQty += item.qty;
+      return `${idx + 1}. [${item.code}] *${item.title}*\n   • Ilość: ${item.qty} szt. x ${unit.toFixed(2)} zł = *${rowT.toFixed(2)} zł*\n   • Siedzisko: ${SHOP_CONFIG.seatOptions[item.seatIdx]?.label}\n   • Nóżka: ${item.leg}\n   • Guziki: ${item.skipButtons ? "Nie dotyczy" : item.buttons}\n   • Tkanina: *${item.fabric}*`;
+    }).join("\n\n");
+
+    const shipM = document.querySelector('input[name="slmShipRadio"]:checked')?.value || "courier";
+    const shipCost = shipM === "pickup" ? 0 : (shippingMode === "per_item" ? courierRate * totalQty : courierRate);
+    const grand = subtotal + shipCost;
+
+    const msg = `🛒 NOWE ZAMÓWIENIE - SLM24.PL\n📌 KODY: ${codes}\n==============================\n${lines}\n\nSuma: ${subtotal.toFixed(2)} zł\nDostawa: ${shipM === "pickup" ? "Odbiór osobisty (0 zł)" : "Kurier (" + shipCost.toFixed(2) + " zł)"}\nRAZEM: ${grand.toFixed(2)} zł\nPłatność: ${payment}\n==============================\n👤 KLIENT:\nImię: ${name}\nTel: ${phone}\nE-mail: ${email}\nAdres: ${street}, ${zip} ${city}\nUwagi: ${notes || "Brak"}`;
+
+    if (ch === "whatsapp") {
+      window.open(`https://wa.me/${SHOP_CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`, "_blank");
+    } else {
+      window.location.href = `mailto:${SHOP_CONFIG.ownerEmail}?subject=${encodeURIComponent("Zamówienie [" + codes + "] - " + name)}&body=${encodeURIComponent(msg)}`;
+    }
+  }
+
+  function sendProductQuestion(ch) {
+    const prod = document.getElementById("slmAskProdTitle").innerText;
+    const email = document.getElementById("slmAskEmail").value.trim();
+    const phone = document.getElementById("slmAskPhone").value.trim();
+    const q = document.getElementById("slmAskQuestion").value.trim();
+    if (!email || !q) { alert("Podaj e-mail oraz treść pytania!"); return; }
+
+    const text = `ZAPYTANIE:\n${prod}\nE-mail: ${email}\nTel: ${phone || "Brak"}\nPytanie: ${q}`;
+    if (ch === "whatsapp") {
+      window.open(`https://wa.me/${SHOP_CONFIG.whatsappNumber}?text=${encodeURIComponent(text)}`, "_blank");
+    } else {
+      window.location.href = `mailto:${SHOP_CONFIG.ownerEmail}?subject=${encodeURIComponent("Zapytanie - " + prod)}&body=${encodeURIComponent(text)}`;
+    }
+    document.getElementById("slmAskProductModal").classList.remove("active");
+  }
+
+  // Автозапуск
+  function run() {
+    injectCartUI();
+    enhanceCards();
+    renderCart();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", run);
+  } else {
+    run();
+  }
+  setInterval(() => { enhanceCards(); }, 1200);
+})();
