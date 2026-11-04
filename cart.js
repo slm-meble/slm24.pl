@@ -158,15 +158,33 @@ document.addEventListener("DOMContentLoaded", function() {
                 updateCardPrice();
             });
 
-            actionsDiv.querySelector(".slm-add-btn").addEventListener("click", () => {
+           actionsDiv.querySelector(".slm-add-btn").addEventListener("click", () => {
                 const qty = parseInt(qtyInput.value) || 1;
 
+                // Точне витягування артикулу (наприклад, #001, #004) з назви товару
+                let foundId = "Brak ID";
+                const matchId = title.match(/#\d+/);
+                if (matchId) {
+                    foundId = matchId[0];
+                }
+
                 cart.push({
-                    name: title, // тепер тут міститься ваш артикул на зразок "#001 Назва..."
+                    name: title,
                     skipButtons: skipButtons,
-                    cardId: title.match(/#\d+/) ? title.match(/#\d+/)[0] : ("#00" + (index + 1)),
+                    cardId: foundId, // тепер сюди гарантовано запишеться ваш номер #00X
                     basePrice: basePrice,
                     qty: qty,
+                    springVal: 0,
+                    spring: "Bez sprężyny falistej (standard)",
+                    leg: "1",
+                    buttons: skipButtons ? "Nie dotyczy" : "A",
+                    fabric: "Jak na zdjęciu"
+                });
+
+                saveAndRenderCart();
+                document.getElementById("slm-cart-modal").style.display = "flex";
+            });
+
                     springVal: 0,
                     spring: "Bez sprężyny falistej (standard)",
                     leg: "1",
