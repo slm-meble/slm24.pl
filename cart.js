@@ -1,5 +1,5 @@
 // =========================================================================
-// ОРИГІНАЛЬНИЙ КОШИК SLM24.PL (З ВИПРАВЛЕНИМИ КАТЕГОРІЯМИ ТА КОДАМИ)
+// ОРИГІНАЛЬНИЙ КОШИК SLM24.PL (ФІНАЛЬНА ВИПРАВЛЕНА ВЕРСІЯ БЕЗ ДУБЛЮВАНЬ)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", function() {
     let cart = JSON.parse(localStorage.getItem("slm_cart")) || [];
@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.body.appendChild(askModal);
 
-    // 4. Пошук оголошень та витягування кодів #001 ... #999
+    // 4. Пошук оголошень та витягування кодів #001 ... #999 (БЕЗ ДУБЛЮВАНЬ ТА ІНТЕРВАЛІВ)
     function enhanceProductCards() {
         const buttons = Array.from(document.querySelectorAll("button, a")).filter(el => {
             const txt = (el.innerText || "").toLowerCase();
@@ -131,10 +131,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
         buttons.forEach((btn, index) => {
             if (btn.dataset.slmEnhanced) return;
-            btn.dataset.slmEnhanced = "true";
-
-            const card = btn.closest("div") || btn.parentElement;
+            
+            // Шукаємо картку або батьківський контейнер товару
+            const card = btn.closest(".product, .card, .item, .ogloszenie, article, li") || btn.closest("div") || btn.parentElement;
             if (!card) return;
+
+            // Захист: якщо на цій картці вже створено блок дій, пропускаємо її
+            if (card.querySelector(".slm-prod-actions")) {
+                btn.style.display = "none";
+                return;
+            }
+
+            btn.dataset.slmEnhanced = "true";
 
             const titleEl = card.querySelector("h3, h2, h4, strong") || { innerText: "Mebel SLM24" };
             const title = titleEl.innerText.trim();
@@ -150,7 +158,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 adCode = "#" + String(index + 1).padStart(3, "0");
             }
 
-            // Перевірка тільки на Chesterfield та підсушку (без Caterpillar)
             const skipButtons = /chesterfield|poduszka/i.test(title + " " + fullCardText);
             
             let basePrice = 0;
@@ -229,7 +236,8 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    setInterval(enhanceProductCards, 800);
+    // Запускаємо один раз при завантаженні (без setInterval)
+    enhanceProductCards();
 
     // 5. Рендеринг кошика
     function saveAndRenderCart() {
