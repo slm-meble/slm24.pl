@@ -94,7 +94,7 @@
         .photo-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
         .photo-item {
             position: relative; width: 85px; height: 85px; border-radius: 8px;
-            overflow: hidden; border: 1px solid var(--border); background: #eee;
+            overflow: hidden; border: 1px solid var(--border); background: #fff;
         }
         .photo-item img { width: 100%; height: 100%; object-fit: cover; }
         .photo-item .remove-photo {
@@ -176,7 +176,7 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Nazwa mebla</label>
+                    <label>Nazwa mebla (np. #005 Fotel Uszak...)</label>
                     <input type="text" id="fName" class="form-control">
                 </div>
                 <div class="form-group">
@@ -207,12 +207,12 @@
             </div>
 
             <div class="form-group">
-                <label>Zdjęcia mebla (nieograniczona ilość — automatyczne zmniejszanie)</label>
+                <label>Zdjęcia mebla (dowolna rozdzielczość i format AI — automatyczna konwersja)</label>
                 <div class="upload-zone" onclick="document.getElementById('filePicker').click()">
                     <strong style="color:var(--accent); font-size:16px;">📷 Kliknij tutaj, aby wybrać zdjęcia z telefonu lub komputera</strong>
-                    <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Możesz zaznaczyć od razu 5, 10 lub więcej zdjęć. Zostaną automatycznie pomniejszone i wysłane na serwer.</p>
+                    <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Obsługuje zdjęcia wysokiej rozdzielczości (Huawei, AI Pro, PNG, WebP, JPG) — brak czarnego tła!</p>
                 </div>
-                <input type="file" id="filePicker" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)">
+                <input type="file" id="filePicker" accept="image/*,.heic,.heif,.webp,.png,.jpg,.jpeg" multiple style="display:none" onchange="handlePhotoUpload(event)">
                 <div class="photo-list" id="photoPreviewList"></div>
             </div>
 
@@ -249,6 +249,7 @@
 
         let catalogData = { products: [] };
         let currentPhotos = [];
+        let localPhotoCache = {}; // Локальний кеш для миттєвого показу прев'ю без очікування GitHub
         let homeJsonSha = "";
 
         function loginPin() {
@@ -349,8 +350,6 @@ Dane produktu:
 Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto propozycja opisu" i bez gwiazdek Markdown **). Użyj ładnych akapitów oraz wypunktowań (np. z symbolem ✔), podkreśl komfort, wysoką jakość wykonania oraz możliwość personalizacji tkaniny.`;
 
             try {
-                let generatedText = "";
-
                 const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
                     headers: {
@@ -358,14 +357,14 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'llama-3.1-70b-versatile',
+                        model: 'llama-3.3-70b-versatile',
                         messages: [{ role: 'user', content: promptText }],
                         temperature: 0.7
                     })
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error?.message || 'Błąd serwera Groq');
-                generatedText = data.choices?.[0]?.message?.content || '';
+                const generatedText = data.choices?.[0]?.message?.content || '';
 
                 document.getElementById('fDesc').value = generatedText.replace(/\*\*/g, '').trim();
                 showStatus('✨ Gotowe! Opis został napisany i wstawiony.', 3500);
@@ -417,7 +416,8 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
 
             container.innerHTML = catalogData.products.map((p, idx) => {
                 const firstImg = (p.image || (p.images ? p.images.split(',')[0] : '')).trim();
-                const thumbSrc = firstImg ? '/' + firstImg.replace(/^\//, '') : '';
+                const cleanPath = firstImg.replace(/^\//, '');
+                const thumbSrc = localPhotoCache[cleanPath] || (cleanPath ? '/' + cleanPath : '');
                 const imgCount = p.images ? p.images.split(',').filter(Boolean).length : (p.image ? 1 : 0);
 
                 return `
@@ -454,7 +454,7 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
             }
 
             for (let i = 0; i < files.length; i++) {
-                showStatus(`⏳ Zmniejszanie i wysyłanie zdjęcia ${i + 1} z ${files.length}...`);
+                showStatus(`⏳ Przetwarzanie i wysyłanie zdjęcia ${i + 1} z ${files.length}...`);
                 try {
                     const compressedBase64 = await compressPhotoFile(files[i]);
                     const cleanBase64 = compressedBase64.split(',')[1];
@@ -474,52 +474,111 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
                         })
                     });
 
-                    if (!res.ok) throw new Error('Błąd wysyłania zdjęcia');
+                    if (!res.ok) {
+                        const errData = await res.json().catch(() => ({}));
+                        throw new Error(errData.message || 'Błąd wysyłania zdjęcia na GitHub');
+                    }
+
+                    // Зберігаємо картинку в локальний кеш для миттєвого відображення
+                    localPhotoCache[filePath] = compressedBase64;
                     currentPhotos.push(filePath);
                     renderPhotoPreviews();
                 } catch (err) {
                     console.error(err);
-                    alert('Błąd podczas wysyłania zdjęcia nr ' + (i + 1));
+                    alert(`Błąd podczas wysyłania zdjęcia nr ${i + 1}: ${err.message}`);
                 }
             }
             event.target.value = '';
-            showStatus('✅ Wszystkie wybrane zdjęcia zostały pomniejszone i wgrane!', 3500);
+            showStatus('✅ Wszystkie wybrane zdjęcia zostały przetworzone i wgrane!', 3500);
         }
 
-        function compressPhotoFile(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const MAX_DIM = 1200;
-                        let w = img.width;
-                        let h = img.height;
+        // Надійна функція стиснення: підтримує будь-яку роздільну здатність, PNG/WebP після ШІ та заливає прозорий фон білим
+        async function compressPhotoFile(file) {
+            const MAX_DIM = 1600; // Висока якість і деталізація для меблів
+            let source = null;
+            let width = 0;
+            let height = 0;
+            let objectUrl = null;
 
-                        if (w > h && w > MAX_DIM) { h *= MAX_DIM / w; w = MAX_DIM; }
-                        else if (h > MAX_DIM) { w *= MAX_DIM / h; h = MAX_DIM; }
+            try {
+                // 1. Сучасний метод: легко читає навіть величезні фото 50 МП+ та враховує поворот камери Huawei
+                if (window.createImageBitmap) {
+                    try {
+                        source = await createImageBitmap(file, { imageOrientation: 'from-image' });
+                        width = source.width;
+                        height = source.height;
+                    } catch (bmpErr) {
+                        source = null;
+                    }
+                }
 
-                        canvas.width = Math.round(w);
-                        canvas.height = Math.round(h);
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.82));
-                    };
-                };
-            });
+                // 2. Резервний метод через ObjectURL (без перевантаження пам'яті FileReader)
+                if (!source) {
+                    objectUrl = URL.createObjectURL(file);
+                    source = await new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.onload = () => resolve(img);
+                        img.onerror = () => reject(new Error('Nie można odczytać pliku obrazu'));
+                        img.src = objectUrl;
+                    });
+                    width = source.naturalWidth || source.width;
+                    height = source.naturalHeight || source.height;
+                }
+
+                if (!width || !height) {
+                    throw new Error('Nieprawidłowy rozmiar zdjęcia');
+                }
+
+                let targetW = width;
+                let targetH = height;
+
+                if (targetW > targetH && targetW > MAX_DIM) {
+                    targetH = Math.round(targetH * (MAX_DIM / targetW));
+                    targetW = MAX_DIM;
+                } else if (targetH >= targetW && targetH > MAX_DIM) {
+                    targetW = Math.round(targetW * (MAX_DIM / targetH));
+                    targetH = MAX_DIM;
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = targetW;
+                canvas.height = targetH;
+
+                const ctx = canvas.getContext('2d', { alpha: false });
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                // КЛЮЧОВЕ ВИПРАВЛЕННЯ: Примусово заливаємо полотно чистим білим кольором!
+                // Завдяки цьому прозорі зони після обробки ШІ ніколи не стануть чорними.
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, targetW, targetH);
+
+                // Малюємо саме фото поверх білого фону
+                ctx.drawImage(source, 0, 0, targetW, targetH);
+
+                const resultDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+
+                if (source && typeof source.close === 'function') {
+                    source.close();
+                }
+
+                return resultDataUrl;
+            } finally {
+                if (objectUrl) {
+                    URL.revokeObjectURL(objectUrl);
+                }
+            }
         }
 
         function renderPhotoPreviews() {
             const box = document.getElementById('photoPreviewList');
             box.innerHTML = currentPhotos.map((path, idx) => {
-                const src = '/' + path.replace(/^\//, '');
+                const cleanPath = path.replace(/^\//, '');
+                const src = localPhotoCache[cleanPath] || ('/' + cleanPath);
                 return `
                 <div class="photo-item">
-                    <img src="${src}" onerror="this.src='https://via.placeholder.com/85?text=OK'">
-                    <button class="remove-photo" title="Usuń to zdjęcie" onclick="removePhotoFromCurrent(${idx})">×</button>
+                    <img src="${src}" onerror="this.src='https://via.placeholder.com/85/ffffff/9e2a48?text=Wgrano'">
+                    <button type="button" class="remove-photo" title="Usuń to zdjęcie" onclick="removePhotoFromCurrent(${idx})">×</button>
                 </div>`;
             }).join('');
         }
