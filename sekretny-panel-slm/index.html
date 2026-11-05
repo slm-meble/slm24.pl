@@ -152,7 +152,7 @@
 
         <div class="card" id="tokenBox" style="display:none; background:#fff8e6; border-color:#ffd54f;">
             <h3>🔑 Połączenie z serwerem GitHub (jednorazowo)</h3>
-            <p style="font-size:13px; color:#555; margin-bottom:10px;">Klucz Personal Access Token z GitHuba (zaczynający się od <b>ghp_...</b>):</p>
+            <p style="font-size:13px; color:#555; margin-bottom:10px;">Klucz Personal Access Token z GitHuba:</p>
             <div style="display:flex; gap:10px;">
                 <input type="password" id="ghTokenInput" class="form-control" style="margin:0;">
                 <button class="btn btn-green" onclick="saveToken()">Zapisz</button>
@@ -161,9 +161,6 @@
 
         <div class="card" id="geminiBox" style="display:none; background:#f3e8ff; border-color:#d8b4fe;">
             <h3 style="color:var(--ai-purple);">🤖 Klucz sztucznej inteligencji AI (jednorazowo)</h3>
-            <p style="font-size:13px; color:#555; margin-bottom:10px;">
-                Wklej darmowy klucz z <a href="https://console.groq.com/keys" target="_blank" style="color:var(--ai-purple); font-weight:bold;">console.groq.com/keys</a> (zaczyna się od <b>gsk_...</b>):
-            </p>
             <div style="display:flex; gap:10px;">
                 <input type="password" id="geminiKeyInput" class="form-control" style="margin:0;">
                 <button class="btn" style="background:var(--ai-purple);" onclick="saveGeminiKey()">Zapisz klucz AI</button>
@@ -182,6 +179,18 @@
                 <div class="form-group">
                     <label>Cena (np. 1299.00 zł)</label>
                     <input type="text" id="fPrice" class="form-control">
+                </div>
+            </div>
+
+            <!-- НОВИЙ РЯДОК: Доставка та Внесення -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>🚚 Koszt dostawy (zł) - wpisz 0 jeśli darmowa</label>
+                    <input type="number" id="fDelivery" class="form-control" placeholder="np. 150">
+                </div>
+                <div class="form-group">
+                    <label>💪 Usługa wniesienia (zł) - opcjonalnie</label>
+                    <input type="number" id="fCarry" class="form-control" placeholder="np. 100">
                 </div>
             </div>
 
@@ -210,7 +219,6 @@
                 <label>Zdjęcia mebla (dowolna rozdzielczość i format AI — automatyczna konwersja)</label>
                 <div class="upload-zone" onclick="document.getElementById('filePicker').click()">
                     <strong style="color:var(--accent); font-size:16px;">📷 Kliknij tutaj, aby wybrać zdjęcia z telefonu lub komputera</strong>
-                    <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Obsługuje zdjęcia wysokiej rozdzielczości (Huawei, AI Pro, PNG, WebP, JPG) — brak czarnego tła!</p>
                 </div>
                 <input type="file" id="filePicker" accept="image/*,.heic,.heif,.webp,.png,.jpg,.jpeg" multiple style="display:none" onchange="handlePhotoUpload(event)">
                 <div class="photo-list" id="photoPreviewList"></div>
@@ -218,7 +226,7 @@
 
             <div class="form-group">
                 <div class="desc-header">
-                    <label style="margin:0;">Opis przedmiotu (wpisz krótkie notatki po ukraińsku lub polsku i kliknij przycisk AI 👉)</label>
+                    <label style="margin:0;">Opis przedmiotu (wpisz krótkie notatki i kliknij AI 👉)</label>
                     <button type="button" class="btn-ai" id="aiBtn" onclick="generateDescriptionWithAI()">✨ Ulepsz / Napisz opis z AI</button>
                 </div>
                 <textarea id="fDesc" class="form-control"></textarea>
@@ -249,7 +257,7 @@
 
         let catalogData = { products: [] };
         let currentPhotos = [];
-        let localPhotoCache = {}; // Локальний кеш для миттєвого показу прев'ю без очікування GitHub
+        let localPhotoCache = {}; 
         let homeJsonSha = "";
 
         function loginPin() {
@@ -316,7 +324,7 @@
         async function generateDescriptionWithAI() {
             const apiKey = getGeminiKey();
             if (!apiKey) {
-                alert('Najpierw wklej darmowy klucz AI (kliknij fioletowy przycisk "🤖 Klucz AI" na górze ekranu)!');
+                alert('Najpierw wklej darmowy klucz AI!');
                 document.getElementById('geminiBox').style.display = 'block';
                 return;
             }
@@ -337,25 +345,15 @@
             aiBtn.innerHTML = '⏳ AI pisze tekst...';
             showStatus('✨ Sztuczna inteligencja tworzy profesjonalny opis...');
 
-            const promptText = `Jesteś profesjonalnym copywriterem polskiego sklepu meblowego SLM24.pl (sprzedaż foteli, sof, narożników, łóżek i mebli Chesterfield).
-Twoim zadaniem jest napisać lub ulepszyć opis produktu w języku polskim, tak aby zachęcał klienta do zakupu, był czytelny, elegancki i dobrze sformatowany.
-Uwaga: Notatki od właściciela mogą być napisane po ukraińsku, po polsku lub z błędami — przetłumacz je i przekształć w piękny polski tekst sprzedażowy. Nie wymyślaj dokładnych wymiarów w centymetrach, jeśli nie podano ich w notatkach.
-
-Dane produktu:
-- Nazwa mebla: ${name || 'Mebel tapicerowany'}
-- Kategoria: ${cat}
-- Cena: ${price || 'do ustalenia'}
-- Notatki / dotychczasowy opis od właściciela: ${rawDesc || 'Brak dodatkowych notatek — napisz atrakcyjny opis na podstawie nazwy i kategorii.'}
-
-Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto propozycja opisu" i bez gwiazdek Markdown **). Użyj ładnych akapitów oraz wypunktowań (np. z symbolem ✔), podkreśl komfort, wysoką jakość wykonania oraz możliwość personalizacji tkaniny.`;
+            const promptText = `Jesteś profesjonalnym copywriterem polskiego sklepu meblowego SLM24.pl. Napisz elegancki opis produktu w języku polskim. 
+Dane produktu: Nazwa: ${name}, Kategoria: ${cat}, Cena: ${price}. 
+Notatki właściciela: ${rawDesc}. 
+Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów i wypunktowań.`;
 
             try {
                 const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + apiKey,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         model: 'llama-3.3-70b-versatile',
                         messages: [{ role: 'user', content: promptText }],
@@ -370,8 +368,8 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
                 showStatus('✨ Gotowe! Opis został napisany i wstawiony.', 3500);
             } catch (err) {
                 console.error(err);
-                alert('Szczegóły błędu AI: ' + err.message);
-                showStatus('❌ Błąd generowania opisu AI', 3500);
+                alert('Błąd AI: ' + err.message);
+                showStatus('❌ Błąd generowania opisu', 3500);
             } finally {
                 aiBtn.disabled = false;
                 aiBtn.innerHTML = origText;
@@ -400,7 +398,7 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
                 showStatus('✅ Załadowano listę ogłoszeń!', 2000);
             } catch (err) {
                 console.error(err);
-                document.getElementById('productsContainer').innerHTML = '<p style="color:red;">Błąd wczytywania. Sprawdź połączenie lub klucz GitHub.</p>';
+                document.getElementById('productsContainer').innerHTML = '<p style="color:red;">Błąd wczytywania.</p>';
                 showStatus('❌ Błąd pobierania danych', 3000);
             }
         }
@@ -418,8 +416,10 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
                 const firstImg = (p.image || (p.images ? p.images.split(',')[0] : '')).trim();
                 const cleanPath = firstImg.replace(/^\//, '');
                 const thumbSrc = localPhotoCache[cleanPath] || (cleanPath ? '/' + cleanPath : '');
-                const imgCount = p.images ? p.images.split(',').filter(Boolean).length : (p.image ? 1 : 0);
-
+                
+                // Відображаємо доставку в списку
+                const dostawa = parseFloat(p.deliveryPrice) > 0 ? p.deliveryPrice + ' zł' : 'darmowa';
+                
                 return `
                 <div class="prod-item">
                     <div class="prod-info">
@@ -429,12 +429,12 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
                             <div style="font-size:13px; margin-top:3px;">
                                 <span style="color:var(--accent); font-weight:bold;">${p.price || ''}</span> • 
                                 <span style="color:#666;">Kategoria: ${p.category || 'inne'}</span> • 
-                                <span style="color:#2e7d32;">📷 Zdjęć: ${imgCount}</span>
+                                <span style="color:#2e7d32;">🚚 Dostawa: ${dostawa}</span>
                             </div>
                         </div>
                     </div>
                     <div class="prod-actions">
-                        ${idx > 0 ? `<button class="btn-sm btn-pin" title="Przypnij na samą górę" onclick="pinToTop(${idx})">📌 Na górę</button>` : ''}
+                        ${idx > 0 ? `<button class="btn-sm btn-pin" onclick="pinToTop(${idx})">📌 Na górę</button>` : ''}
                         <button class="btn-sm btn-edit" onclick="startEditProduct(${idx})">✏️ Edytuj</button>
                         <button class="btn-sm btn-del" onclick="removeProduct(${idx})">🗑️ Usuń</button>
                     </div>
@@ -449,7 +449,6 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
             const token = getToken();
             if (!token) {
                 alert('Najpierw wklej swój Klucz GitHub!');
-                document.getElementById('tokenBox').style.display = 'block';
                 return;
             }
 
@@ -474,99 +473,58 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
                         })
                     });
 
-                    if (!res.ok) {
-                        const errData = await res.json().catch(() => ({}));
-                        throw new Error(errData.message || 'Błąd wysyłania zdjęcia na GitHub');
-                    }
-
-                    // Зберігаємо картинку в локальний кеш для миттєвого відображення
+                    if (!res.ok) throw new Error('Błąd wysyłania zdjęcia na GitHub');
                     localPhotoCache[filePath] = compressedBase64;
                     currentPhotos.push(filePath);
                     renderPhotoPreviews();
                 } catch (err) {
                     console.error(err);
-                    alert(`Błąd podczas wysyłania zdjęcia nr ${i + 1}: ${err.message}`);
                 }
             }
             event.target.value = '';
-            showStatus('✅ Wszystkie wybrane zdjęcia zostały przetworzone i wgrane!', 3500);
+            showStatus('✅ Wszystkie wybrane zdjęcia wgrane!', 3500);
         }
 
-        // Надійна функція стиснення: підтримує будь-яку роздільну здатність, PNG/WebP після ШІ та заливає прозорий фон білим
         async function compressPhotoFile(file) {
-            const MAX_DIM = 1600; // Висока якість і деталізація для меблів
-            let source = null;
-            let width = 0;
-            let height = 0;
-            let objectUrl = null;
+            const MAX_DIM = 1600;
+            let source = null, width = 0, height = 0, objectUrl = null;
 
             try {
-                // 1. Сучасний метод: легко читає навіть величезні фото 50 МП+ та враховує поворот камери Huawei
                 if (window.createImageBitmap) {
                     try {
                         source = await createImageBitmap(file, { imageOrientation: 'from-image' });
-                        width = source.width;
-                        height = source.height;
-                    } catch (bmpErr) {
-                        source = null;
-                    }
+                        width = source.width; height = source.height;
+                    } catch (e) { source = null; }
                 }
 
-                // 2. Резервний метод через ObjectURL (без перевантаження пам'яті FileReader)
                 if (!source) {
                     objectUrl = URL.createObjectURL(file);
-                    source = await new Promise((resolve, reject) => {
+                    source = await new Promise((resolve) => {
                         const img = new Image();
                         img.onload = () => resolve(img);
-                        img.onerror = () => reject(new Error('Nie można odczytać pliku obrazu'));
                         img.src = objectUrl;
                     });
                     width = source.naturalWidth || source.width;
                     height = source.naturalHeight || source.height;
                 }
 
-                if (!width || !height) {
-                    throw new Error('Nieprawidłowy rozmiar zdjęcia');
-                }
-
-                let targetW = width;
-                let targetH = height;
-
+                let targetW = width, targetH = height;
                 if (targetW > targetH && targetW > MAX_DIM) {
-                    targetH = Math.round(targetH * (MAX_DIM / targetW));
-                    targetW = MAX_DIM;
+                    targetH = Math.round(targetH * (MAX_DIM / targetW)); targetW = MAX_DIM;
                 } else if (targetH >= targetW && targetH > MAX_DIM) {
-                    targetW = Math.round(targetW * (MAX_DIM / targetH));
-                    targetH = MAX_DIM;
+                    targetW = Math.round(targetW * (MAX_DIM / targetH)); targetH = MAX_DIM;
                 }
 
                 const canvas = document.createElement('canvas');
-                canvas.width = targetW;
-                canvas.height = targetH;
-
+                canvas.width = targetW; canvas.height = targetH;
                 const ctx = canvas.getContext('2d', { alpha: false });
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-
-                // КЛЮЧОВЕ ВИПРАВЛЕННЯ: Примусово заливаємо полотно чистим білим кольором!
-                // Завдяки цьому прозорі зони після обробки ШІ ніколи не стануть чорними.
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, targetW, targetH);
-
-                // Малюємо саме фото поверх білого фону
                 ctx.drawImage(source, 0, 0, targetW, targetH);
 
-                const resultDataUrl = canvas.toDataURL('image/jpeg', 0.88);
-
-                if (source && typeof source.close === 'function') {
-                    source.close();
-                }
-
-                return resultDataUrl;
+                return canvas.toDataURL('image/jpeg', 0.88);
             } finally {
-                if (objectUrl) {
-                    URL.revokeObjectURL(objectUrl);
-                }
+                if (objectUrl) URL.revokeObjectURL(objectUrl);
             }
         }
 
@@ -577,8 +535,8 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
                 const src = localPhotoCache[cleanPath] || ('/' + cleanPath);
                 return `
                 <div class="photo-item">
-                    <img src="${src}" onerror="this.src='https://via.placeholder.com/85/ffffff/9e2a48?text=Wgrano'">
-                    <button type="button" class="remove-photo" title="Usuń to zdjęcie" onclick="removePhotoFromCurrent(${idx})">×</button>
+                    <img src="${src}">
+                    <button type="button" class="remove-photo" onclick="removePhotoFromCurrent(${idx})">×</button>
                 </div>`;
             }).join('');
         }
@@ -591,6 +549,8 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
         async function saveProductToList() {
             const name = document.getElementById('fName').value.trim();
             const price = document.getElementById('fPrice').value.trim();
+            const deliveryPrice = document.getElementById('fDelivery').value.trim();
+            const carryPrice = document.getElementById('fCarry').value.trim();
             const cat = document.getElementById('fCat').value;
             const pos = document.getElementById('fPin').value;
             const desc = document.getElementById('fDesc').value.trim();
@@ -609,6 +569,8 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
                 name: name,
                 category: cat,
                 price: price,
+                deliveryPrice: deliveryPrice,
+                carryPrice: carryPrice,
                 image: mainImage,
                 images: allImages,
                 fabric_images: editIdx >= 0 ? (catalogData.products[editIdx].fabric_images || "") : "",
@@ -622,7 +584,7 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
                 catalogData.products[editIdx] = itemObj;
             }
 
-            const ok = await pushJsonToGitHub('Zaktualizowano katalog produktów z panelu SLM24');
+            const ok = await pushJsonToGitHub('Zaktualizowano ogłoszenie (dostawa+wniesienie)');
             if (ok) {
                 clearForm();
                 renderProductsList();
@@ -634,6 +596,11 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
             document.getElementById('editIdx').value = idx;
             document.getElementById('fName').value = p.name || p.title || '';
             document.getElementById('fPrice').value = p.price || '';
+            
+            // Заповнення полів доставки/внесення
+            document.getElementById('fDelivery').value = p.deliveryPrice || '';
+            document.getElementById('fCarry').value = p.carryPrice || '';
+
             document.getElementById('fCat').value = p.category || 'fotele';
             document.getElementById('fDesc').value = p.description || '';
 
@@ -656,16 +623,18 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
 
         async function removeProduct(idx) {
             const p = catalogData.products[idx];
-            if (!confirm(`Czy na pewno chcesz całkowicie usunąć "${p.name || p.title}"?`)) return;
+            if (!confirm(`Czy na pewno chcesz usunąć "${p.name || p.title}"?`)) return;
             catalogData.products.splice(idx, 1);
             renderProductsList();
-            await pushJsonToGitHub('Usunięto ogłoszenie z katalogu');
+            await pushJsonToGitHub('Usunięto ogłoszenie');
         }
 
         function clearForm() {
             document.getElementById('editIdx').value = '-1';
             document.getElementById('fName').value = '';
             document.getElementById('fPrice').value = '';
+            document.getElementById('fDelivery').value = '';
+            document.getElementById('fCarry').value = '';
             document.getElementById('fDesc').value = '';
             currentPhotos = [];
             renderPhotoPreviews();
@@ -676,13 +645,7 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
 
         async function pushJsonToGitHub(commitMsg) {
             const token = getToken();
-            if (!token) {
-                alert('Wklej najpierw swój Klucz GitHub!');
-                document.getElementById('tokenBox').style.display = 'block';
-                return false;
-            }
-
-            showStatus('⏳ Zapisywanie zmian na serwerze GitHub...');
+            showStatus('⏳ Zapisywanie na GitHub...');
             try {
                 const getRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${JSON_PATH}?t=${Date.now()}`, {
                     headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
@@ -695,34 +658,23 @@ Zwróć TYLKO gotowy opis produktu po polsku (bez żadnych wstępów typu "Oto p
                 const jsonString = JSON.stringify(catalogData, null, 2);
                 const utf8Bytes = new TextEncoder().encode(jsonString);
                 let binaryStr = "";
-                for (let i = 0; i < utf8Bytes.length; i++) {
-                    binaryStr += String.fromCharCode(utf8Bytes[i]);
-                }
+                for (let i = 0; i < utf8Bytes.length; i++) binaryStr += String.fromCharCode(utf8Bytes[i]);
                 const base64Content = btoa(binaryStr);
 
                 const putRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${JSON_PATH}`, {
                     method: 'PUT',
-                    headers: {
-                        'Authorization': 'token ' + token,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: commitMsg,
-                        content: base64Content,
-                        sha: homeJsonSha
-                    })
+                    headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: commitMsg, content: base64Content, sha: homeJsonSha })
                 });
 
-                if (!putRes.ok) throw new Error('Błąd zapisu pliku home.json');
+                if (!putRes.ok) throw new Error('Błąd zapisu');
                 const putData = await putRes.json();
                 homeJsonSha = putData.content.sha;
 
-                showStatus('✅ Zapisano! Zmiany pojawią się na stronie za ok. 1 minutę.', 4500);
+                showStatus('✅ Zapisano pomyślnie!', 4500);
                 return true;
             } catch (err) {
                 console.error(err);
-                alert('Wystąpił błąd podczas zapisywania na GitHub.');
                 showStatus('❌ Błąd zapisu', 3000);
                 return false;
             }
