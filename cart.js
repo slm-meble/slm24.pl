@@ -433,3 +433,33 @@
     if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", initSLMCart); } 
     else { initSLMCart(); }
 })();
+// --- SEO МІКРОРОЗМІТКА SCHEMA.ORG ДЛЯ GOOGLE ---
+setTimeout(function() {
+    if (!window.allProducts || !Array.isArray(window.allProducts)) return;
+    
+    const schemaList = window.allProducts.map(function(p) {
+        let priceStr = String(p.price).replace(/[^\d.,]/g, "").replace(",", ".");
+        let price = parseFloat(priceStr) || 0;
+        
+        return {
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": p.name || p.title,
+            "image": "https://slm24.pl/" + (p.image ? p.image.replace(/^\//, '') : ""),
+            "description": p.description || "Ekskluzywne meble tapicerowane od producenta.",
+            "offers": {
+                "@type": "Offer",
+                "url": "https://slm24.pl/",
+                "priceCurrency": "PLN",
+                "price": price.toFixed(2),
+                "availability": "https://schema.org/InStock",
+                "itemCondition": "https://schema.org/NewCondition"
+            }
+        };
+    });
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(schemaList);
+    document.head.appendChild(script);
+}, 2500);
