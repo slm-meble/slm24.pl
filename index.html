@@ -13,21 +13,21 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <!-- SEO: Головна назва та опис для пошуку Google -->
+    <!-- SEO -->
     <title>SLM24.PL – Producent Mebli Tapicerowanych | Fotele Uszak, Sofy, Narożniki, Łóżka</title>
     <meta name="description" content="Ekskluzywne meble tapicerowane prosto od producenta SLM24.pl. Produkujemy fotele Uszak, sofy, narożniki, łóżka tapicerowane oraz meble Chesterfield na zamówienie. Dostawa w całej Polsce i 24 miesiące gwarancji!">
     <meta name="keywords" content="producent mebli tapicerowanych, fotel uszak, sofy rozkładane, narożniki, łóżka tapicerowane, meble chesterfield, meble na zamówienie, slm24">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://slm24.pl/">
 
-    <!-- Гарний вигляд посилання у WhatsApp, Facebook та Viber -->
+    <!-- Social Meta -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://slm24.pl/">
     <meta property="og:title" content="SLM24.PL – Ekskluzywne Meble Tapicerowane od Producenta">
     <meta property="og:description" content="Fotele Uszak, sofy, narożniki, łóżka i meble Chesterfield. Ręczne wykonanie, wybór tkanin, 24 miesiące gwarancji i dostawa w całej Polsce.">
     <meta property="og:locale" content="pl_PL">
 
-    <!-- Технічна мікророзмітка Schema.org для Google -->
+    <!-- Schema.org -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -46,41 +46,11 @@
     }
     </script>
     
-    <meta name="description" content="Ekskluzywne meble tapicerowane od producenta. Narożniki, sofy, fotele Chesterfield. Wysoka jakość, dostawa w całej Polsce.">
-    
     <style>
         html, body {
             -webkit-overflow-scrolling: touch;
             width: 100%;
             overflow-x: hidden;
-        }
-
-        #modal-main-img { cursor: pointer; }
-        
-        .lightbox-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        .lightbox-modal.open { display: flex; }
-        .lightbox-content { position: relative; max-width: 90vw; max-height: 90vh; }
-        .lightbox-content img { max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 4px; }
-        .lightbox-close { position: absolute; top: -40px; right: 0; background: none; border: none; color: #fff; font-size: 30px; cursor: pointer; }
-        .lightbox-nav {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.2); color: #fff; border: none;
-            width: 50px; height: 50px; border-radius: 50%; font-size: 24px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .lightbox-prev { left: -60px; }
-        .lightbox-next { right: -60px; }
-        @media (max-width: 768px) {
-            .lightbox-prev { left: 10px; }
-            .lightbox-next { right: 10px; }
         }
 
         :root {
@@ -98,6 +68,11 @@
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg-main); color: var(--text-dark); line-height: 1.5; }
 
         .top-bar { background-color: #dec5c1; color: #3b2826; text-align: center; padding: 7px 15px; font-size: 13px; font-weight: 500; }
+        
+        /* ПАСОК ДОВІРИ (Trust Bar) під меню */
+        .trust-bar { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 12px 15px; display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; font-size: 13px; font-weight: 600; color: var(--text-dark); }
+        .trust-bar span { display: flex; align-items: center; gap: 6px; }
+
         header { background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
         .header-inner { max-width: 1320px; margin: 0 auto; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
         .header-left, .header-right { display: flex; align-items: center; gap: 16px; }
@@ -111,28 +86,36 @@
 
         .drawer-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45); z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
         .drawer-overlay.open { opacity: 1; pointer-events: auto; }
-
-        .side-drawer {
-            position: fixed; top: 0; left: 0; bottom: 0; width: 310px; max-width: 85vw;
-            background: var(--bg-card); z-index: 950; transform: translateX(-100%);
-            transition: transform 0.3s ease; overflow-y: auto; display: flex; flex-direction: column;
-        }
+        .side-drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 310px; max-width: 85vw; background: var(--bg-card); z-index: 950; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; display: flex; flex-direction: column; }
         .side-drawer.open { transform: translateX(0); }
         .drawer-header { padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); font-size: 20px; font-weight: 500; }
         .drawer-section { padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
         .drawer-section-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: var(--text-dark); }
         .drawer-list { list-style: none; }
         .drawer-list li a { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; color: var(--text-dark); text-decoration: none; font-size: 15px; cursor: pointer; }
-        .drawer-list li a:hover { color: var(--accent); }
 
-        .hero-banner { background-size: cover; background-position: center; position: relative; padding: 45px 16px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-dark); }
-        .hero-banner::before { content: ''; position: absolute; inset: 0; background: rgba(250, 248, 245, 0.30); z-index: 1; }
+        /* ГОЛОВНИЙ БАНЕР (Адаптивний) */
+        .hero-banner { 
+            background-size: cover; 
+            background-position: center; 
+            position: relative; 
+            min-height: 400px; /* Висота банера */
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            padding: 45px 16px; 
+            text-align: center; 
+            border-bottom: 1px solid var(--border-color); 
+            color: var(--text-dark); 
+        }
+        /* Легке затемнення фотографії, щоб текст читався краще */
+        .hero-banner::before { content: ''; position: absolute; inset: 0; background: rgba(255, 255, 255, 0.65); z-index: 1; }
         .hero-inner { max-width: 820px; margin: 0 auto; position: relative; z-index: 2; }
-        .breadcrumbs { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
-        #hero-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; line-height: 1.25; }
-        #hero-subtitle { font-size: 15px; color: var(--text-muted); }
+        .breadcrumbs { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; font-weight: 600;}
+        #hero-title { font-size: 32px; font-weight: 800; margin-bottom: 8px; line-height: 1.25; color: #1f1d1a; }
+        #hero-subtitle { font-size: 16px; font-weight: 500; color: #4a4742; }
 
-        .catalog-wrapper { max-width: 1320px; margin: 0 auto; padding: 20px 12px 50px; }
+        .catalog-wrapper { max-width: 1320px; margin: 0 auto; padding: 30px 12px 50px; }
         .toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; }
         .product-counter { font-size: 14px; color: var(--text-muted); font-weight: 500; }
         .product-counter strong { color: var(--text-dark); font-size: 16px; }
@@ -145,7 +128,7 @@
         .pill-btn.active, .pill-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } #hero-title { font-size: 36px; } }
+        @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } #hero-title { font-size: 42px; } }
         @media (min-width: 1100px) { .product-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
 
         .product-card { background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column; cursor: pointer; }
@@ -158,20 +141,23 @@
         .card-price { font-size: 16px; font-weight: 700; color: var(--accent); }
         .card-order-btn { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 8px 11px; font-size: 13px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 5px; }
 
-        /* Модальне вікно */
+        /* ОНОВЛЕНЕ МОДАЛЬНЕ ВІКНО ДЛЯ ТОВАРУ (Ширший текст) */
         .product-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); z-index: 1000; display: none; overflow-y: auto; overflow-x: hidden; }
         .product-modal.open { display: block; }
-        .modal-content { background: var(--bg-main); width: 100%; max-width: 960px; min-height: 100vh; position: relative; padding-bottom: 40px; margin: 0 auto; }
+        .modal-content { background: var(--bg-main); width: 100%; max-width: 1000px; min-height: 100vh; position: relative; padding-bottom: 40px; margin: 0 auto; }
         @media (min-width: 768px) { .product-modal.open { display: flex; align-items: flex-start; justify-content: center; } .product-modal { padding: 30px 16px; } .modal-content { min-height: auto; border-radius: 16px; } }
 
         .modal-top-bar { background: var(--bg-card); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; }
         .close-modal-btn { background: var(--bg-soft); border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; cursor: pointer; }
-        .modal-body { padding: 18px 16px; width: 100%; box-sizing: border-box; }
-        .modal-main-grid { display: grid; grid-template-columns: 100%; gap: 20px; width: 100%; }
-        @media (min-width: 768px) { .modal-main-grid { grid-template-columns: 1fr 1fr; gap: 28px; } }
+        .modal-body { padding: 25px; width: 100%; box-sizing: border-box; }
+        
+        /* ТУТ ВИПРАВЛЕНО ПРОПОРЦІЇ: 40% фото, 60% текст (текст більше не стискається) */
+        .modal-main-grid { display: grid; grid-template-columns: 100%; gap: 25px; width: 100%; }
+        @media (min-width: 768px) { .modal-main-grid { grid-template-columns: 40% 1fr; gap: 40px; } }
 
         .gallery-container { background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; width: 100%; }
-        .gallery-main-img-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; background: #000; }
+        /* Додано курсор-лупу для повноекранного фото */
+        .gallery-main-img-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; background: #000; cursor: zoom-in; }
         .gallery-main-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
         .gallery-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: #fff; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .gallery-prev { left: 10px; } .gallery-next { right: 10px; }
@@ -180,18 +166,33 @@
         .gallery-thumb.active { border-color: var(--accent); }
         .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
-        .modal-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); word-break: break-word; }
-        .modal-price { font-size: 24px; font-weight: 800; color: var(--accent); margin-bottom: 14px; }
-        .modal-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 18px; white-space: pre-line; word-wrap: break-word; }
+        .modal-title { font-size: 26px; font-weight: 700; margin-bottom: 10px; color: var(--text-dark); word-break: normal; }
+        .modal-price { font-size: 28px; font-weight: 800; color: var(--accent); margin-bottom: 18px; }
+        /* Розширено висоту між рядками тексту для комфорту */
+        .modal-desc { font-size: 15px; line-height: 1.6; color: var(--text-muted); margin-bottom: 25px; white-space: pre-line; word-wrap: break-word; }
 
         .btn-primary-action, .btn-phone-action { display: flex; align-items: center; justify-content: center; width: 100%; text-decoration: none; font-size: 16px; font-weight: 600; padding: 15px; border-radius: 10px; margin-bottom: 12px; border: none; cursor: pointer; }
         .btn-primary-action { background: var(--accent); color: #fff; gap: 10px; }
         .btn-phone-action { background: #f0ede8; color: var(--text-dark); gap: 8px; margin-bottom: 20px; border: 1px solid var(--border-color); font-size: 15px; }
 
-        .trust-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 22px; overflow: hidden; }
-        .trust-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-bottom: 1px solid var(--border-color); }
-        .trust-item:last-child { border-bottom: none; }
-        .trust-icon { width: 38px; height: 38px; border-radius: 8px; background: #f8eff1; color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        /* ВІКНО НА ВЕСЬ ЕКРАН ДЛЯ ФОТО (Lightbox) */
+        .lightbox-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .lightbox-modal.open { display: flex; }
+        .lightbox-content { position: relative; max-width: 95vw; max-height: 90vh; display: flex; justify-content: center; align-items: center;}
+        .lightbox-content img { max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 4px; }
+        .lightbox-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: none; color: #fff; font-size: 24px; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 2001;}
+        .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.2); color: #fff; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index:2001;}
+        .lightbox-prev { left: 10px; }
+        .lightbox-next { right: 10px; }
+
+        /* СЕКЦІЯ ВІДЕО ТА ВІДГУКІВ */
+        .extra-sections { max-width: 1320px; margin: 40px auto; padding: 0 16px; }
+        .section-title { text-align: center; font-size: 24px; font-weight: 700; margin-bottom: 25px; color: var(--text-dark); }
+        .video-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-bottom: 50px; }
+        .video-wrapper { flex: 1; min-width: 300px; max-width: 600px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow); background: #000; aspect-ratio: 16/9;}
+        
+        .reviews-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .reviews-grid img { width: 100%; height: 250px; object-fit: cover; border-radius: 12px; cursor: zoom-in; border: 1px solid var(--border-color); }
 
         footer { background: #f2ece4; border-top: 1px solid var(--border-color); padding: 45px 16px 30px; margin-top: 40px; }
         .footer-inner { max-width: 1200px; margin: 0 auto; }
@@ -219,6 +220,13 @@
         <div class="search-bar" id="search-bar">
             <input type="text" id="search-input" placeholder="Szukaj mebli..." oninput="renderCatalog()">
         </div>
+        <!-- ПАСОК ДОВІРИ (Гарантії та Оплата) -->
+        <div class="trust-bar">
+            <span>🛡️ 24 miesiące gwarancji</span>
+            <span>🔄 14 dni na zwrot</span>
+            <span>🚚 Szybka dostawa w Polsce</span>
+            <span>💳 Bezpieczne płatności</span>
+        </div>
     </header>
 
     <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
@@ -239,7 +247,9 @@
         </div>
     </aside>
 
-    <section class="hero-banner" id="hero-banner-bg">
+    <!-- ГОЛОВНИЙ БАНЕР: Вставте посилання на ваше фото у background-image url('') -->
+    <!-- Наприклад: url('https://slm24.pl/images/moj-baner.jpg') -->
+    <section class="hero-banner" id="hero-banner-bg" style="background-image: url('https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=1600');">
         <div class="hero-inner">
             <div class="breadcrumbs">Strona główna / <strong id="current-cat-label">Kolekcja mebli</strong></div>
             <h1 id="hero-title">EKSKLUZYWNE MEBLE DLA TWOJEGO DOMU</h1>
@@ -283,6 +293,32 @@
         <div class="product-grid" id="product-list"></div>
     </main>
 
+    <!-- СЕКЦІЯ ВІДЕО ТА ВІДГУКІВ -->
+    <div class="extra-sections">
+        <!-- Блок для відео. Вставляйте свої відео у src="" -->
+        <h2 class="section-title">Jak powstają nasze meble</h2>
+        <div class="video-grid">
+            <!-- Варіант 1: Відео з YouTube -->
+            <!-- Щоб вставити, замініть посилання на власне (потрібне посилання типу embed) -->
+            <iframe class="video-wrapper" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            
+            <!-- Варіант 2: Завантажене коротке відео MP4. Розкоментуйте та впишіть своє посилання -->
+            <!-- 
+            <video class="video-wrapper" src="TU_LINK_DO_PLIKU_VIDEO.mp4" controls muted autoplay loop></video> 
+            -->
+        </div>
+
+        <!-- Блок для відгуків та живих фото з OLX. Вставляйте свої картинки -->
+        <h2 class="section-title">Zadowoleni klienci i realizacje</h2>
+        <div class="reviews-grid">
+            <!-- Замініть ці посилання на скриншоти з OLX або живі фото -->
+            <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&q=80&w=600" alt="Realizacja u klienta" onclick="openLightboxImage(this.src)">
+            <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=600" alt="Opinia z OLX" onclick="openLightboxImage(this.src)">
+            <img src="https://images.unsplash.com/photo-1505693314120-0d443867891c?auto=format&fit=crop&q=80&w=600" alt="Realizacja" onclick="openLightboxImage(this.src)">
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО КАРТКИ ТОВАРУ -->
     <div class="product-modal" id="product-modal">
         <div class="modal-content">
             <div class="modal-top-bar">
@@ -293,10 +329,11 @@
                 <div class="modal-main-grid">
                     <div>
                         <div class="gallery-container">
-                            <div class="gallery-main-img-wrap">
+                            <div class="gallery-main-img-wrap" onclick="openLightboxGallery()">
                                 <img id="modal-main-img" src="" alt="Meble">
-                                <button class="gallery-nav-btn gallery-prev" onclick="changeImage(-1)">‹</button>
-                                <button class="gallery-nav-btn gallery-next" onclick="changeImage(1)">›</button>
+                                <!-- Кнопки навігації не заважають відкривати лупу -->
+                                <button class="gallery-nav-btn gallery-prev" onclick="changeImage(-1); event.stopPropagation();">‹</button>
+                                <button class="gallery-nav-btn gallery-next" onclick="changeImage(1); event.stopPropagation();">›</button>
                             </div>
                             <div class="gallery-thumbs" id="gallery-thumbs"></div>
                         </div>
@@ -313,15 +350,68 @@
         </div>
     </div>
 
+    <!-- ВІКНО "DANE FIRMY" З ПОВНИМИ РЕКВІЗИТАМИ -->
+    <div class="product-modal" id="company-modal" style="z-index: 2500;">
+        <div class="modal-content" style="max-width: 450px; min-height: auto; margin-top: 10vh; border-radius:12px;">
+            <div class="modal-top-bar">
+                <span>Dane rejestrowe firmy</span>
+                <button class="close-modal-btn" onclick="document.getElementById('company-modal').classList.remove('open')">✕</button>
+            </div>
+            <div class="modal-body" style="font-size:16px; line-height:1.8;">
+                <strong>SLM Meble Lesia Chaikovska</strong><br>
+                NIP: 6192056820<br>
+                REGON: 523263170<br><br>
+                <strong>Adres rejestrowy:</strong><br>
+                ul. Leśna 11<br>
+                63-604 Baranów (woj. wielkopolskie)<br>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX ДЛЯ ФОТО НА ВЕСЬ ЕКРАН -->
+    <div class="lightbox-modal" id="lightbox-modal" onclick="closeLightbox(event)">
+        <button class="lightbox-close" onclick="closeLightbox(event)">✕</button>
+        <div class="lightbox-content">
+            <img id="lightbox-img" src="" alt="Fullscreen">
+            <button class="lightbox-nav lightbox-prev" id="lb-prev" onclick="changeLightboxImage(-1); event.stopPropagation();">‹</button>
+            <button class="lightbox-nav lightbox-next" id="lb-next" onclick="changeLightboxImage(1); event.stopPropagation();">›</button>
+        </div>
+    </div>
+
     <footer>
         <div class="footer-inner">
             <div class="footer-grid">
-                <div class="footer-col"><h4>Obsługa klienta</h4><ul><li>Dostawa w całej Polsce</li><li>24 miesiące gwarancji</li></ul></div>
-                <div class="footer-col"><h4>Informacje prawne</h4><ul><li><a href="regulamin.html">Regulamin sklepu</a></li><li><a href="polityka-prywatnosci.html">Polityka prywatności</a></li></ul></div>
-                <div class="footer-col" id="footer-contact"><h4>Kontakt</h4><ul><li>📍 Leśna 11</li><li>🕒 Pn-Pt: 9:00 - 18:00</li><li>📞 +48 666 688 298</li></ul></div>
+                <div class="footer-col">
+                    <h4>Obsługa klienta</h4>
+                    <ul>
+                        <li>Dostawa w całej Polsce</li>
+                        <li>24 miesiące gwarancji</li>
+                        <li>14 dni na zwrot bez podania przyczyny</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Informacje prawne</h4>
+                    <ul>
+                        <li><a href="regulamin.html">Regulamin sklepu</a></li>
+                        <li><a href="polityka-prywatnosci.html">Polityka prywatności</a></li>
+                        <!-- Посилання на приховані реквізити -->
+                        <li><a href="#" onclick="document.getElementById('company-modal').classList.add('open'); return false;" style="font-weight:600; color:var(--text-dark);">Dane firmy (NIP, REGON)</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col" id="footer-contact">
+                    <h4>Kontakt i Social Media</h4>
+                    <ul>
+                        <li>🕒 Pn-Pt: 9:00 - 18:00</li>
+                        <li>📞 +48 666 688 298</li>
+                    </ul>
+                    <!-- ІКОНКИ СОЦМЕРЕЖ: Вставте посилання на ваші профілі замість '#' -->
+                    <div style="margin-top: 15px; display: flex; gap: 15px;">
+                        <a href="TU_LINK_DO_FACEBOOKA" target="_blank" style="font-size:26px; text-decoration:none; background:#1877F2; color:#fff; border-radius:6px; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">f</a>
+                        <a href="TU_LINK_DO_INSTAGRAMA" target="_blank" style="font-size:26px; text-decoration:none; background:linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color:#fff; border-radius:6px; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">IG</a>
+                    </div>
+                </div>
             </div>
             <div class="footer-bottom">
-                <!-- Секретний тригер адмінки: натисни 3 рази швидко сюди -->
                 <p id="secret-admin-trigger" onclick="triggerAdmin()" style="cursor:default; user-select:none;">&copy; 2026 SLM24.PL. Wszelkie prawa zastrzeżone.</p>
             </div>
         </div>
@@ -402,6 +492,7 @@
         }
 
         let currentModalImages = [], currentImageIndex = 0;
+        
         function openProductModal(index) {
             const item = allProducts[index];
             if (!item) return;
@@ -439,6 +530,32 @@
             document.body.style.overflow = '';
         }
 
+        /* LIGHTBOX FUNCTIONS */
+        function openLightboxImage(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox-modal').classList.add('open');
+            document.getElementById('lb-prev').style.display = 'none';
+            document.getElementById('lb-next').style.display = 'none';
+        }
+
+        function openLightboxGallery() {
+            document.getElementById('lightbox-img').src = currentModalImages[currentImageIndex];
+            document.getElementById('lightbox-modal').classList.add('open');
+            document.getElementById('lb-prev').style.display = currentModalImages.length > 1 ? 'flex' : 'none';
+            document.getElementById('lb-next').style.display = currentModalImages.length > 1 ? 'flex' : 'none';
+        }
+
+        function changeLightboxImage(dir) {
+            changeImage(dir); 
+            document.getElementById('lightbox-img').src = currentModalImages[currentImageIndex];
+        }
+
+        function closeLightbox(e) {
+            if(e.target.id === 'lightbox-modal' || e.target.classList.contains('lightbox-close')) {
+                document.getElementById('lightbox-modal').classList.remove('open');
+            }
+        }
+
         async function loadSiteContent() {
             try {
                 const res = await fetch('content/home.json?v=' + new Date().getTime());
@@ -448,7 +565,6 @@
             } catch (e) { console.error(e); }
         }
 
-        // Секретний тригер: 3 швидкі натискання на текст у футері
         let secretClicks = 0, secretTimer = null;
         function triggerAdmin() {
             secretClicks++;
