@@ -65,14 +65,21 @@
         .pill-btn { padding: 12px 24px; border: 1px solid var(--border-color); background: var(--bg-card); font-size: 12px; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: 0.2s; white-space: nowrap; letter-spacing: 1px; color: var(--text-dark);}
         .pill-btn.active, .pill-btn:hover { background: var(--text-dark); color: #fff; border-color: var(--text-dark); }
 
+        /* Кнопка Outlet */
+        .pill-btn.outlet-btn { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+        .pill-btn.outlet-btn.active, .pill-btn.outlet-btn:hover { background: #b91c1c; color: #fff; border-color: #b91c1c; }
+
         .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 40px; padding: 15px 20px; border: 1px solid var(--border-color); background: var(--bg-card); }
         .filter-select { padding: 10px 15px; border: 1px solid var(--border-color); font-size: 13px; cursor: pointer; outline: none; background: #fff; text-transform: uppercase; font-weight: 600; color: var(--text-dark);}
 
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
-        .product-card { background: var(--bg-card); border: 1px solid var(--border-color); display: flex; flex-direction: column; cursor: pointer; transition: 0.3s; border-radius: 4px;}
+        .product-card { background: var(--bg-card); border: 1px solid var(--border-color); display: flex; flex-direction: column; cursor: pointer; transition: 0.3s; border-radius: 4px; position: relative;}
         .product-card:hover { box-shadow: var(--shadow); transform: translateY(-3px); border-color: #ccc;}
-        .card-img-wrap { width: 100%; aspect-ratio: 1/1; background: var(--bg-soft); }
+        .card-img-wrap { width: 100%; aspect-ratio: 1/1; background: var(--bg-soft); position: relative;}
         .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .outlet-badge { position: absolute; top: 15px; right: 15px; background: #b91c1c; color: #fff; padding: 6px 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; border-radius: 4px; letter-spacing: 1px;}
+        
         .card-body { padding: 25px 20px; display: flex; flex-direction: column; flex: 1; text-align: center;}
         .card-title { font-size: 14px; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; flex: 1;}
         .card-price { font-size: 18px; font-weight: 800; margin-bottom: 15px; }
@@ -131,7 +138,7 @@
         .btn-phone-action { background: transparent; color: var(--text-dark); margin-bottom: 0; }
         .btn-phone-action:hover { background: var(--bg-soft); }
 
-        /* LIGHTBOX (Повноекранне фото зі стрілками) */
+        /* LIGHTBOX */
         .lightbox-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; }
         .lightbox-modal.open { display: flex; }
         .lightbox-content { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;}
@@ -179,7 +186,7 @@
             <li><a onclick="selectCategory('chesterfield')">Meble Chesterfield</a></li>
             <li><a onclick="selectCategory('anton-pozzo')">Anton i Pozzo</a></li>
             <li><a onclick="selectCategory('lozka')">Łóżka</a></li>
-            <li><a onclick="selectCategory('tkaniny')">Tkaniny</a></li>
+            <li><a onclick="selectCategory('outlet')">Outlet %</a></li>
         </ul>
     </aside>
 
@@ -199,6 +206,7 @@
             <button class="pill-btn" data-cat="chesterfield" onclick="selectCategory('chesterfield')">Chesterfield</button>
             <button class="pill-btn" data-cat="anton-pozzo" onclick="selectCategory('anton-pozzo')">Anton / Pozzo</button>
             <button class="pill-btn" data-cat="lozka" onclick="selectCategory('lozka')">Łóżka</button>
+            <button class="pill-btn outlet-btn" data-cat="outlet" onclick="selectCategory('outlet')">Outlet %</button>
         </div>
 
         <div class="toolbar">
@@ -340,7 +348,7 @@
         </div>
     </div>
 
-    <!-- LIGHTBOX (Повноекранне фото зі стрілками) -->
+    <!-- LIGHTBOX -->
     <div class="lightbox-modal" id="lightbox-modal" onclick="closeLightbox(event)">
         <button class="lightbox-close" onclick="closeLightbox(event)">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -372,6 +380,9 @@
             if (cat === 'all') return true;
             const explicit = (item.category || '').toLowerCase();
             const text = ((item.name || '') + ' ' + (item.title || '') + ' ' + (item.description || '') + ' ' + explicit).toLowerCase();
+            
+            if (cat === 'outlet') return explicit === 'outlet';
+            
             if (cat === 'chesterfield') return text.includes('chesterfield');
             if (cat === 'anton-pozzo') return text.includes('anton') || text.includes('pozzo');
             if (cat === 'narozniki') return text.includes('naroż') || text.includes('naroz');
@@ -421,12 +432,25 @@
             container.innerHTML = filtered.map(item => {
                 const mainImg = item.image || (item.images ? item.images.split(',')[0].trim() : '');
                 const title = item.name || item.title || 'Mebel';
+                const isOutlet = (item.category || '').toLowerCase() === 'outlet';
+                const badgeHtml = isOutlet ? `<div class="outlet-badge">Szybka wysyłka 24h</div>` : '';
+                
+                // Відображення доставки прямо на картці
+                const delPriceNum = parseFloat(String(item.deliveryPrice || "0").replace(/[^\d.,]/g, '').replace(',', '.'));
+                const deliveryTextHtml = delPriceNum > 0 
+                    ? `<div style="font-size:12px; color:#10b981; font-weight:800; margin-top:-5px; margin-bottom:15px; text-transform:uppercase;">🚚 Dostawa: ${delPriceNum.toFixed(2)} zł</div>` 
+                    : `<div style="font-size:12px; color:#10b981; font-weight:800; margin-top:-5px; margin-bottom:15px; text-transform:uppercase;">🚚 Darmowa dostawa</div>`;
+
                 return `
                     <div class="product-card" onclick="openProductModal(${item._index})">
-                        <div class="card-img-wrap"><img src="${mainImg}" alt="${title}" loading="lazy"></div>
+                        <div class="card-img-wrap">
+                            <img src="${mainImg}" alt="${title}" loading="lazy">
+                            ${badgeHtml}
+                        </div>
                         <div class="card-body">
                             <div class="card-title">${title}</div>
                             <div class="card-price">${item.price || ''}</div>
+                            ${deliveryTextHtml}
                             <button class="card-order-btn">Sprawdź szczegóły</button>
                         </div>
                     </div>
@@ -473,7 +497,6 @@
             document.body.style.overflow = '';
         }
 
-        /* ОНОВЛЕНІ ЛОГІКА ТА КНОПКИ ДЛЯ ЛУПИ (Lightbox) */
         function openLightboxGallery() {
             document.getElementById('lightbox-img').src = currentModalImages[currentImageIndex];
             document.getElementById('lightbox-modal').classList.add('open');
