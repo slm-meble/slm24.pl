@@ -1,4 +1,4 @@
-// Повнофункціональний кошик для SLM24.pl (ЕЛЕГАНТНІ КОЛЬОРІ ТА НАДІЙНА ДОСТАВКА)
+// Повнофункціональний кошик для SLM24.pl (ОДРАЗУ СУМУЄ ДОСТАВКУ + САМОВИВІЗ)
 
 (function() {
     function initSLMCart() {
@@ -19,11 +19,9 @@
             .slm-qty-btn:hover { background: #e5e0d8; }
             .slm-qty-input { width: 36px; text-align: center; border: none; font-size: 13px; font-weight: bold; background: #fff; color: #111; }
             
-            /* Елегантний бордовий колір кнопок покупки */
             .slm-add-btn { width: 100%; background: #8B1E41; color: #fff; border: none; padding: 12px 8px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; box-shadow: 0 4px 10px rgba(139, 30, 65, 0.2); }
             .slm-add-btn:hover { background: #6b1732; }
             
-            /* М'який колір для кнопки запитання */
             .slm-ask-btn { width: 100%; background: transparent; color: #111; border: 1px solid #d5cdc2; padding: 9px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;}
             .slm-ask-btn:hover { background: #f4f2ee; }
             
@@ -33,7 +31,6 @@
             .slm-input:focus { border-color: #8B1E41; }
             .slm-cart-item-edit select, .slm-cart-item-edit input { padding: 5px 6px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; margin-top: 3px; }
             
-            /* Плаваюча кнопка кошика - Бордова */
             .slm-floating-cart-btn { position: fixed; bottom: 18px; left: 18px; background: #8B1E41; color: #fff; border: none; border-radius: 4px; padding: 14px 22px; font-weight: 700; font-size: 14px; cursor: pointer; z-index: 900; box-shadow: 0 6px 18px rgba(139, 30, 65, 0.4); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;}
             .slm-floating-cart-btn:hover { background: #6b1732; transform: translateY(-2px); }
             .slm-cart-badge { background: #fff; color: #8B1E41; border-radius: 50%; padding: 2px 8px; font-size: 13px; font-weight: 800; }
@@ -146,8 +143,6 @@
                 const oldBtn = card.querySelector(".card-order-btn");
 
                 const title = titleEl ? titleEl.innerText.trim() : ("#" + String(index + 1).padStart(3, "0") + " Mebel SLM24");
-                
-                // ГОЛОВНЕ ВИПРАВЛЕННЯ ДОСТАВКИ: Очищаємо назви від спецсимволів
                 const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '');
 
                 let basePrice = priceEl ? extractPriceNumber(priceEl.innerText) : extractPriceNumber(card.innerText) || 1360;
@@ -215,7 +210,8 @@
                         cardId: sku,
                         skipButtons: skipButtons,
                         basePrice: basePrice,
-                        deliveryPrice: deliveryPrice,
+                        baseDeliveryPrice: deliveryPrice, // Зберігаємо базову доставку
+                        currentDeliveryVal: deliveryPrice, // За замовчуванням доставка включена!
                         carryPrice: carryPrice,
                         carryVal: 0,
                         carryDesc: "Bez wniesienia (0 zł)",
@@ -253,7 +249,12 @@
                 const spExtra = parseFloat(item.springVal) || 0;
                 const crExtra = (item.buttons && item.buttons.includes("+50")) ? 50 : 0;
                 const carry = parseFloat(item.carryVal) || 0;
-                const delivery = parseFloat(item.deliveryPrice) || 0;
+                
+                // ВАЖЛИВО: Додаємо доставку до фінальної ціни!
+                let delivery = 0;
+                if (item.baseDeliveryPrice > 0) {
+                    delivery = item.currentDeliveryVal !== undefined ? parseFloat(item.currentDeliveryVal) : parseFloat(item.baseDeliveryPrice);
+                }
 
                 item.unitPrice = base + spExtra + crExtra + carry + delivery;
                 item.qty = parseInt(item.qty) || 1;
@@ -282,7 +283,6 @@
 
             container.innerHTML = cart.map((item, i) => {
                 const displayTitle = item.name.includes(item.cardId) ? item.name : `<span style="color:#8B1E41;">[${item.cardId}]</span> ${item.name}`;
-                const deliveryText = item.deliveryPrice > 0 ? item.deliveryPrice.toFixed(2) + ' zł' : 'Darmowa dostawa';
                 
                 return `
                 <div class="slm-cart-item-edit" style="border-bottom:1px solid #e5e0d8; padding:12px 0;">
@@ -320,8 +320,13 @@
                             <input type="text" value="${item.fabric || 'Jak na zdjęciu'}" onchange="window.slmUpdateCartItem(${i}, 'fabric', this.value)" style="width:100%; box-sizing:border-box;">
                         </div>
                         <div>
-                            <b>🚚 Dostawa:</b><br>
-                            <span style="font-size:11px; color:#8B1E41; padding:5px 6px; display:block; border:1px solid #8B1E41; border-radius:4px; margin-top:3px; background:#fdf5f7; font-weight:bold;">${deliveryText}</span>
+                            <b>🚚 Dostawa (wybierz):</b><br>
+                            ${item.baseDeliveryPrice > 0 ? `
+                            <select onchange="window.slmUpdateCartItem(${i}, 'delivery', this.value)" style="width:100%; border-color:#8B1E41;">
+                                <option value="${item.baseDeliveryPrice}" ${item.currentDeliveryVal > 0 ? 'selected' : ''}>Kurier (+${parseFloat(item.baseDeliveryPrice).toFixed(2)} zł)</option>
+                                <option value="0" ${item.currentDeliveryVal === 0 ? 'selected' : ''}>Odbiór osobisty (0 zł)</option>
+                            </select>
+                            ` : `<span style="font-size:11px; color:#8B1E41; padding:5px 6px; display:block; border:1px solid #8B1E41; border-radius:4px; margin-top:3px; background:#fdf5f7; font-weight:bold;">Darmowa dostawa</span>`}
                         </div>
                         <div>
                             <b>💪 Wniesienie:</b><br>
@@ -356,6 +361,8 @@
             } else if (field === "carryVal") {
                 cart[index].carryVal = parseFloat(value) || 0;
                 cart[index].carryDesc = value > 0 ? `Z wniesieniem (+${parseFloat(value).toFixed(2)} zł)` : "Bez wniesienia (0 zł)";
+            } else if (field === "delivery") {
+                cart[index].currentDeliveryVal = parseFloat(value) || 0;
             } else {
                 cart[index][field] = value;
             }
@@ -409,7 +416,10 @@
             let total = 0;
             let itemsText = cart.map((item, idx) => {
                 total += item.totalPrice;
-                const deliveryText = item.deliveryPrice > 0 ? item.deliveryPrice.toFixed(2) + ' zł' : 'Darmowa';
+                const deliveryText = item.baseDeliveryPrice > 0 
+                    ? (item.currentDeliveryVal > 0 ? `Kurier (+${item.currentDeliveryVal.toFixed(2)} zł)` : `Odbiór osobisty (0 zł)`)
+                    : 'Darmowa dostawa';
+                    
                 return `${idx + 1}. [${item.cardId}] *${item.name}*\n` +
                        `   - Ilość: ${item.qty} szt. x ${item.unitPrice.toFixed(2)} zł = ${item.totalPrice.toFixed(2)} zł\n` +
                        `   - 🪑 Siedzisko: ${item.spring}\n` +
@@ -468,33 +478,3 @@
     if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", initSLMCart); } 
     else { initSLMCart(); }
 })();
-
-setTimeout(function() {
-    if (!window.allProducts || !Array.isArray(window.allProducts)) return;
-    
-    const schemaList = window.allProducts.map(function(p) {
-        let priceStr = String(p.price).replace(/[^\d.,]/g, "").replace(",", ".");
-        let price = parseFloat(priceStr) || 0;
-        
-        return {
-            "@context": "https://schema.org/",
-            "@type": "Product",
-            "name": p.name || p.title,
-            "image": "https://slm24.pl/" + (p.image ? p.image.replace(/^\//, '') : ""),
-            "description": p.description || "Ekskluzywne meble tapicerowane od producenta.",
-            "offers": {
-                "@type": "Offer",
-                "url": "https://slm24.pl/",
-                "priceCurrency": "PLN",
-                "price": price.toFixed(2),
-                "availability": "https://schema.org/InStock",
-                "itemCondition": "https://schema.org/NewCondition"
-            }
-        };
-    });
-
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.text = JSON.stringify(schemaList);
-    document.head.appendChild(script);
-}, 2500);
