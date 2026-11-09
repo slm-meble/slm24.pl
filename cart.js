@@ -147,18 +147,21 @@
                 // ВИПРАВЛЕНИЙ ПОШУК (Не зважаємо на великі/малі літери)
                 let deliveryPrice = 0;
                 let carryPrice = 0;
-                if (window.allProducts && Array.isArray(window.allProducts)) {
-                    const titleLower = title.toLowerCase();
-                    const matchedProd = window.allProducts.find(p => {
-                        const pName = (p.name || p.title || "").toLowerCase().trim();
-                        return pName === titleLower;
-                    });
-                    
-                    if (matchedProd) {
-                        deliveryPrice = extractPriceNumber(matchedProd.deliveryPrice);
-                        carryPrice = extractPriceNumber(matchedProd.carryPrice);
-                    }
+              if (window.allProducts && Array.isArray(window.allProducts)) {
+                // НАДІЙНИЙ ПОШУК: Очищаємо назви від зайвих символів для порівняння
+                const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '');
+                
+                const matchedProd = window.allProducts.find(p => {
+                    const pName = (p.name || p.title || "").toLowerCase().replace(/[^a-z0-9]/g, '');
+                    // Перевіряємо, чи містить очищена назва з бази очищену назву зі сторінки (або навпаки)
+                    return pName.includes(cleanTitle) || cleanTitle.includes(pName);
+                });
+                
+                if (matchedProd) {
+                    deliveryPrice = extractPriceNumber(matchedProd.deliveryPrice);
+                    carryPrice = extractPriceNumber(matchedProd.carryPrice);
                 }
+            }
 
                 const skipButtons = /caterpillar|chesterfield|narożnik|naroznik|sofa|łóżko|lozko/i.test(title);
                 if (oldBtn) oldBtn.style.display = "none";
