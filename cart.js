@@ -1,4 +1,4 @@
-// Повнофункціональний кошик для SLM24.pl (ЗАЛІЗОБЕТОННА ДОСТАВКА ТА СУМУВАННЯ)
+// Повнофункціональний кошик для SLM24.pl (ТОЧНЕ СУМУВАННЯ ДОСТАВКИ ТА ПРАВИЛА КАТЕГОРІЙ)
 
 (function() {
     function initSLMCart() {
@@ -25,11 +25,11 @@
             .slm-ask-btn { width: 100%; background: transparent; color: #111; border: 1px solid #d5cdc2; padding: 9px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;}
             .slm-ask-btn:hover { background: #f4f2ee; }
             
-            .slm-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
-            .slm-modal-box { background: #fff; width: 100%; max-width: 650px; border-radius: 4px; padding: 22px; max-height: 92vh; overflow-y: auto; box-shadow: 0 12px 35px rgba(0,0,0,0.35); position: relative; box-sizing: border-box; font-family: 'Helvetica Neue', Arial, sans-serif; }
+            .slm-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center; padding: 12px; box-sizing: border-box; }
+            .slm-modal-box { background: #fff; width: 100%; max-width: 650px; border-radius: 4px; padding: 20px; max-height: 92vh; overflow-y: auto; box-shadow: 0 12px 35px rgba(0,0,0,0.35); position: relative; box-sizing: border-box; font-family: 'Helvetica Neue', Arial, sans-serif; }
             .slm-input { width: 100%; padding: 10px; margin-bottom: 9px; border: 1px solid #d5cdc2; border-radius: 4px; font-size: 14px; box-sizing: border-box; outline: none; }
             .slm-input:focus { border-color: #8B1E41; }
-            .slm-cart-item-edit select, .slm-cart-item-edit input { padding: 5px 6px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; margin-top: 3px; }
+            .slm-cart-item-edit select, .slm-cart-item-edit input { padding: 6px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; margin-top: 3px; width: 100%; box-sizing: border-box; }
             
             .slm-floating-cart-btn { position: fixed; bottom: 18px; left: 18px; background: #8B1E41; color: #fff; border: none; border-radius: 4px; padding: 14px 22px; font-weight: 700; font-size: 14px; cursor: pointer; z-index: 900; box-shadow: 0 6px 18px rgba(139, 30, 65, 0.4); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;}
             .slm-floating-cart-btn:hover { background: #6b1732; transform: translateY(-2px); }
@@ -41,6 +41,7 @@
         floatBtn.className = "slm-floating-cart-btn";
         floatBtn.innerHTML = `🛒 Koszyk <span class="slm-cart-badge" id="slm-cart-badge">0</span>`;
         floatBtn.addEventListener("click", () => {
+            syncCartWithDatabase();
             saveAndRenderCart();
             document.getElementById("slm-cart-modal").style.display = "flex";
         });
@@ -125,11 +126,48 @@
             return isNaN(val) ? 0 : val;
         }
 
-        // ЦЯ ФУНКЦІЯ ШУКАЄ ТІЛЬКИ НОМЕР (наприклад #014)
         function extractSku(text, fallbackIndex) {
             if (!text) return "#00" + (fallbackIndex + 1);
             const match = String(text).match(/#\s*\d+/);
             return match ? match[0].replace(/\s+/g, "") : "#00" + (fallbackIndex + 1);
+        }
+
+        // ВИЗНАЧАЄМО ТИП ОПЦІЙ ҐУДЗИКІВ / ПІКУВАННЯ ЗА ВАШИМИ ПРАВИЛАМИ:
+        // 'none' -> Нарожники, Антон, Посо, Ліжка (пікування забирається, тільки ніжки і тканина)
+        // 'chester' -> Честерфілд (пікування A-F забирається, залишається вибір кольору ґудзиків/кришталиків, ніжки і тканина)
+        // 'full' -> Усі інші крісла (Fotele) та Софи (Sofy) (залишається пікування A-F, ніжки і тканина)
+        function getButtonsMode(title, category) {
+            const text = ((title || "") + " " + (category || "")).toLowerCase();
+            if (/narożnik|naroznik|anton|pozzo|poso|łóżk|lozk/i.test(text)) {
+                return "none";
+            }
+            if (/chesterfield|chester/i.test(text)) {
+                return "chester";
+            }
+            return "full";
+        }
+
+        // Автоматична перевірка і підтягування доставки з бази навіть для старих товарів у кошику
+        function syncCartWithDatabase() {
+            if (!window.allProducts || !Array.isArray(window.allProducts) || window.allProducts.length === 0) return;
+            cart.forEach((item, idx) => {
+                const sku = item.cardId || extractSku(item.name, idx);
+                const matched = window.allProducts.find((p, pIdx) => extractSku(p.name || p.title || "", pIdx) === sku);
+                if (matched) {
+                    const dbDel = extractPriceNumber(matched.deliveryPrice);
+                    const dbCarry = extractPriceNumber(matched.carryPrice);
+                    if (dbDel > 0 && (!item.baseDeliveryPrice || item.baseDeliveryPrice === 0)) {
+                        item.baseDeliveryPrice = dbDel;
+                        item.currentDeliveryVal = dbDel;
+                    }
+                    if (dbCarry > 0 && (!item.carryPrice || item.carryPrice === 0)) {
+                        item.carryPrice = dbCarry;
+                    }
+                    item.buttonsMode = getButtonsMode(item.name, matched.category);
+                } else if (!item.buttonsMode) {
+                    item.buttonsMode = getButtonsMode(item.name, "");
+                }
+            });
         }
 
         function enhanceProductCards() {
@@ -140,33 +178,13 @@
 
                 const titleEl = card.querySelector(".card-title");
                 const priceEl = card.querySelector(".card-price");
-                const descEl = card.querySelector(".card-desc");
                 const oldBtn = card.querySelector(".card-order-btn");
 
                 const title = titleEl ? titleEl.innerText.trim() : ("#" + String(index + 1).padStart(3, "0") + " Mebel SLM24");
-                
-                // ВИТЯГУЄМО СТРОГИЙ НОМЕР (SKU) З НАЗВИ
-                const sku = extractSku(title + " " + (descEl ? descEl.innerText.trim() : ""), index);
+                const sku = extractSku(title, index);
 
-                let basePrice = priceEl ? extractPriceNumber(priceEl.innerText) : extractPriceNumber(card.innerText) || 1360;
-
-                let deliveryPrice = 0;
-                let carryPrice = 0;
-                
-                if (window.allProducts && Array.isArray(window.allProducts)) {
-                    // НАДІЙНИЙ ПОШУК: Тільки за номером #014 == #014
-                    const matchedProd = window.allProducts.find(p => {
-                        const pSku = extractSku(p.name || p.title || "", index);
-                        return pSku === sku;
-                    });
-                    
-                    if (matchedProd) {
-                        deliveryPrice = extractPriceNumber(matchedProd.deliveryPrice);
-                        carryPrice = extractPriceNumber(matchedProd.carryPrice);
-                    }
-                }
-
-                const skipButtons = /caterpillar|chesterfield|narożnik|naroznik|sofa|łóżko|lozko/i.test(title);
+                // Читаємо ціну і доставку ПРЯМО З АТРИБУТІВ КАРТКИ
+                let basePrice = extractPriceNumber(card.dataset.price) || (priceEl ? extractPriceNumber(priceEl.innerText) : 1000);
                 if (oldBtn) oldBtn.style.display = "none";
 
                 const actionsDiv = document.createElement("div");
@@ -207,13 +225,34 @@
 
                 actionsDiv.querySelector(".slm-add-btn").addEventListener("click", (e) => {
                     e.stopPropagation();
+
+                    // Беремо доставку прямо з картки товару (100% точність!)
+                    let deliveryPrice = extractPriceNumber(card.dataset.delivery);
+                    let carryPrice = extractPriceNumber(card.dataset.carry);
+                    let cat = card.dataset.category || "";
+
+                    // Додаткова перевірка в window.allProducts на випадок, якщо атрибут порожній
+                    if (deliveryPrice === 0 && window.allProducts && Array.isArray(window.allProducts)) {
+                        const matched = window.allProducts.find((p, pIdx) => extractSku(p.name || p.title || "", pIdx) === sku);
+                        if (matched) {
+                            deliveryPrice = extractPriceNumber(matched.deliveryPrice);
+                            carryPrice = extractPriceNumber(matched.carryPrice);
+                            cat = matched.category || cat;
+                        }
+                    }
+
+                    const bMode = getButtonsMode(title, cat);
+                    let defaultButtons = "Układ A";
+                    if (bMode === "none") defaultButtons = "Nie dotyczy";
+                    if (bMode === "chester") defaultButtons = "Guziki w kolorze tkaniny (w cenie)";
+
                     cart.push({
                         name: title,
                         cardId: sku,
-                        skipButtons: skipButtons,
+                        buttonsMode: bMode,
                         basePrice: basePrice,
                         baseDeliveryPrice: deliveryPrice, 
-                        currentDeliveryVal: deliveryPrice, // Доставка автоматично ВРАХОВАНА
+                        currentDeliveryVal: deliveryPrice, // ОДРАЗУ ДОДАЄМО ДОСТАВКУ ДО СУМИ!
                         carryPrice: carryPrice,
                         carryVal: 0,
                         carryDesc: "Bez wniesienia (0 zł)",
@@ -221,7 +260,7 @@
                         springVal: 0,
                         spring: "Bez sprężyny falistej (standard)",
                         leg: "1",
-                        buttons: skipButtons ? "Nie dotyczy" : "A",
+                        buttons: defaultButtons,
                         fabric: "Jak na zdjęciu"
                     });
 
@@ -239,9 +278,10 @@
             });
         }
 
-        setInterval(enhanceProductCards, 600);
+        setInterval(enhanceProductCards, 500);
 
         function saveAndRenderCart() {
+            syncCartWithDatabase();
             cart = cart.filter(item => item && item.name && !isNaN(parseFloat(item.basePrice)));
 
             let totalSum = 0, totalQty = 0;
@@ -252,10 +292,12 @@
                 const crExtra = (item.buttons && item.buttons.includes("+50")) ? 50 : 0;
                 const carry = parseFloat(item.carryVal) || 0;
                 
-                // ЖОРСТКЕ СУМУВАННЯ ДОСТАВКИ
+                // АВТОМАТИЧНЕ СУМУВАННЯ: Ціна товару + Доставка
                 let delivery = 0;
                 if (item.baseDeliveryPrice > 0) {
-                    delivery = item.currentDeliveryVal !== undefined ? parseFloat(item.currentDeliveryVal) : parseFloat(item.baseDeliveryPrice);
+                    delivery = (item.currentDeliveryVal !== undefined && item.currentDeliveryVal !== null) 
+                        ? parseFloat(item.currentDeliveryVal) 
+                        : parseFloat(item.baseDeliveryPrice);
                 }
 
                 item.unitPrice = base + spExtra + crExtra + carry + delivery;
@@ -285,7 +327,35 @@
 
             container.innerHTML = cart.map((item, i) => {
                 const displayTitle = item.name.includes(item.cardId) ? item.name : `<span style="color:#8B1E41;">[${item.cardId}]</span> ${item.name}`;
-                
+                const bMode = item.buttonsMode || getButtonsMode(item.name, "");
+
+                let buttonsHtml = "";
+                if (bMode === "full") {
+                    const opts = ['Układ A','Układ B','Układ C','Układ D','Układ E','Układ F','Kryształki (+50 zł)'];
+                    buttonsHtml = `
+                        <div>
+                            <b>🔘 Pikowanie / Guziki:</b><br>
+                            <select onchange="window.slmUpdateCartItem(${i}, 'buttons', this.value)">
+                                ${opts.map(b => `<option value="${b}" ${item.buttons === b ? 'selected' : ''}>${b}</option>`).join('')}
+                            </select>
+                        </div>`;
+                } else if (bMode === "chester") {
+                    const opts = ['Guziki w kolorze tkaniny (w cenie)', 'Kryształki (+50 zł)'];
+                    buttonsHtml = `
+                        <div>
+                            <b>🔘 Rodzaj guzików:</b><br>
+                            <select onchange="window.slmUpdateCartItem(${i}, 'buttons', this.value)">
+                                ${opts.map(b => `<option value="${b}" ${item.buttons === b ? 'selected' : ''}>${b}</option>`).join('')}
+                            </select>
+                        </div>`;
+                } else {
+                    buttonsHtml = `
+                        <div>
+                            <b>🔘 Pikowanie / Guziki:</b><br>
+                            <span style="font-size:11px; color:#888; font-style:italic; display:block; padding-top:6px;">Nie dotyczy</span>
+                        </div>`;
+                }
+
                 return `
                 <div class="slm-cart-item-edit" style="border-bottom:1px solid #e5e0d8; padding:12px 0;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:8px;">
@@ -295,44 +365,34 @@
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:11px; color:#555; background:#fbfaf8; padding:10px; border-radius:4px; border:1px solid #e5e0d8;">
                         <div>
                             <b>🪑 Siedzisko:</b><br>
-                            <select onchange="window.slmUpdateCartItem(${i}, 'springVal', this.value)" style="width:100%;">
+                            <select onchange="window.slmUpdateCartItem(${i}, 'springVal', this.value)">
                                 <option value="0" ${item.springVal == 0 ? 'selected' : ''}>Bez sprężyny (w cenie)</option>
                                 <option value="69" ${item.springVal == 69 ? 'selected' : ''}>Sprężyna falista (+69 zł)</option>
                             </select>
                         </div>
                         <div>
-                            <b>🦵 Nóżka (1-6):</b><br>
-                            <select onchange="window.slmUpdateCartItem(${i}, 'leg', this.value)" style="width:100%;">
+                            <b>🦵 Kolor / Nóżka (1-6):</b><br>
+                            <select onchange="window.slmUpdateCartItem(${i}, 'leg', this.value)">
                                 ${[1,2,3,4,5,6].map(n => `<option value="${n}" ${item.leg == n ? 'selected' : ''}>Nóżka nr ${n}</option>`).join('')}
                             </select>
                         </div>
-                        ${!item.skipButtons ? `
-                        <div>
-                            <b>🔘 Układ guzików:</b><br>
-                            <select onchange="window.slmUpdateCartItem(${i}, 'buttons', this.value)" style="width:100%;">
-                                ${['A','B','C','D','E','F','Kryształki (+50 zł)'].map(b => `<option value="${b}" ${item.buttons === b ? 'selected' : ''}>${b.length === 1 ? 'Układ ' + b : b}</option>`).join('')}
-                            </select>
-                        </div>` : `
-                        <div>
-                            <b>🔘 Układ guzików:</b><br>
-                            <span style="font-size:11px; color:#888; font-style:italic;">Nie dotyczy</span>
-                        </div>`}
+                        ${buttonsHtml}
                         <div>
                             <b>🎨 Tkanina / Kolor:</b><br>
-                            <input type="text" value="${item.fabric || 'Jak na zdjęciu'}" onchange="window.slmUpdateCartItem(${i}, 'fabric', this.value)" style="width:100%; box-sizing:border-box;">
+                            <input type="text" value="${item.fabric || 'Jak na zdjęciu'}" onchange="window.slmUpdateCartItem(${i}, 'fabric', this.value)">
                         </div>
                         <div>
-                            <b>🚚 Dostawa (wybierz):</b><br>
+                            <b>🚚 Dostawa (wliczona):</b><br>
                             ${item.baseDeliveryPrice > 0 ? `
-                            <select onchange="window.slmUpdateCartItem(${i}, 'delivery', this.value)" style="width:100%; border-color:#8B1E41;">
+                            <select onchange="window.slmUpdateCartItem(${i}, 'delivery', this.value)" style="border-color:#8B1E41; font-weight:bold; color:#8B1E41; background:#fdf5f7;">
                                 <option value="${item.baseDeliveryPrice}" ${item.currentDeliveryVal > 0 ? 'selected' : ''}>Kurier (+${parseFloat(item.baseDeliveryPrice).toFixed(2)} zł)</option>
                                 <option value="0" ${item.currentDeliveryVal === 0 ? 'selected' : ''}>Odbiór osobisty (0 zł)</option>
                             </select>
-                            ` : `<span style="font-size:11px; color:#8B1E41; padding:5px 6px; display:block; border:1px solid #8B1E41; border-radius:4px; margin-top:3px; background:#fdf5f7; font-weight:bold;">Darmowa dostawa</span>`}
+                            ` : `<span style="font-size:11px; color:#10b981; padding:5px 6px; display:block; border:1px solid #10b981; border-radius:4px; margin-top:3px; background:#ecfdf5; font-weight:bold;">Darmowa (0 zł)</span>`}
                         </div>
                         <div>
                             <b>💪 Wniesienie:</b><br>
-                            <select onchange="window.slmUpdateCartItem(${i}, 'carryVal', this.value)" style="width:100%;" ${!item.carryPrice || item.carryPrice <= 0 ? 'disabled' : ''}>
+                            <select onchange="window.slmUpdateCartItem(${i}, 'carryVal', this.value)" ${!item.carryPrice || item.carryPrice <= 0 ? 'disabled' : ''}>
                                 ${item.carryPrice > 0 ? `
                                     <option value="0" ${item.carryVal == 0 ? 'selected' : ''}>Bez wniesienia (0 zł)</option>
                                     <option value="${item.carryPrice}" ${item.carryVal == item.carryPrice ? 'selected' : ''}>Z wniesieniem (+${parseFloat(item.carryPrice).toFixed(2)} zł)</option>
@@ -348,7 +408,8 @@
                             <button type="button" onclick="window.slmChangeQty(${i}, 1)" style="padding:2px 8px; cursor:pointer; background:#e5e0d8; border:none; border-radius:3px;">+</button>
                         </div>
                         <div>
-                            <b style="color:#111; font-size:15px;">${item.totalPrice.toFixed(2)} zł</b>
+                            <span style="color:#666; font-size:11px; margin-right:6px;">(${item.basePrice.toFixed(0)} zł + ${item.currentDeliveryVal > 0 ? item.currentDeliveryVal.toFixed(0) + ' zł dostawa' : '0 zł dostawa'})</span>
+                            <b style="color:#8B1E41; font-size:15px;">${item.totalPrice.toFixed(2)} zł</b>
                         </div>
                     </div>
                 </div>`;
@@ -426,7 +487,7 @@
                        `   - Ilość: ${item.qty} szt. x ${item.unitPrice.toFixed(2)} zł = ${item.totalPrice.toFixed(2)} zł\n` +
                        `   - 🪑 Siedzisko: ${item.spring}\n` +
                        `   - 🦵 Nóżka nr: ${item.leg}\n` +
-                       `   - 🔘 Układ guzików: ${item.skipButtons ? "Nie dotyczy" : item.buttons}\n` +
+                       `   - 🔘 Guziki / Pikowanie: ${item.buttonsMode === "none" ? "Nie dotyczy" : item.buttons}\n` +
                        `   - 🎨 Tkanina / kolor: ${item.fabric || "Jak na zdjęciu"}\n` +
                        `   - 🚚 Dostawa: ${deliveryText}\n` +
                        `   - 💪 Wniesienie: ${item.carryDesc}`;
