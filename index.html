@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!<!DOCTYPE html>
 <html lang="pl">
 <head>
   <!-- Google tag (gtag.js) -->
@@ -25,7 +25,7 @@
     <style>
         :root { --bg-main: #fbfaf8; --bg-card: #ffffff; --bg-soft: #f4f2ee; --text-dark: #111111; --text-muted: #666666; --border-color: #e5e0d8; --shadow: 0 4px 15px rgba(0, 0, 0, 0.03); }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg-main); color: var(--text-dark); line-height: 1.5; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg-main); color: var(--text-dark); line-height: 1.5; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
 
         header { background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
@@ -35,7 +35,7 @@
         .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-dark); display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
         .icon-btn:hover { opacity: 0.6; }
         
-        .logo { font-size: 24px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+        .logo { font-size: 24px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; text-align: center; }
         .logo span { display: block; font-size: 9px; font-weight: 500; letter-spacing: 4px; color: var(--text-muted); margin-top: 2px; }
 
         .search-bar { display: none; background: var(--bg-card); padding: 15px 20px; border-bottom: 1px solid var(--border-color); }
@@ -44,7 +44,7 @@
 
         .drawer-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 900; opacity: 0; pointer-events: none; transition: 0.3s; }
         .drawer-overlay.open { opacity: 1; pointer-events: auto; }
-        .side-drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 320px; background: var(--bg-card); z-index: 950; transform: translateX(-100%); transition: 0.3s; overflow-y: auto; }
+        .side-drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 320px; max-width: 85vw; background: var(--bg-card); z-index: 950; transform: translateX(-100%); transition: 0.3s; overflow-y: auto; }
         .side-drawer.open { transform: translateX(0); }
         .drawer-header { padding: 25px 20px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); font-weight: 700; text-transform: uppercase; font-size: 14px; letter-spacing: 1px;}
         .drawer-list { list-style: none; padding: 10px 20px; }
@@ -65,7 +65,6 @@
         .pill-btn { padding: 12px 24px; border: 1px solid var(--border-color); background: var(--bg-card); font-size: 12px; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: 0.2s; white-space: nowrap; letter-spacing: 1px; color: var(--text-dark);}
         .pill-btn.active, .pill-btn:hover { background: var(--text-dark); color: #fff; border-color: var(--text-dark); }
 
-        /* Кнопка Outlet */
         .pill-btn.outlet-btn { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
         .pill-btn.outlet-btn.active, .pill-btn.outlet-btn:hover { background: #b91c1c; color: #fff; border-color: #b91c1c; }
 
@@ -109,54 +108,59 @@
         .footer-bottom { text-align: center; font-size: 12px; color: var(--text-dark); font-weight: 600; border-top: 1px solid var(--border-color); padding-top: 25px; text-transform: uppercase; letter-spacing: 1px; display: flex; flex-direction: column; align-items: center;}
         .product-counter { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; color: var(--text-dark);}
 
-        /* СТРОГІ МОДАЛЬНІ ВІКНА */
-        .product-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: none; overflow-y: auto; padding: 20px; }
+        /* МОДАЛЬНІ ВІКНА (ВИПРАВЛЕНЕ ЦЕНТРУВАННЯ НА ВСІХ ЕКРАНАХ) */
+        .product-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: none; overflow-y: auto; overflow-x: hidden; padding: 15px; }
         .product-modal.open { display: flex; justify-content: center; align-items: flex-start; }
-        .modal-content { background: var(--bg-main); width: 100%; max-width: 1000px; margin-top: 2vh; position: relative; border-radius: 4px;}
-        .modal-top-bar { padding: 20px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;}
+        .modal-content { background: var(--bg-main); width: 100%; max-width: 1000px; margin: 10px auto; position: relative; border-radius: 4px; overflow: hidden; box-sizing: border-box; }
+        .modal-top-bar { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;}
         .close-modal-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-dark); display: flex; align-items: center;}
-        .modal-body { padding: 40px; display: grid; grid-template-columns: 1fr; gap: 40px; }
-        @media (min-width: 768px) { .modal-body { grid-template-columns: 45% 1fr; } }
         
-        .gallery-container { border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 4px;}
-        .gallery-main-img-wrap { aspect-ratio: 1/1; position: relative; cursor: zoom-in; }
-        .gallery-main-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
-        .gallery-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: var(--bg-card); border: 1px solid var(--border-color); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%;}
-        .gallery-prev { left: 15px; } .gallery-next { right: 15px; }
-        .gallery-thumbs { display: flex; gap: 10px; padding: 15px; overflow-x: auto; background: var(--bg-soft); border-top: 1px solid var(--border-color);}
-        .gallery-thumb { width: 65px; height: 65px; border: 1px solid transparent; cursor: pointer; flex-shrink: 0; background: #fff;}
-        .gallery-thumb.active { border-color: var(--text-dark); }
+        .modal-body { padding: 30px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 30px; width: 100%; box-sizing: border-box; }
+        @media (min-width: 768px) { .modal-body { grid-template-columns: minmax(0, 45%) minmax(0, 1fr); padding: 40px; gap: 40px; } }
+        
+        .gallery-container { border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 4px; width: 100%; max-width: 100%; overflow: hidden; margin: 0 auto; }
+        .gallery-main-img-wrap { width: 100%; aspect-ratio: 1/1; position: relative; cursor: zoom-in; display: flex; align-items: center; justify-content: center; background: #fff; }
+        .gallery-main-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; margin: 0 auto; }
+        .gallery-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: var(--bg-card); border: 1px solid var(--border-color); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; z-index: 5;}
+        .gallery-prev { left: 10px; } .gallery-next { right: 10px; }
+        .gallery-thumbs { display: flex; gap: 10px; padding: 12px; overflow-x: auto; background: var(--bg-soft); border-top: 1px solid var(--border-color); max-width: 100%; box-sizing: border-box; }
+        .gallery-thumb { width: 60px; height: 60px; border: 2px solid transparent; cursor: pointer; flex-shrink: 0; background: #fff; border-radius: 3px; overflow: hidden;}
+        .gallery-thumb.active { border-color: #8B1E41; }
         .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
-        .modal-title { font-size: 28px; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; line-height: 1.2; letter-spacing: -0.5px;}
-        .modal-price { font-size: 24px; font-weight: 700; padding-bottom: 25px; border-bottom: 1px solid var(--border-color); margin-bottom: 25px; }
-        .modal-desc { font-size: 14px; line-height: 1.8; color: var(--text-dark); font-weight: 500; margin-bottom: 35px; white-space: pre-line; }
+        .modal-info-col { width: 100%; max-width: 100%; overflow-wrap: break-word; word-wrap: break-word; }
+        .modal-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; line-height: 1.25; letter-spacing: -0.5px;}
+        .modal-price { font-size: 22px; font-weight: 800; color: #8B1E41; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
+        .modal-desc { font-size: 14px; line-height: 1.7; color: var(--text-dark); font-weight: 500; margin-bottom: 30px; white-space: pre-line; overflow-wrap: break-word; word-wrap: break-word; }
 
-        .btn-primary-action, .btn-phone-action { display: flex; align-items: center; justify-content: center; width: 100%; padding: 18px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: 2px solid var(--text-dark); margin-bottom: 15px; transition: 0.2s; border-radius: 4px;}
+        .btn-primary-action, .btn-phone-action { display: flex; align-items: center; justify-content: center; width: 100%; padding: 16px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: 2px solid var(--text-dark); margin-bottom: 12px; transition: 0.2s; border-radius: 4px;}
         .btn-primary-action { background: var(--text-dark); color: #fff; }
         .btn-primary-action:hover { background: #333; }
         .btn-phone-action { background: transparent; color: var(--text-dark); margin-bottom: 0; }
         .btn-phone-action:hover { background: var(--bg-soft); }
 
+        /* АДАПТАЦІЯ ДЛЯ ТЕЛЕФОНІВ (ВЕРТИКАЛЬНО І ГОРИЗОНТАЛЬНО) */
+        @media (max-width: 767px) {
+            #hero-title { font-size: 26px; }
+            .product-modal { padding: 8px; }
+            .modal-content { margin: 0 auto; width: 100%; }
+            .modal-body { padding: 16px; gap: 20px; }
+            .modal-title { font-size: 18px; text-align: center; }
+            .modal-price { font-size: 20px; text-align: center; padding-bottom: 15px; margin-bottom: 15px; }
+            .modal-desc { font-size: 13px; text-align: left; }
+        }
+
         /* LIGHTBOX */
         .lightbox-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; }
         .lightbox-modal.open { display: flex; }
         .lightbox-content { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;}
-        .lightbox-content img { max-width: 95vw; max-height: 90vh; object-fit: contain; }
+        .lightbox-content img { max-width: 95vw; max-height: 90vh; object-fit: contain; margin: 0 auto; display: block; }
         .lightbox-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #fff; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 2005; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
         .lightbox-close:hover { background: rgba(255,255,255,0.2); }
         .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #fff; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index:2005; transition: 0.2s;}
         .lightbox-nav:hover { background: rgba(255,255,255,0.2); }
         .lb-prev { left: 20px; }
         .lb-next { right: 20px; }
-      /* ВИПРАВЛЕННЯ ДЛЯ ТЕЛЕФОНУ */
-        @media (max-width: 600px) {
-            .product-modal { padding: 10px !important; }
-            .modal-content { overflow-x: hidden; width: 100%; margin-top: 5vh; }
-            .modal-body { padding: 20px !important; gap: 20px; }
-            .modal-title { font-size: 20px; }
-            .modal-desc { word-wrap: break-word; overflow-wrap: break-word; font-size: 13px; }
-        }
     </style>
 </head>
 <body>
@@ -218,7 +222,7 @@
         </div>
 
         <div class="toolbar">
-          <select class="filter-select" id="sort-select" onchange="renderCatalog()">
+            <select class="filter-select" id="sort-select" onchange="renderCatalog()">
                 <option value="default">Sortuj: Domyślnie</option>
                 <option value="price-asc">Od najtańszego</option>
                 <option value="price-desc">Od najdroższego</option>
@@ -287,12 +291,12 @@
             
             <div class="footer-bottom">
                 <div class="product-counter"><strong id="product-count">0</strong> produktów na stronie</div>
-                <p id="secret-admin-trigger" onclick="triggerAdmin()" style="cursor:default; user-select:none;">&copy; 2026 SLM24.PL. Wszelkie prawa zastrzeżone.</p>
+                <p id="secret-admin-trigger" onclick="triggerAdmin()" style="cursor:default; user-select:none;">© 2026 SLM24.PL. Wszelkie prawa zastrzeżone.</p>
             </div>
         </div>
     </footer>
 
-    <!-- МОДАЛЬНЕ ВІКНО ТОВАРУ -->
+    <!-- МОДАЛЬНЕ ВІКНО ТОВАРУ (БЕЗ ЗАЙВОЇ ОБГОРТКИ, ІДЕАЛЬНО ПО ЦЕНТРУ) -->
     <div class="product-modal" id="product-modal">
         <div class="modal-content">
             <div class="modal-top-bar">
@@ -302,35 +306,31 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="modal-main-grid">
-                    <div>
-                        <div class="gallery-container">
-                            <div class="gallery-main-img-wrap" onclick="openLightboxGallery()">
-                                <img id="modal-main-img" src="" alt="Meble">
-                                <div class="gallery-nav-btn gallery-prev" onclick="changeImage(-1); event.stopPropagation();">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                                </div>
-                                <div class="gallery-nav-btn gallery-next" onclick="changeImage(1); event.stopPropagation();">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                </div>
-                            </div>
-                            <div class="gallery-thumbs" id="gallery-thumbs"></div>
+                <div class="gallery-container">
+                    <div class="gallery-main-img-wrap" onclick="openLightboxGallery()">
+                        <img id="modal-main-img" src="" alt="Meble">
+                        <div class="gallery-nav-btn gallery-prev" onclick="changeImage(-1); event.stopPropagation();">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </div>
+                        <div class="gallery-nav-btn gallery-next" onclick="changeImage(1); event.stopPropagation();">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </div>
                     </div>
-                    <div>
-                        <h2 class="modal-title" id="modal-title"></h2>
-                        <div class="modal-price" id="modal-price"></div>
-                        <p class="modal-desc" id="modal-desc"></p>
-                        
-                        <a id="modal-wa-btn" href="#" target="_blank" class="btn-primary-action">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                            Zapytaj na WhatsApp
-                        </a>
-                        <a id="modal-phone-btn" href="tel:+48666688298" class="btn-phone-action">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                            +48 666 688 298
-                        </a>
-                    </div>
+                    <div class="gallery-thumbs" id="gallery-thumbs"></div>
+                </div>
+                <div class="modal-info-col">
+                    <h2 class="modal-title" id="modal-title"></h2>
+                    <div class="modal-price" id="modal-price"></div>
+                    <p class="modal-desc" id="modal-desc"></p>
+                    
+                    <a id="modal-wa-btn" href="#" target="_blank" class="btn-primary-action">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                        Zapytaj na WhatsApp
+                    </a>
+                    <a id="modal-phone-btn" href="tel:+48666688298" class="btn-phone-action">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        +48 666 688 298
+                    </a>
                 </div>
             </div>
         </div>
@@ -345,13 +345,15 @@
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
-            <div class="modal-body" style="font-size:14px; line-height:2;">
-                <strong>SLM Meble Lesia Chaikovska</strong><br>
-                NIP: 6192056820<br>
-                REGON: 523263170<br><br>
-                <strong>Adres rejestrowy:</strong><br>
-                ul. Leśna 11<br>
-                63-604 Baranów (woj. wielkopolskie)<br>
+            <div class="modal-body" style="grid-template-columns: 1fr; font-size:14px; line-height:2;">
+                <div>
+                    <strong>SLM Meble Lesia Chaikovska</strong><br>
+                    NIP: 6192056820<br>
+                    REGON: 523263170<br><br>
+                    <strong>Adres rejestrowy:</strong><br>
+                    ul. Leśna 11<br>
+                    63-604 Baranów (woj. wielkopolskie)<br>
+                </div>
             </div>
         </div>
     </div>
@@ -372,9 +374,9 @@
         </div>
     </div>
 
-    <script src="cart.js?v=20261109"></script>
     <script>
-        let allProducts = [];
+        // Робимо масив глобальним через window, щоб кошик бачив його миттєво
+        window.allProducts = [];
         let activeCategory = 'all';
         let contactPhoneRaw = '48666688298';
 
@@ -390,13 +392,11 @@
             const text = ((item.name || '') + ' ' + (item.title || '') + ' ' + (item.description || '') + ' ' + explicit).toLowerCase();
             
             if (cat === 'outlet') return explicit === 'outlet';
-            
             if (cat === 'chesterfield') return text.includes('chesterfield');
-            if (cat === 'anton-pozzo') return text.includes('anton') || text.includes('pozzo');
+            if (cat === 'anton-pozzo') return text.includes('anton') || text.includes('pozzo') || text.includes('poso');
             if (cat === 'narozniki') return text.includes('naroż') || text.includes('naroz');
             if (cat === 'sofy') return text.includes('sofa') || text.includes('sofy');
             if (cat === 'lozka') return text.includes('łóżk') || text.includes('lozk');
-            if (cat === 'tkaniny') return text.includes('tkanin');
             if (cat === 'fotele') return text.includes('fotel');
             return explicit === cat;
         }
@@ -423,7 +423,7 @@
             const searchQuery = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
             const sortBy = document.getElementById('sort-select').value;
 
-            let filtered = allProducts.filter((item, idx) => {
+            let filtered = window.allProducts.filter((item, idx) => {
                 item._index = idx;
                 return matchesCategory(item, activeCategory) && (!searchQuery || (item.name || item.title || '').toLowerCase().includes(searchQuery));
             });
@@ -440,17 +440,27 @@
             container.innerHTML = filtered.map(item => {
                 const mainImg = item.image || (item.images ? item.images.split(',')[0].trim() : '');
                 const title = item.name || item.title || 'Mebel';
-                const isOutlet = (item.category || '').toLowerCase() === 'outlet';
-                const badgeHtml = isOutlet ? `<div class="outlet-badge">Szybka wysyłka 24h</div>` : '';
+                const cat = (item.category || '').toLowerCase();
+                const isOutlet = cat === 'outlet';
+                const badgeHtml = isOutlet ? `<div class="outlet-badge">Od ręki 24h</div>` : '';
                 
-                // Відображення доставки прямо на картці
-                const delPriceNum = parseFloat(String(item.deliveryPrice || "0").replace(/[^\d.,]/g, '').replace(',', '.'));
+                const delPriceNum = parsePrice(item.deliveryPrice);
+                const carryPriceNum = parsePrice(item.carryPrice);
+                const basePriceNum = parsePrice(item.price);
+
                 const deliveryTextHtml = delPriceNum > 0 
-                    ? `<div style="font-size:12px; color:#10b981; font-weight:800; margin-top:-5px; margin-bottom:15px; text-transform:uppercase;">🚚 Dostawa: ${delPriceNum.toFixed(2)} zł</div>` 
+                    ? `<div style="font-size:12px; color:#8B1E41; font-weight:800; margin-top:-5px; margin-bottom:15px; text-transform:uppercase;">🚚 Dostawa: ${delPriceNum.toFixed(2)} zł</div>` 
                     : `<div style="font-size:12px; color:#10b981; font-weight:800; margin-top:-5px; margin-bottom:15px; text-transform:uppercase;">🚚 Darmowa dostawa</div>`;
 
+                // Передаємо доставку, внесення та категорію ПРЯМО В КАРТКУ (data-delivery, data-carry, data-category)
                 return `
-                    <div class="product-card" onclick="openProductModal(${item._index})">
+                    <div class="product-card" 
+                         data-index="${item._index}"
+                         data-price="${basePriceNum}"
+                         data-delivery="${delPriceNum}" 
+                         data-carry="${carryPriceNum}" 
+                         data-category="${cat}"
+                         onclick="openProductModal(${item._index})">
                         <div class="card-img-wrap">
                             <img src="${mainImg}" alt="${title}" loading="lazy">
                             ${badgeHtml}
@@ -469,14 +479,16 @@
         let currentModalImages = [], currentImageIndex = 0;
         
         function openProductModal(index) {
-            const item = allProducts[index];
+            const item = window.allProducts[index];
             if (!item) return;
             currentModalImages = (item.images || item.image || '').split(',').map(s => s.trim()).filter(Boolean);
             if (currentModalImages.length === 0) currentModalImages = [''];
             currentImageIndex = 0;
 
             document.getElementById('modal-title').textContent = item.name || item.title || '';
-            document.getElementById('modal-price').textContent = item.price || '';
+            const delNum = parsePrice(item.deliveryPrice);
+            const delInfo = delNum > 0 ? ` (+ dostawa ${delNum.toFixed(2)} zł)` : '';
+            document.getElementById('modal-price').textContent = (item.price || '') + delInfo;
             document.getElementById('modal-desc').textContent = item.description || '';
             updateGalleryView();
 
@@ -528,7 +540,7 @@
                 const res = await fetch('content/home.json?v=' + new Date().getTime());
                 if (!res.ok) return;
                 const data = await res.json();
-                if (data.products) { allProducts = data.products; renderCatalog(); }
+                if (data.products) { window.allProducts = data.products; renderCatalog(); }
             } catch (e) { console.error(e); }
         }
 
@@ -542,5 +554,6 @@
 
         document.addEventListener('DOMContentLoaded', loadSiteContent);
     </script>
+    <script src="cart.js?v=20261112_final"></script>
 </body>
-</html>
+</html>DOCTYPE html>
