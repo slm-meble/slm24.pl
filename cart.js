@@ -1,4 +1,4 @@
-// Повнофункціональний кошик для SLM24.pl (ОДРАЗУ СУМУЄ ДОСТАВКУ + САМОВИВІЗ)
+// Повнофункціональний кошик для SLM24.pl (ЗАЛІЗОБЕТОННА ДОСТАВКА ТА СУМУВАННЯ)
 
 (function() {
     function initSLMCart() {
@@ -55,7 +55,7 @@
                     <h2 style="margin:0; color:#8B1E41; font-size:18px; text-transform:uppercase; letter-spacing:1px;">🛒 Twój Koszyk</h2>
                     <div style="display:flex; align-items:center; gap:12px;">
                         <button type="button" id="slm-clear-cart" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:4px 8px; border-radius:4px; font-size:12px; cursor:pointer;">Wyczyść koszyk</button>
-                        <span id="slm-close-cart" style="cursor:pointer; font-size:26px; font-weight:bold; color:#888;">&times;</span>
+                        <span id="slm-close-cart" style="cursor:pointer; font-size:26px; font-weight:bold; color:#888;">×</span>
                     </div>
                 </div>
                 <div id="slm-cart-items"></div>
@@ -105,7 +105,7 @@
             <div class="slm-modal-box" style="max-width:420px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e5e0d8; padding-bottom:10px; margin-bottom:12px;">
                     <h3 style="margin:0; color:#8B1E41; font-size:16px; text-transform:uppercase;">Zapytaj o produkt</h3>
-                    <span id="slm-close-ask" style="cursor:pointer; font-size:24px; font-weight:bold; color:#888;">&times;</span>
+                    <span id="slm-close-ask" style="cursor:pointer; font-size:24px; font-weight:bold; color:#888;">×</span>
                 </div>
                 <p id="slm-ask-prod-name" style="font-weight:bold; color:#333; margin:0 0 12px 0; font-size:13px;"></p>
                 <input type="email" id="slm-ask-email" class="slm-input" placeholder="* Twój adres e-mail">
@@ -125,6 +125,7 @@
             return isNaN(val) ? 0 : val;
         }
 
+        // ЦЯ ФУНКЦІЯ ШУКАЄ ТІЛЬКИ НОМЕР (наприклад #014)
         function extractSku(text, fallbackIndex) {
             if (!text) return "#00" + (fallbackIndex + 1);
             const match = String(text).match(/#\s*\d+/);
@@ -143,7 +144,9 @@
                 const oldBtn = card.querySelector(".card-order-btn");
 
                 const title = titleEl ? titleEl.innerText.trim() : ("#" + String(index + 1).padStart(3, "0") + " Mebel SLM24");
-                const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '');
+                
+                // ВИТЯГУЄМО СТРОГИЙ НОМЕР (SKU) З НАЗВИ
+                const sku = extractSku(title + " " + (descEl ? descEl.innerText.trim() : ""), index);
 
                 let basePrice = priceEl ? extractPriceNumber(priceEl.innerText) : extractPriceNumber(card.innerText) || 1360;
 
@@ -151,9 +154,10 @@
                 let carryPrice = 0;
                 
                 if (window.allProducts && Array.isArray(window.allProducts)) {
+                    // НАДІЙНИЙ ПОШУК: Тільки за номером #014 == #014
                     const matchedProd = window.allProducts.find(p => {
-                        const pName = (p.name || p.title || "").toLowerCase().replace(/[^a-z0-9]/g, '');
-                        return pName.includes(cleanTitle) || cleanTitle.includes(pName);
+                        const pSku = extractSku(p.name || p.title || "", index);
+                        return pSku === sku;
                     });
                     
                     if (matchedProd) {
@@ -201,8 +205,6 @@
                     qtyInput.value = parseInt(qtyInput.value) + 1; updateCardPrice();
                 });
 
-                const sku = extractSku(title + " " + (descEl ? descEl.innerText.trim() : ""), index);
-
                 actionsDiv.querySelector(".slm-add-btn").addEventListener("click", (e) => {
                     e.stopPropagation();
                     cart.push({
@@ -210,8 +212,8 @@
                         cardId: sku,
                         skipButtons: skipButtons,
                         basePrice: basePrice,
-                        baseDeliveryPrice: deliveryPrice, // Зберігаємо базову доставку
-                        currentDeliveryVal: deliveryPrice, // За замовчуванням доставка включена!
+                        baseDeliveryPrice: deliveryPrice, 
+                        currentDeliveryVal: deliveryPrice, // Доставка автоматично ВРАХОВАНА
                         carryPrice: carryPrice,
                         carryVal: 0,
                         carryDesc: "Bez wniesienia (0 zł)",
@@ -250,7 +252,7 @@
                 const crExtra = (item.buttons && item.buttons.includes("+50")) ? 50 : 0;
                 const carry = parseFloat(item.carryVal) || 0;
                 
-                // ВАЖЛИВО: Додаємо доставку до фінальної ціни!
+                // ЖОРСТКЕ СУМУВАННЯ ДОСТАВКИ
                 let delivery = 0;
                 if (item.baseDeliveryPrice > 0) {
                     delivery = item.currentDeliveryVal !== undefined ? parseFloat(item.currentDeliveryVal) : parseFloat(item.baseDeliveryPrice);
@@ -288,7 +290,7 @@
                 <div class="slm-cart-item-edit" style="border-bottom:1px solid #e5e0d8; padding:12px 0;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:8px;">
                         <strong style="font-size:13px; color:#111; line-height:1.35; text-transform:uppercase;">${displayTitle}</strong>
-                        <button type="button" onclick="window.slmRemoveItem(${i})" style="background:#ff4d4d; color:#fff; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-weight:bold;">&times;</button>
+                        <button type="button" onclick="window.slmRemoveItem(${i})" style="background:#ff4d4d; color:#fff; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-weight:bold;">×</button>
                     </div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:11px; color:#555; background:#fbfaf8; padding:10px; border-radius:4px; border:1px solid #e5e0d8;">
                         <div>
