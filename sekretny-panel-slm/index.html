@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
     <title>Panel Administracyjny - SLM24.pl</title>
     <style>
         :root {
@@ -43,8 +44,8 @@
         }
         .pin-box h2 { color: var(--accent); margin-bottom: 15px; }
         .pin-input {
-            width: 100%; padding: 14px; font-size: 24px; text-align: center;
-            letter-spacing: 8px; border: 2px solid var(--border); border-radius: 10px;
+            width: 100%; padding: 14px; font-size: 20px; text-align: center;
+            letter-spacing: 3px; border: 2px solid var(--border); border-radius: 10px;
             margin-bottom: 15px; font-weight: bold;
         }
 
@@ -133,10 +134,10 @@
     <div class="screen active" id="pinScreen">
         <div class="pin-box">
             <h2>🔒 Panel SLM24</h2>
-            <p style="color:var(--text-muted); font-size:14px; margin-bottom:15px;">Wprowadź PIN administratora</p>
-            <input type="password" id="pinInput" class="pin-input" maxlength="8" autocomplete="off">
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:15px;">Wprowadź hasło administratora</p>
+            <input type="password" id="pinInput" class="pin-input" maxlength="32" autocomplete="off">
             <button class="btn btn-full" onclick="loginPin()">Wejdź do panelu</button>
-            <p id="pinErr" style="color:#d01f58; margin-top:12px; font-size:14px; display:none; font-weight:bold;">Nieprawidłowy PIN!</p>
+            <p id="pinErr" style="color:#d01f58; margin-top:12px; font-size:14px; display:none; font-weight:bold;">Nieprawidłowe hasło!</p>
         </div>
     </div>
 
@@ -182,7 +183,6 @@
                 </div>
             </div>
 
-            <!-- НОВИЙ РЯДОК: Доставка та Внесення -->
             <div class="form-row">
                 <div class="form-group">
                     <label>🚚 Koszt dostawy (zł) - wpisz 0 jeśli darmowa</label>
@@ -202,8 +202,9 @@
                         <option value="sofy">Sofy</option>
                         <option value="narozniki">Narożniki</option>
                         <option value="chesterfield">Chesterfield</option>
+                        <option value="anton-pozzo">Anton / Pozzo</option>
                         <option value="lozka">Łóżka</option>
-                        <option value="tkaniny">Tkaniny</option>
+                        <option value="outlet">Od ręki % (Szybka wysyłka)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -250,7 +251,8 @@
     <div class="status-bar" id="statusBar"></div>
 
     <script>
-        const ADMIN_PIN = "1234";
+        // НОВИЙ ПАРОЛЬ АДМІНІСТРАТОРА (Можете змінити SlmMeble2026! на будь-який свій)
+        const ADMIN_PIN = "SlmMeble2026!";
         const REPO_OWNER = "slm-meble";
         const REPO_NAME = "slm24.pl";
         const JSON_PATH = "content/home.json";
@@ -347,6 +349,7 @@
 
             const promptText = `Jesteś profesjonalnym copywriterem polskiego sklepu meblowego SLM24.pl. Napisz elegancki opis produktu w języku polskim. 
 Dane produktu: Nazwa: ${name}, Kategoria: ${cat}, Cena: ${price}. 
+Ważne: każdy nasz mebel posiada sprężynę falistą w standardzie (w cenie mebla, bez dopłat).
 Notatki właściciela: ${rawDesc}. 
 Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów i wypunktowań.`;
 
@@ -416,8 +419,6 @@ Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów 
                 const firstImg = (p.image || (p.images ? p.images.split(',')[0] : '')).trim();
                 const cleanPath = firstImg.replace(/^\//, '');
                 const thumbSrc = localPhotoCache[cleanPath] || (cleanPath ? '/' + cleanPath : '');
-                
-                // Відображаємо доставку в списку
                 const dostawa = parseFloat(p.deliveryPrice) > 0 ? p.deliveryPrice + ' zł' : 'darmowa';
                 
                 return `
@@ -596,11 +597,8 @@ Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów 
             document.getElementById('editIdx').value = idx;
             document.getElementById('fName').value = p.name || p.title || '';
             document.getElementById('fPrice').value = p.price || '';
-            
-            // Заповнення полів доставки/внесення
             document.getElementById('fDelivery').value = p.deliveryPrice || '';
             document.getElementById('fCarry').value = p.carryPrice || '';
-
             document.getElementById('fCat').value = p.category || 'fotele';
             document.getElementById('fDesc').value = p.description || '';
 
