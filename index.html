@@ -15,6 +15,8 @@
     <title>SLM24.PL – Producent Mebli Tapicerowanych</title>
     <meta name="description" content="Ekskluzywne meble tapicerowane prosto od producenta SLM24.pl. Produkujemy fotele Uszak, sofy, narożniki, łóżka tapicerowane.">
     <link rel="canonical" href="https://slm24.pl/">
+    <link rel="alternate" hreflang="pl" href="https://slm24.pl/">
+    <link rel="alternate" hreflang="de" href="https://slm24.pl/de/">
 
     <!-- Social Meta -->
     <meta property="og:type" content="website">
@@ -30,10 +32,14 @@
 
         header { background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
         .header-inner { max-width: 1320px; margin: 0 auto; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .header-left, .header-right { display: flex; align-items: center; gap: 24px; }
+        .header-left, .header-right { display: flex; align-items: center; gap: 16px; }
         
         .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-dark); display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
         .icon-btn:hover { opacity: 0.6; }
+
+        .lang-switch { display: flex; gap: 6px; font-size: 12px; font-weight: 800; align-items: center; }
+        .lang-switch a { padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 4px; }
+        .lang-switch a.active { background: #8B1E41; color: #fff; border-color: #8B1E41; }
         
         .logo { font-size: 24px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; text-align: center; }
         .logo span { display: block; font-size: 9px; font-weight: 500; letter-spacing: 4px; color: var(--text-muted); margin-top: 2px; }
@@ -108,7 +114,7 @@
         .footer-bottom { text-align: center; font-size: 12px; color: var(--text-dark); font-weight: 600; border-top: 1px solid var(--border-color); padding-top: 25px; text-transform: uppercase; letter-spacing: 1px; display: flex; flex-direction: column; align-items: center;}
         .product-counter { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; color: var(--text-dark);}
 
-        /* МОДАЛЬНІ ВІКНА (ВИПРАВЛЕНЕ ЦЕНТРУВАННЯ НА ВСІХ ЕКРАНАХ) */
+        /* МОДАЛЬНІ ВІКНА */
         .product-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: none; overflow-y: auto; overflow-x: hidden; padding: 15px; }
         .product-modal.open { display: flex; justify-content: center; align-items: flex-start; }
         .modal-content { background: var(--bg-main); width: 100%; max-width: 1000px; margin: 10px auto; position: relative; border-radius: 4px; overflow: hidden; box-sizing: border-box; }
@@ -139,7 +145,6 @@
         .btn-phone-action { background: transparent; color: var(--text-dark); margin-bottom: 0; }
         .btn-phone-action:hover { background: var(--bg-soft); }
 
-        /* АДАПТАЦІЯ ДЛЯ ТЕЛЕФОНІВ (ВЕРТИКАЛЬНО І ГОРИЗОНТАЛЬНО) */
         @media (max-width: 767px) {
             #hero-title { font-size: 26px; }
             .product-modal { padding: 8px; }
@@ -171,6 +176,10 @@
                 <button class="icon-btn" onclick="toggleDrawer(true)">
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </button>
+                <div class="lang-switch">
+                    <a href="/" class="active">🇵🇱 PL</a>
+                    <a href="/de/">🇩🇪 DE</a>
+                </div>
             </div>
             <a href="#" class="logo" onclick="selectCategory('all'); return false;">SLM24.PL<span>EXCLUSIVE FURNITURE</span></a>
             <div class="header-right">
@@ -245,7 +254,7 @@
             </div>
             <div class="trust-item">
                 <div class="trust-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></div>
-                <div class="trust-text">Dostawa w Polsce</div>
+                <div class="trust-text">Dostawa w Polsce i DE</div>
             </div>
             <div class="trust-item">
                 <div class="trust-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
