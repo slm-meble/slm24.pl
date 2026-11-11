@@ -1,4 +1,4 @@
-// Повнофункціональний кошик для SLM24.pl (ТОЧНЕ СУМУВАННЯ ДОСТАВКИ ТА ПРАВИЛА КАТЕГОРІЙ)
+// Повнофункціональний кошик для SLM24.pl (БЕЗ ДОПЛАТИ ЗА ПРУЖИНУ — ПРУЖИНА В СТАНДАРТІ)
 
 (function() {
     function initSLMCart() {
@@ -132,10 +132,6 @@
             return match ? match[0].replace(/\s+/g, "") : "#00" + (fallbackIndex + 1);
         }
 
-        // ВИЗНАЧАЄМО ТИП ОПЦІЙ ҐУДЗИКІВ / ПІКУВАННЯ ЗА ВАШИМИ ПРАВИЛАМИ:
-        // 'none' -> Нарожники, Антон, Посо, Ліжка (пікування забирається, тільки ніжки і тканина)
-        // 'chester' -> Честерфілд (пікування A-F забирається, залишається вибір кольору ґудзиків/кришталиків, ніжки і тканина)
-        // 'full' -> Усі інші крісла (Fotele) та Софи (Sofy) (залишається пікування A-F, ніжки і тканина)
         function getButtonsMode(title, category) {
             const text = ((title || "") + " " + (category || "")).toLowerCase();
             if (/narożnik|naroznik|anton|pozzo|poso|łóżk|lozk/i.test(text)) {
@@ -147,7 +143,6 @@
             return "full";
         }
 
-        // Автоматична перевірка і підтягування доставки з бази навіть для старих товарів у кошику
         function syncCartWithDatabase() {
             if (!window.allProducts || !Array.isArray(window.allProducts) || window.allProducts.length === 0) return;
             cart.forEach((item, idx) => {
@@ -167,6 +162,9 @@
                 } else if (!item.buttonsMode) {
                     item.buttonsMode = getButtonsMode(item.name, "");
                 }
+                // Скидаємо будь-яку стару доплату за пружину до 0
+                item.springVal = 0;
+                item.spring = "Sprężyna falista (w standardzie)";
             });
         }
 
@@ -183,7 +181,6 @@
                 const title = titleEl ? titleEl.innerText.trim() : ("#" + String(index + 1).padStart(3, "0") + " Mebel SLM24");
                 const sku = extractSku(title, index);
 
-                // Читаємо ціну і доставку ПРЯМО З АТРИБУТІВ КАРТКИ
                 let basePrice = extractPriceNumber(card.dataset.price) || (priceEl ? extractPriceNumber(priceEl.innerText) : 1000);
                 if (oldBtn) oldBtn.style.display = "none";
 
@@ -226,12 +223,10 @@
                 actionsDiv.querySelector(".slm-add-btn").addEventListener("click", (e) => {
                     e.stopPropagation();
 
-                    // Беремо доставку прямо з картки товару (100% точність!)
                     let deliveryPrice = extractPriceNumber(card.dataset.delivery);
                     let carryPrice = extractPriceNumber(card.dataset.carry);
                     let cat = card.dataset.category || "";
 
-                    // Додаткова перевірка в window.allProducts на випадок, якщо атрибут порожній
                     if (deliveryPrice === 0 && window.allProducts && Array.isArray(window.allProducts)) {
                         const matched = window.allProducts.find((p, pIdx) => extractSku(p.name || p.title || "", pIdx) === sku);
                         if (matched) {
@@ -252,13 +247,13 @@
                         buttonsMode: bMode,
                         basePrice: basePrice,
                         baseDeliveryPrice: deliveryPrice, 
-                        currentDeliveryVal: deliveryPrice, // ОДРАЗУ ДОДАЄМО ДОСТАВКУ ДО СУМИ!
+                        currentDeliveryVal: deliveryPrice,
                         carryPrice: carryPrice,
                         carryVal: 0,
                         carryDesc: "Bez wniesienia (0 zł)",
                         qty: parseInt(qtyInput.value) || 1,
                         springVal: 0,
-                        spring: "Bez sprężyny falistej (standard)",
+                        spring: "Sprężyna falista (w standardzie)",
                         leg: "1",
                         buttons: defaultButtons,
                         fabric: "Jak na zdjęciu"
@@ -288,11 +283,9 @@
 
             cart.forEach((item, idx) => {
                 const base = parseFloat(item.basePrice) || 0;
-                const spExtra = parseFloat(item.springVal) || 0;
                 const crExtra = (item.buttons && item.buttons.includes("+50")) ? 50 : 0;
                 const carry = parseFloat(item.carryVal) || 0;
                 
-                // АВТОМАТИЧНЕ СУМУВАННЯ: Ціна товару + Доставка
                 let delivery = 0;
                 if (item.baseDeliveryPrice > 0) {
                     delivery = (item.currentDeliveryVal !== undefined && item.currentDeliveryVal !== null) 
@@ -300,7 +293,8 @@
                         : parseFloat(item.baseDeliveryPrice);
                 }
 
-                item.unitPrice = base + spExtra + crExtra + carry + delivery;
+                // БЕЗ ДОПЛАТИ ЗА ПРУЖИНУ: тільки база + кришталики (якщо вибрані) + внесення + доставка
+                item.unitPrice = base + crExtra + carry + delivery;
                 item.qty = parseInt(item.qty) || 1;
                 item.totalPrice = item.unitPrice * item.qty;
                 if (!item.cardId) item.cardId = extractSku(item.name, idx);
@@ -364,11 +358,8 @@
                     </div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:11px; color:#555; background:#fbfaf8; padding:10px; border-radius:4px; border:1px solid #e5e0d8;">
                         <div>
-                            <b>🪑 Siedzisko:</b><br>
-                            <select onchange="window.slmUpdateCartItem(${i}, 'springVal', this.value)">
-                                <option value="0" ${item.springVal == 0 ? 'selected' : ''}>Bez sprężyny (w cenie)</option>
-                                <option value="69" ${item.springVal == 69 ? 'selected' : ''}>Sprężyna falista (+69 zł)</option>
-                            </select>
+                            <b>🪑 Wykonanie siedziska:</b><br>
+                            <span style="font-size:11px; color:#10b981; padding:5px 6px; display:block; border:1px solid #a7f3d0; border-radius:4px; margin-top:3px; background:#ecfdf5; font-weight:bold;">Sprężyna falista (w cenie)</span>
                         </div>
                         <div>
                             <b>🦵 Kolor / Nóżka (1-6):</b><br>
@@ -418,10 +409,7 @@
 
         window.slmUpdateCartItem = function(index, field, value) {
             if (!cart[index]) return;
-            if (field === "springVal") {
-                cart[index].springVal = parseFloat(value) || 0;
-                cart[index].spring = value == "69" ? "Ze sprężyną falistą (+69 zł)" : "Bez sprężyny falistej (standard)";
-            } else if (field === "carryVal") {
+            if (field === "carryVal") {
                 cart[index].carryVal = parseFloat(value) || 0;
                 cart[index].carryDesc = value > 0 ? `Z wniesieniem (+${parseFloat(value).toFixed(2)} zł)` : "Bez wniesienia (0 zł)";
             } else if (field === "delivery") {
@@ -485,7 +473,7 @@
                     
                 return `${idx + 1}. [${item.cardId}] *${item.name}*\n` +
                        `   - Ilość: ${item.qty} szt. x ${item.unitPrice.toFixed(2)} zł = ${item.totalPrice.toFixed(2)} zł\n` +
-                       `   - 🪑 Siedzisko: ${item.spring}\n` +
+                       `   - 🪑 Siedzisko: Sprężyna falista (w standardzie)\n` +
                        `   - 🦵 Nóżka nr: ${item.leg}\n` +
                        `   - 🔘 Guziki / Pikowanie: ${item.buttonsMode === "none" ? "Nie dotyczy" : item.buttons}\n` +
                        `   - 🎨 Tkanina / kolor: ${item.fabric || "Jak na zdjęciu"}\n` +
