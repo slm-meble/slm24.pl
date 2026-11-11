@@ -1,7 +1,6 @@
-<!<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta name="robots" content="noindex, nofollow">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-5C1WVCZP3Q"></script>
   <script>
@@ -297,7 +296,7 @@
         </div>
     </footer>
 
-    <!-- МОДАЛЬНЕ ВІКНО ТОВАРУ (БЕЗ ЗАЙВОЇ ОБГОРТКИ, ІДЕАЛЬНО ПО ЦЕНТРУ) -->
+    <!-- МОДАЛЬНЕ ВІКНО ТОВАРУ -->
     <div class="product-modal" id="product-modal">
         <div class="modal-content">
             <div class="modal-top-bar">
@@ -376,7 +375,6 @@
     </div>
 
     <script>
-        // Робимо масив глобальним через window, щоб кошик бачив його миттєво
         window.allProducts = [];
         let activeCategory = 'all';
         let contactPhoneRaw = '48666688298';
@@ -453,7 +451,6 @@
                     ? `<div style="font-size:12px; color:#8B1E41; font-weight:800; margin-top:-5px; margin-bottom:15px; text-transform:uppercase;">🚚 Dostawa: ${delPriceNum.toFixed(2)} zł</div>` 
                     : `<div style="font-size:12px; color:#10b981; font-weight:800; margin-top:-5px; margin-bottom:15px; text-transform:uppercase;">🚚 Darmowa dostawa</div>`;
 
-                // Передаємо доставку, внесення та категорію ПРЯМО В КАРТКУ (data-delivery, data-carry, data-category)
                 return `
                     <div class="product-card" 
                          data-index="${item._index}"
@@ -555,6 +552,6 @@
 
         document.addEventListener('DOMContentLoaded', loadSiteContent);
     </script>
-    <script src="cart.js?v=20261112_final"></script>
+    <script src="cart.js?v=20261113_bez_sprezyny"></script>
 </body>
-</html>DOCTYPE html>
+</html>
