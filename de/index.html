@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5C1WVCZP3Q"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-5C1WVCZP3Q');
+  </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>SLM24.PL – Exklusive Polstermöbel direkt vom Hersteller</title>
+    <meta name="description" content="Exklusive Polstermöbel direkt vom Hersteller SLM24.pl. Ohrensessel, Sofas, Ecksofas, Chesterfield-Möbel und Polsterbetten mit Lieferung nach Deutschland.">
+    <link rel="canonical" href="https://slm24.pl/de/">
+    <link rel="alternate" hreflang="pl" href="https://slm24.pl/">
+    <link rel="alternate" hreflang="de" href="https://slm24.pl/de/">
+
+    <style>
+        :root { --bg-main: #fbfaf8; --bg-card: #ffffff; --bg-soft: #f4f2ee; --text-dark: #111111; --text-muted: #666666; --border-color: #e5e0d8; --shadow: 0 4px 15px rgba(0, 0, 0, 0.03); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg-main); color: var(--text-dark); line-height: 1.5; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+
+        header { background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; }
+        .header-inner { max-width: 1320px; margin: 0 auto; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .header-left, .header-right { display: flex; align-items: center; gap: 16px; }
+        
+        .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-dark); display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
+        .icon-btn:hover { opacity: 0.6; }
+        
+        .lang-switch { display: flex; gap: 6px; font-size: 12px; font-weight: 800; align-items: center; }
+        .lang-switch a { padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 4px; }
+        .lang-switch a.active { background: #8B1E41; color: #fff; border-color: #8B1E41; }
+
+        .logo { font-size: 24px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; text-align: center; }
+        .logo span { display: block; font-size: 9px; font-weight: 500; letter-spacing: 4px; color: var(--text-muted); margin-top: 2px; }
+
+        .search-bar { display: none; background: var(--bg-card); padding: 15px 20px; border-bottom: 1px solid var(--border-color); }
+        .search-bar.active { display: block; }
+        .search-bar input { width: 100%; max-width: 600px; margin: 0 auto; display: block; padding: 12px 16px; border: 1px solid var(--border-color); font-size: 14px; outline: none; color: var(--text-dark); font-weight: 500;}
+
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 900; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+        .side-drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 320px; max-width: 85vw; background: var(--bg-card); z-index: 950; transform: translateX(-100%); transition: 0.3s; overflow-y: auto; }
+        .side-drawer.open { transform: translateX(0); }
+        .drawer-header { padding: 25px 20px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); font-weight: 700; text-transform: uppercase; font-size: 14px; letter-spacing: 1px;}
+        .drawer-list { list-style: none; padding: 10px 20px; }
+        .drawer-list li { border-bottom: 1px solid var(--bg-soft); }
+        .drawer-list li a { display: block; padding: 16px 0; font-size: 13px; font-weight: 600; text-transform: uppercase; cursor: pointer; letter-spacing: 0.5px;}
+
+        .hero-banner { background-image: url('../images/baner-glowny.jpg'); background-size: cover; background-position: center; position: relative; min-height: 280px; display: flex; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; }
+        .hero-banner::before { content: ''; position: absolute; inset: 0; background: rgba(255, 255, 255, 0.15); z-index: 1; }
+        .hero-inner { position: relative; z-index: 2; max-width: 800px; color: var(--text-dark); }
+        .breadcrumbs { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 700; }
+        #hero-title { font-size: 38px; font-weight: 800; margin-bottom: 0; line-height: 1.1; letter-spacing: -1px; text-transform: uppercase;}
+
+        .catalog-wrapper { max-width: 1320px; margin: 0 auto; padding: 50px 20px; }
+        
+        .category-pills { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 30px; scrollbar-width: none; }
+        .category-pills::-webkit-scrollbar { display: none; }
+        .pill-btn { padding: 12px 24px; border: 1px solid var(--border-color); background: var(--bg-card); font-size: 12px; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: 0.2s; white-space: nowrap; letter-spacing: 1px; color: var(--text-dark);}
+        .pill-btn.active, .pill-btn:hover { background: var(--text-dark); color: #fff; border-color: var(--text-dark); }
+
+        .pill-btn.outlet-btn { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+        .pill-btn.outlet-btn.active, .pill-btn.outlet-btn:hover { background: #b91c1c; color: #fff; border-color: #b91c1c; }
+
+        .toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 40px; padding: 15px 20px; border: 1px solid var(--border-color); background: var(--bg-card); }
+        .filter-select { padding: 10px 15px; border: 1px solid var(--border-color); font-size: 13px; cursor: pointer; outline: none; background: #fff; text-transform: uppercase; font-weight: 600; color: var(--text-dark);}
+
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        .product-card { background: var(--bg-card); border: 1px solid var(--border-color); display: flex; flex-direction: column; cursor: pointer; transition: 0.3s; border-radius: 4px; position: relative;}
+        .product-card:hover { box-shadow: var(--shadow); transform: translateY(-3px); border-color: #ccc;}
+        .card-img-wrap { width: 100%; aspect-ratio: 1/1; background: var(--bg-soft); position: relative;}
+        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .outlet-badge { position: absolute; top: 15px; right: 15px; background: #b91c1c; color: #fff; padding: 6px 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; border-radius: 4px; letter-spacing: 1px;}
+        
+        .card-body { padding: 25px 20px; display: flex; flex-direction: column; flex: 1; text-align: center;}
+        .card-title { font-size: 14px; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; flex: 1;}
+        .card-price { font-size: 18px; font-weight: 800; margin-bottom: 15px; }
+        .card-order-btn { background: var(--text-dark); color: #fff; border: none; padding: 14px; font-size: 12px; font-weight: 700; text-transform: uppercase; cursor: pointer; letter-spacing: 1px; display: flex; justify-content: center; align-items: center; border-radius: 4px;}
+
+        .footer-trust-bar { border-top: 1px solid var(--border-color); padding: 50px 20px; background: var(--bg-card); }
+        .trust-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; text-align: center; }
+        .trust-item { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .trust-icon { color: var(--text-dark); }
+        .trust-text { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dark); }
+
+        footer { background: var(--bg-soft); border-top: 1px solid var(--border-color); padding: 60px 20px 30px; }
+        .footer-inner { max-width: 1200px; margin: 0 auto; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 50px; text-align: left;}
+        .footer-col h4 { font-size: 13px; font-weight: 800; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 1.5px; color: var(--text-dark); }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 15px; font-size: 14px; color: var(--text-dark); font-weight: 500;}
+        .footer-col ul li a { font-weight: 600; text-decoration: underline; text-decoration-color: var(--border-color); text-underline-offset: 4px; cursor: pointer;}
+        .footer-col ul li a:hover { text-decoration-color: var(--text-dark); }
+        
+        .social-links { display: flex; gap: 15px; margin-top: 25px; }
+        .social-links a { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; color: #fff; transition: 0.2s; }
+        .social-links a:hover { opacity: 0.8; transform: scale(1.05); }
+        
+        .footer-bottom { text-align: center; font-size: 12px; color: var(--text-dark); font-weight: 600; border-top: 1px solid var(--border-color); padding-top: 25px; text-transform: uppercase; letter-spacing: 1px; display: flex; flex-direction: column; align-items: center;}
+        .product-counter { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; color: var(--text-dark);}
+
+        .product-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: none; overflow-y: auto; overflow-x: hidden; padding: 15px; }
+        .product-modal.open { display: flex; justify-content: center; align-items: flex-start; }
+        .modal-content { background: var(--bg-main); width: 100%; max-width: 1000px; margin: 10px auto; position: relative; border-radius: 4px; overflow: hidden; box-sizing: border-box; }
+        .modal-top-bar { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;}
+        .close-modal-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-dark); display: flex; align-items: center;}
+        
+        .modal-body { padding: 30px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 30px; width: 100%; box-sizing: border-box; }
+        @media (min-width: 768px) { .modal-body { grid-template-columns: minmax(0, 45%) minmax(0, 1fr); padding: 40px; gap: 40px; } }
+        
+        .gallery-container { border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 4px; width: 100%; max-width: 100%; overflow: hidden; margin: 0 auto; }
+        .gallery-main-img-wrap { width: 100%; aspect-ratio: 1/1; position: relative; cursor: zoom-in; display: flex; align-items: center; justify-content: center; background: #fff; }
+        .gallery-main-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; margin: 0 auto; }
+        .gallery-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: var(--bg-card); border: 1px solid var(--border-color); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; z-index: 5;}
+        .gallery-prev { left: 10px; } .gallery-next { right: 10px; }
+        .gallery-thumbs { display: flex; gap: 10px; padding: 12px; overflow-x: auto; background: var(--bg-soft); border-top: 1px solid var(--border-color); max-width: 100%; box-sizing: border-box; }
+        .gallery-thumb { width: 60px; height: 60px; border: 2px solid transparent; cursor: pointer; flex-shrink: 0; background: #fff; border-radius: 3px; overflow: hidden;}
+        .gallery-thumb.active { border-color: #8B1E41; }
+        .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        .modal-info-col { width: 100%; max-width: 100%; overflow-wrap: break-word; word-wrap: break-word; }
+        .modal-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; line-height: 1.25; letter-spacing: -0.5px;}
+        .modal-price { font-size: 22px; font-weight: 800; color: #8B1E41; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
+        .modal-desc { font-size: 14px; line-height: 1.7; color: var(--text-dark); font-weight: 500; margin-bottom: 30px; white-space: pre-line; overflow-wrap: break-word; word-wrap: break-word; }
+
+        .btn-primary-action, .btn-phone-action { display: flex; align-items: center; justify-content: center; width: 100%; padding: 16px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: 2px solid var(--text-dark); margin-bottom: 12px; transition: 0.2s; border-radius: 4px;}
+        .btn-primary-action { background: var(--text-dark); color: #fff; }
+        .btn-primary-action:hover { background: #333; }
+        .btn-phone-action { background: transparent; color: var(--text-dark); margin-bottom: 0; }
+        .btn-phone-action:hover { background: var(--bg-soft); }
+
+        @media (max-width: 767px) {
+            #hero-title { font-size: 24px; }
+            .product-modal { padding: 8px; }
+            .modal-content { margin: 0 auto; width: 100%; }
+            .modal-body { padding: 16px; gap: 20px; }
+            .modal-title { font-size: 18px; text-align: center; }
+            .modal-price { font-size: 20px; text-align: center; padding-bottom: 15px; margin-bottom: 15px; }
+            .modal-desc { font-size: 13px; text-align: left; }
+        }
+
+        .lightbox-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .lightbox-modal.open { display: flex; }
+        .lightbox-content { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;}
+        .lightbox-content img { max-width: 95vw; max-height: 90vh; object-fit: contain; margin: 0 auto; display: block; }
+        .lightbox-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #fff; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 2005; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+        .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #fff; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index:2005;}
+        .lb-prev { left: 20px; } .lb-next { right: 20px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-inner">
+            <div class="header-left">
+                <button class="icon-btn" onclick="toggleDrawer(true)">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+                <div class="lang-switch">
+                    <a href="/">🇵🇱 PL</a>
+                    <a href="/de/" class="active">🇩🇪 DE</a>
+                </div>
+            </div>
+            <a href="#" class="logo" onclick="selectCategory('all'); return false;">SLM24.PL<span>EXCLUSIVE FURNITURE</span></a>
+            <div class="header-right">
+                <button class="icon-btn" onclick="toggleSearch()">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+                <a href="#footer-contact" class="icon-btn">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                </a>
+            </div>
+        </div>
+        <div class="search-bar" id="search-bar">
+            <input type="text" id="search-input" placeholder="Möbel suchen (z.B. #014, Sessel, Ecksofa)..." oninput="renderCatalog()">
+        </div>
+    </header>
+
+    <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
+    <aside class="side-drawer" id="side-drawer">
+        <div class="drawer-header"><span>Kollektionen</span><button class="icon-btn" onclick="toggleDrawer(false)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
+        <ul class="drawer-list">
+            <li><a onclick="selectCategory('all')">Alle Möbel</a></li>
+            <li><a onclick="selectCategory('fotele')">Sessel (Ohrensessel)</a></li>
+            <li><a onclick="selectCategory('narozniki')">Ecksofas</a></li>
+            <li><a onclick="selectCategory('sofy')">Sofas</a></li>
+            <li><a onclick="selectCategory('chesterfield')">Chesterfield Möbel</a></li>
+            <li><a onclick="selectCategory('anton-pozzo')">Anton & Pozzo</a></li>
+            <li><a onclick="selectCategory('lozka')">Polsterbetten</a></li>
+            <li><a onclick="selectCategory('outlet')">Sofort lieferbar %</a></li>
+        </ul>
+    </aside>
+
+    <section class="hero-banner" id="hero-banner-bg">
+        <div class="hero-inner">
+            <div class="breadcrumbs"><strong id="current-cat-label" style="color:var(--text-dark);">Möbelkollektion • Direkt vom Hersteller</strong></div>
+            <h1 id="hero-title">Exklusive Polstermöbel für Ihr Zuhause</h1>
+        </div>
+    </section>
+
+    <main class="catalog-wrapper">
+        <div class="category-pills">
+            <button class="pill-btn active" data-cat="all" onclick="selectCategory('all')">Alle</button>
+            <button class="pill-btn" data-cat="fotele" onclick="selectCategory('fotele')">Sessel</button>
+            <button class="pill-btn" data-cat="narozniki" onclick="selectCategory('narozniki')">Ecksofas</button>
+            <button class="pill-btn" data-cat="sofy" onclick="selectCategory('sofy')">Sofas</button>
+            <button class="pill-btn" data-cat="chesterfield" onclick="selectCategory('chesterfield')">Chesterfield</button>
+            <button class="pill-btn" data-cat="anton-pozzo" onclick="selectCategory('anton-pozzo')">Anton / Pozzo</button>
+            <button class="pill-btn" data-cat="lozka" onclick="selectCategory('lozka')">Betten</button>
+            <button class="pill-btn outlet-btn" data-cat="outlet" onclick="selectCategory('outlet')">Sofort lieferbar %</button>
+        </div>
+
+        <div class="toolbar">
+            <select class="filter-select" id="sort-select" onchange="renderCatalog()">
+                <option value="default">Sortieren: Standard</option>
+                <option value="price-asc">Preis: aufsteigend</option>
+                <option value="price-desc">Preis: absteigend</option>
+            </select>
+        </div>
+
+        <div class="product-grid" id="product-list"></div>
+    </main>
+
+    <div class="footer-trust-bar">
+        <div class="trust-grid">
+            <div class="trust-item">
+                <div class="trust-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+                <div class="trust-text">24 Monate Garantie</div>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg></div>
+                <div class="trust-text">14 Tage Rückgaberecht</div>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></div>
+                <div class="trust-text">Lieferung nach Deutschland</div>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
+                <div class="trust-text">Sichere Zahlung (auch bei Lieferung)</div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="footer-contact">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Rechtliche Informationen</h4>
+                    <ul>
+                        <li><a onclick="document.getElementById('agb-modal').classList.add('open')">AGB & Widerrufsbelehrung</a></li>
+                        <li><a onclick="document.getElementById('datenschutz-modal').classList.add('open')">Datenschutzerklärung</a></li>
+                        <li><a onclick="document.getElementById('company-modal').classList.add('open')">Impressum (Firmendaten)</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Kontakt & Kundenservice</h4>
+                    <ul>
+                        <li>Werk & Sitz: ul. Leśna 11, 63-604 Baranów (PL)</li>
+                        <li>Tel / WhatsApp: +48 666 688 298</li>
+                        <li>E-Mail: slmmble2022@gmail.com</li>
+                        <li>Mo-Fr: 9:00 - 18:00 Uhr</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Social Media</h4>
+                    <ul><li>Folgen Sie uns online für aktuelle Angebote.</li></ul>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/share/1SSnFum1Z9/" target="_blank" title="Facebook" style="background: #1877F2;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                        </a>
+                        <a href="https://instagram.com/czaikovskislm" target="_blank" title="Instagram" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="product-counter"><strong id="product-count">0</strong> Produkte verfügbar</div>
+                <p>© 2026 SLM24.PL. Alle Rechte vorbehalten.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- МОДАЛЬНЕ ВІКНО ТОВАРУ -->
+    <div class="product-modal" id="product-modal">
+        <div class="modal-content">
+            <div class="modal-top-bar">
+                <span>Produktdetails</span>
+                <button class="close-modal-btn" onclick="closeProductModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="gallery-container">
+                    <div class="gallery-main-img-wrap" onclick="openLightboxGallery()">
+                        <img id="modal-main-img" src="" alt="Möbel">
+                        <div class="gallery-nav-btn gallery-prev" onclick="changeImage(-1); event.stopPropagation();">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </div>
+                        <div class="gallery-nav-btn gallery-next" onclick="changeImage(1); event.stopPropagation();">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                    </div>
+                    <div class="gallery-thumbs" id="gallery-thumbs"></div>
+                </div>
+                <div class="modal-info-col">
+                    <h2 class="modal-title" id="modal-title"></h2>
+                    <div class="modal-price" id="modal-price"></div>
+                    <p class="modal-desc" id="modal-desc"></p>
+                    
+                    <a id="modal-wa-btn" href="#" target="_blank" class="btn-primary-action">
+                        Frage per WhatsApp senden
+                    </a>
+                    <a id="modal-phone-btn" href="tel:+48666688298" class="btn-phone-action">
+                        +48 666 688 298
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMPRESSUM MODAL -->
+    <div class="product-modal" id="company-modal" style="z-index: 2500;">
+        <div class="modal-content" style="max-width: 500px; min-height: auto;">
+            <div class="modal-top-bar">
+                <span>Impressum (Angaben gemäß § 5 TMG)</span>
+                <button class="close-modal-btn" onclick="document.getElementById('company-modal').classList.remove('open')">×</button>
+            </div>
+            <div class="modal-body" style="grid-template-columns: 1fr; font-size:14px; line-height:1.8;">
+                <div>
+                    <strong>SLM Meble Lesia Chaikovska</strong><br>
+                    ul. Leśna 11, 63-604 Baranów, Polen<br><br>
+                    <strong>USt-IdNr. (NIP):</strong> PL6192056820<br>
+                    <strong>REGON:</strong> 523263170<br><br>
+                    <strong>Kontakt:</strong><br>
+                    Telefon / WhatsApp: +48 666 688 298<br>
+                    E-Mail: slmmble2022@gmail.com
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AGB & WIDERRUF MODAL -->
+    <div class="product-modal" id="agb-modal" style="z-index: 2500;">
+        <div class="modal-content" style="max-width: 650px; min-height: auto;">
+            <div class="modal-top-bar">
+                <span>AGB & Widerrufsbelehrung</span>
+                <button class="close-modal-btn" onclick="document.getElementById('agb-modal').classList.remove('open')">×</button>
+            </div>
+            <div class="modal-body" style="grid-template-columns: 1fr; font-size:13px; line-height:1.7;">
+                <div>
+                    <strong>1. Geltungsbereich & Vertragspartner</strong><br>
+                    Verkäufer ist SLM Meble Lesia Chaikovska, ul. Leśna 11, 63-604 Baranów, Polen (USt-IdNr.: PL6192056820).<br><br>
+                    <strong>2. Preise & Versand nach Deutschland</strong><br>
+                    Alle angegebenen Preise sind Endpreise in Euro (€). Die Versandkosten nach Deutschland betragen 60,00 € für Sessel und 120,00 € für Sofas, Ecksofas und Betten.<br><br>
+                    <strong>3. Zahlung</strong><br>
+                    Zahlung wahlweise per Barzahlung bei Lieferung (beim Fahrer) oder per Banküberweisung (Vorkasse).<br><br>
+                    <strong>4. Widerrufsrecht (14 Tage) & Garantie</strong><br>
+                    Verbraucher haben ein 14-tägiges Widerrufsrecht ab Erhalt der Ware. Zudem gewähren wir 24 Monate Herstellergarantie auf alle Polstermöbel.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DATENSCHUTZ MODAL -->
+    <div class="product-modal" id="datenschutz-modal" style="z-index: 2500;">
+        <div class="modal-content" style="max-width: 650px; min-height: auto;">
+            <div class="modal-top-bar">
+                <span>Datenschutzerklärung (DSGVO)</span>
+                <button class="close-modal-btn" onclick="document.getElementById('datenschutz-modal').classList.remove('open')">×</button>
+            </div>
+            <div class="modal-body" style="grid-template-columns: 1fr; font-size:13px; line-height:1.7;">
+                <div>
+                    <strong>Verantwortlicher:</strong> SLM Meble Lesia Chaikovska, ul. Leśna 11, 63-604 Baranów, Polen (E-Mail: slmmble2022@gmail.com).<br><br>
+                    Wir verarbeiten Ihre personenbezogenen Daten (Name, Lieferadresse, Telefonnummer, E-Mail) ausschließlich zur Abwicklung Ihrer Möbelbestellung und Lieferung nach Art. 6 Abs. 1 lit. b DSGVO. Eine Weitergabe an Dritte erfolgt nur an das Transportunternehmen zwecks Zustellung.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox-modal" id="lightbox-modal" onclick="closeLightbox(event)">
+        <button class="lightbox-close" onclick="closeLightbox(event)">×</button>
+        <div class="lightbox-content">
+            <img id="lightbox-img" src="" alt="Fullscreen">
+            <button class="lightbox-nav lb-prev" id="lb-prev" onclick="changeLightboxImage(-1); event.stopPropagation();">❮</button>
+            <button class="lightbox-nav lb-next" id="lb-next" onclick="changeLightboxImage(1); event.stopPropagation();">❯</button>
+        </div>
+    </div>
+
+    <script>
+        window.allProducts = [];
+        let activeCategory = 'all';
+        let contactPhoneRaw = '48666688298';
+        const EUR_RATE = 4.25;
+
+        function toggleDrawer(open) {
+            document.getElementById('side-drawer').classList.toggle('open', open);
+            document.getElementById('drawer-overlay').classList.toggle('open', open);
+        }
+        function toggleSearch() { document.getElementById('search-bar').classList.toggle('active'); }
+
+        // Переклад основних польських меблевих термінів у назвах та описах
+        function translateToGerman(str) {
+            if (!str) return '';
+            const dict = [
+                [/narożnik/gi, 'Ecksofa'], [/naroznik/gi, 'Ecksofa'],
+                [/fotel uszak/gi, 'Ohrensessel'], [/fotel/gi, 'Sessel'], [/uszak/gi, 'Ohrensessel'],
+                [/z podnóżkiem otwieranym/gi, 'mit aufklappbarem Hocker'],
+                [/z podnóżkiem/gi, 'mit Hocker'], [/z pufą/gi, 'mit Hocker'], [/pufa otwierana/gi, 'aufklappbarer Hocker'],
+                [/welurowy/gi, 'Velours'], [/welur/gi, 'Velours'], [/sztruksowy/gi, 'Cord'], [/sztruks/gi, 'Cord'],
+                [/czarny/gi, 'Schwarz'], [/czarne nogi/gi, 'schwarze Beine'],
+                [/czerwony/gi, 'Rot'], [/zielony/gi, 'Grün'], [/bordowy/gi, 'Bordeauxrot'],
+                [/szary/gi, 'Grau'], [/beżowy/gi, 'Beige'], [/beż/gi, 'Beige'], [/jasny brąz/gi, 'Hellbraun'],
+                [/oliwka/gi, 'Olivgrün'], [/rudy/gi, 'rostfarben'],
+                [/funkcja spania/gi, 'Schlaffunktion'], [/z funkcją spania/gi, 'mit Schlaffunktion'],
+                [/pojemnik na pościel/gi, 'Bettkasten'], [/i pojemnikiem na pościel/gi, 'und Bettkasten'],
+                [/regulowane zagłówki/gi, 'verstellbare Kopfstützen'],
+                [/głębokie pikowania/gi, 'tiefe Chesterfield-Steppung'],
+                [/sprężyna falista/gi, 'Wellenfederung'],
+                [/wygodny/gi, 'Bequemer'], [/przytulny/gi, 'Gemütlicher'], [/elegancki/gi, 'Eleganter'], [/elegancka/gi, 'Elegante'],
+                [/prawy/gi, 'Rechts'], [/lewy/gi, 'Links'], [/łóżko/gi, 'Polsterbett']
+            ];
+            let out = str;
+            dict.forEach(([rgx, rep]) => { out = out.replace(rgx, rep); });
+            return out;
+        }
+
+        function parsePrice(priceStr) {
+            if (!priceStr) return 0;
+            const num = parseFloat(String(priceStr).replace(/[^0-9.,]/g, '').replace(',', '.'));
+            return isNaN(num) ? 0 : num;
+        }
+
+        // Конвертація PLN -> EUR за курсом 4.25
+        function getEurPrice(item) {
+            if (item.priceEur && parsePrice(item.priceEur) > 0) return Math.round(parsePrice(item.priceEur));
+            const pln = parsePrice(item.price);
+            return pln > 0 ? Math.round(pln / EUR_RATE) : 250;
+        }
+
+        // Доставка в Німеччину: 60 € для крісел, 120 € для диванів/нарожників/ліжок
+        function getGermanDeliveryEur(item) {
+            const text = ((item.name || '') + ' ' + (item.title || '') + ' ' + (item.category || '')).toLowerCase();
+            if (/naroż|naroz|sofa|sofy|anton|pozzo|poso|łóżk|lozk/i.test(text)) {
+                return 120;
+            }
+            return 60;
+        }
+
+        function fixImgPath(path) {
+            if (!path) return '';
+            const clean = path.trim().replace(/^\//, '');
+            if (clean.startsWith('http') || clean.startsWith('data:')) return clean;
+            return '../' + clean;
+        }
+
+        function matchesCategory(item, cat) {
+            if (cat === 'all') return true;
+            const explicit = (item.category || '').toLowerCase();
+            const text = ((item.name || '') + ' ' + (item.title || '') + ' ' + (item.description || '') + ' ' + explicit).toLowerCase();
+            if (cat === 'outlet') return explicit === 'outlet';
+            if (cat === 'chesterfield') return text.includes('chesterfield');
+            if (cat === 'anton-pozzo') return text.includes('anton') || text.includes('pozzo') || text.includes('poso');
+            if (cat === 'narozniki') return text.includes('naroż') || text.includes('naroz');
+            if (cat === 'sofy') return text.includes('sofa') || text.includes('sofy');
+            if (cat === 'lozka') return text.includes('łóżk') || text.includes('lozk');
+            if (cat === 'fotele') return text.includes('fotel');
+            return explicit === cat;
+        }
+
+        function selectCategory(cat) {
+            activeCategory = cat;
+            toggleDrawer(false);
+            document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.pill-btn[data-cat="${cat}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+            renderCatalog();
+        }
+
+        function renderCatalog() {
+            const container = document.getElementById('product-list');
+            const searchQuery = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+            const sortBy = document.getElementById('sort-select').value;
+
+            let filtered = window.allProducts.filter((item, idx) => {
+                item._index = idx;
+                const deTitle = translateToGerman(item.name || item.title || '').toLowerCase();
+                return matchesCategory(item, activeCategory) && (!searchQuery || deTitle.includes(searchQuery) || (item.name || '').toLowerCase().includes(searchQuery));
+            });
+
+            if (sortBy === 'price-asc') filtered.sort((a, b) => getEurPrice(a) - getEurPrice(b));
+            if (sortBy === 'price-desc') filtered.sort((a, b) => getEurPrice(b) - getEurPrice(a));
+
+            document.getElementById('product-count').textContent = filtered.length;
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; padding:60px; color:var(--text-muted); font-size:14px; text-transform:uppercase;">Keine Produkte in dieser Kategorie.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => {
+                const rawImg = item.image || (item.images ? item.images.split(',')[0].trim() : '');
+                const mainImg = fixImgPath(rawImg);
+                const rawTitle = item.nameDE || translateToGerman(item.name || item.title || 'Möbel');
+                const cat = (item.category || '').toLowerCase();
+                const isOutlet = cat === 'outlet';
+                const badgeHtml = isOutlet ? `<div class="outlet-badge">Sofort lieferbar</div>` : '';
+                
+                const eurPrice = getEurPrice(item);
+                const delEur = getGermanDeliveryEur(item);
+
+                return `
+                    <div class="product-card" 
+                         data-index="${item._index}"
+                         data-price="${eurPrice}"
+                         data-delivery="${delEur}" 
+                         data-category="${cat}"
+                         onclick="openProductModal(${item._index})">
+                        <div class="card-img-wrap">
+                            <img src="${mainImg}" alt="${rawTitle}" loading="lazy">
+                            ${badgeHtml}
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">${rawTitle}</div>
+                            <div class="card-price">${eurPrice.toFixed(2)} €</div>
+                            <div style="font-size:12px; color:#8B1E41; font-weight:800; margin-top:-5px; margin-bottom:15px; text-transform:uppercase;">🚚 Lieferung nach DE: ${delEur.toFixed(2)} €</div>
+                            <button class="card-order-btn">Details ansehen</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        let currentModalImages = [], currentImageIndex = 0;
+        
+        function openProductModal(index) {
+            const item = window.allProducts[index];
+            if (!item) return;
+            currentModalImages = (item.images || item.image || '').split(',').map(s => fixImgPath(s)).filter(Boolean);
+            if (currentModalImages.length === 0) currentModalImages = [''];
+            currentImageIndex = 0;
+
+            const deTitle = item.nameDE || translateToGerman(item.name || item.title || '');
+            const eurPrice = getEurPrice(item);
+            const delEur = getGermanDeliveryEur(item);
+
+            document.getElementById('modal-title').textContent = deTitle;
+            document.getElementById('modal-price').textContent = `${eurPrice.toFixed(2)} € (+ Lieferung nach DE ${delEur.toFixed(2)} €)`;
+            document.getElementById('modal-desc').textContent = item.descriptionDE || translateToGerman(item.description || '');
+            updateGalleryView();
+
+            const msg = encodeURIComponent(`Guten Tag! Ich interessiere mich für das Möbelstück: ${deTitle} (${eurPrice} €)`);
+            document.getElementById('modal-wa-btn').href = `https://wa.me/${contactPhoneRaw}?text=${msg}`;
+            document.getElementById('product-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateGalleryView() {
+            document.getElementById('modal-main-img').src = currentModalImages[currentImageIndex] || '';
+            document.getElementById('gallery-thumbs').innerHTML = currentModalImages.map((img, i) => `
+                <div class="gallery-thumb ${i === currentImageIndex ? 'active' : ''}" onclick="currentImageIndex=${i}; updateGalleryView();">
+                    <img src="${img}" alt="Thumb">
+                </div>
+            `).join('');
+        }
+
+        function changeImage(dir) {
+            currentImageIndex = (currentImageIndex + dir + currentModalImages.length) % currentModalImages.length;
+            updateGalleryView();
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function openLightboxGallery() {
+            document.getElementById('lightbox-img').src = currentModalImages[currentImageIndex];
+            document.getElementById('lightbox-modal').classList.add('open');
+        }
+
+        function changeLightboxImage(dir) {
+            changeImage(dir); 
+            document.getElementById('lightbox-img').src = currentModalImages[currentImageIndex];
+        }
+
+        function closeLightbox(e) {
+            if(e.target.id === 'lightbox-modal' || e.target.closest('.lightbox-close')) {
+                document.getElementById('lightbox-modal').classList.remove('open');
+            }
+        }
+
+        async function loadSiteContent() {
+            try {
+                const res = await fetch('../content/home.json?v=' + new Date().getTime());
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.products) { window.allProducts = data.products; renderCatalog(); }
+            } catch (e) { console.error(e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadSiteContent);
+    </script>
+    <script src="cart-de.js?v=20261114_de"></script>
+</body>
+</html>
