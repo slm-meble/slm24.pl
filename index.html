@@ -149,6 +149,14 @@
         .lightbox-nav:hover { background: rgba(255,255,255,0.2); }
         .lb-prev { left: 20px; }
         .lb-next { right: 20px; }
+      /* ВИПРАВЛЕННЯ ДЛЯ ТЕЛЕФОНУ */
+        @media (max-width: 600px) {
+            .product-modal { padding: 10px !important; }
+            .modal-content { overflow-x: hidden; width: 100%; margin-top: 5vh; }
+            .modal-body { padding: 20px !important; gap: 20px; }
+            .modal-title { font-size: 20px; }
+            .modal-desc { word-wrap: break-word; overflow-wrap: break-word; font-size: 13px; }
+        }
     </style>
 </head>
 <body>
