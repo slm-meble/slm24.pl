@@ -72,7 +72,7 @@
             border-radius: 8px; font-size: 15px; background: #fff;
         }
         .form-control:focus { border-color: var(--accent); outline: none; }
-        textarea.form-control { min-height: 170px; resize: vertical; line-height: 1.5; }
+        textarea.form-control { min-height: 150px; resize: vertical; line-height: 1.5; }
 
         .btn {
             background: var(--accent); color: #fff; border: none; padding: 12px 20px;
@@ -143,11 +143,12 @@
 
     <div class="screen" id="mainScreen">
         <header>
-            <h1>⚙️ Zarządzanie Sklepem SLM24</h1>
+            <h1>⚙️ Zarządzanie Sklepem SLM24 (🇵🇱 PL + 🇩🇪 DE)</h1>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <button class="btn btn-gray" style="padding:8px 14px; font-size:13px;" onclick="toggleBox('tokenBox')">🔑 Klucz GitHub</button>
                 <button class="btn" style="background:var(--ai-purple); padding:8px 14px; font-size:13px;" onclick="toggleBox('geminiBox')">🤖 Klucz AI</button>
-                <a href="/" target="_blank" class="btn" style="padding:8px 14px; font-size:13px;">🌐 Zobacz sklep</a>
+                <a href="/" target="_blank" class="btn" style="padding:8px 14px; font-size:13px;">🇵🇱 Sklep PL</a>
+                <a href="/de/" target="_blank" class="btn" style="padding:8px 14px; font-size:13px; background:#1f1d1a;">🇩🇪 Sklep DE</a>
             </div>
         </header>
 
@@ -174,27 +175,31 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Nazwa mebla (np. #005 Fotel Uszak...)</label>
+                    <label>🇵🇱 Nazwa mebla po polsku (np. #005 Fotel Uszak...)</label>
                     <input type="text" id="fName" class="form-control">
                 </div>
                 <div class="form-group">
-                    <label>Cena (np. 1299.00 zł)</label>
+                    <label>Cena w Polsce (np. 1299.00 zł)</label>
                     <input type="text" id="fPrice" class="form-control">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>🚚 Koszt dostawy (zł) - wpisz 0 jeśli darmowa</label>
-                    <input type="number" id="fDelivery" class="form-control" placeholder="np. 150">
+                    <label>🇩🇪 Nazwa po niemiecku (AI wypełni automatycznie)</label>
+                    <input type="text" id="fNameDE" class="form-control" placeholder="np. #005 Ohrensessel Velours...">
                 </div>
                 <div class="form-group">
-                    <label>💪 Usługa wniesienia (zł) - opcjonalnie</label>
-                    <input type="number" id="fCarry" class="form-control" placeholder="np. 100">
+                    <label>🚚 Koszt dostawy w PL (zł) - wpisz 0 jeśli darmowa</label>
+                    <input type="number" id="fDelivery" class="form-control" placeholder="np. 150">
                 </div>
             </div>
 
             <div class="form-row">
+                <div class="form-group">
+                    <label>💪 Usługa wniesienia w PL (zł) - opcjonalnie</label>
+                    <input type="number" id="fCarry" class="form-control" placeholder="np. 100">
+                </div>
                 <div class="form-group">
                     <label>Kategoria</label>
                     <select id="fCat" class="form-control">
@@ -207,17 +212,18 @@
                         <option value="outlet">Od ręki % (Szybka wysyłka)</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Pozycja na liście</label>
-                    <select id="fPin" class="form-control">
-                        <option value="top">📌 Dodaj na początek (Góra strony)</option>
-                        <option value="bottom">Na koniec listy</option>
-                    </select>
-                </div>
             </div>
 
             <div class="form-group">
-                <label>Zdjęcia mebla (dowolna rozdzielczość i format AI — automatyczna konwersja)</label>
+                <label>Pozycja na liście</label>
+                <select id="fPin" class="form-control">
+                    <option value="top">📌 Dodaj na początek (Góra strony)</option>
+                    <option value="bottom">Na koniec listy</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Zdjęcia mebla (wspólne dla PL i DE)</label>
                 <div class="upload-zone" onclick="document.getElementById('filePicker').click()">
                     <strong style="color:var(--accent); font-size:16px;">📷 Kliknij tutaj, aby wybrać zdjęcia z telefonu lub komputera</strong>
                 </div>
@@ -227,10 +233,15 @@
 
             <div class="form-group">
                 <div class="desc-header">
-                    <label style="margin:0;">Opis przedmiotu (wpisz krótkie notatki i kliknij AI 👉)</label>
-                    <button type="button" class="btn-ai" id="aiBtn" onclick="generateDescriptionWithAI()">✨ Ulepsz / Napisz opis z AI</button>
+                    <label style="margin:0;">🇵🇱 Opis po polsku (kliknij AI, aby napisać opis PL + DE jednocześnie 👉)</label>
+                    <button type="button" class="btn-ai" id="aiBtn" onclick="generateDescriptionWithAI()">✨ Napisz opis PL + 🇩🇪 DE z AI</button>
                 </div>
                 <textarea id="fDesc" class="form-control"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>🇩🇪 Opis po niemiecku (dla klientów z Niemiec на slm24.pl/de/)</label>
+                <textarea id="fDescDE" class="form-control" placeholder="Tutaj automatycznie pojawi się profesjonalny opis po niemiecku..."></textarea>
             </div>
 
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -240,9 +251,12 @@
         </div>
 
         <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
                 <h3 style="margin:0; border:none;">📦 Lista aktywnych ogłoszeń (<span id="countBadge">0</span>)</h3>
-                <button class="btn btn-green" style="padding:8px 14px; font-size:13px;" onclick="syncWithGitHub()">🔄 Odśwież listę</button>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button class="btn-ai" id="batchDeBtn" onclick="translateAllProductsToGerman()">🇩🇪 Przetłumacz wszystkie ogłoszenia na niemiecki (AI)</button>
+                    <button class="btn btn-green" style="padding:8px 14px; font-size:13px;" onclick="syncWithGitHub()">🔄 Odśwież listę</button>
+                </div>
             </div>
             <div id="productsContainer">Ładowanie ogłoszeń...</div>
         </div>
@@ -251,8 +265,7 @@
     <div class="status-bar" id="statusBar"></div>
 
     <script>
-        // НОВИЙ ПАРОЛЬ АДМІНІСТРАТОРА (Можете змінити 070973 на будь-який свій)
-        const ADMIN_PIN = "070973";
+        const ADMIN_PIN = "SlmMeble2026!";
         const REPO_OWNER = "slm-meble";
         const REPO_NAME = "slm24.pl";
         const JSON_PATH = "content/home.json";
@@ -323,6 +336,7 @@
             }
         }
 
+        // Генерує одночасно польський та німецький опис + німецьку назву
         async function generateDescriptionWithAI() {
             const apiKey = getGeminiKey();
             if (!apiKey) {
@@ -344,14 +358,19 @@
             const aiBtn = document.getElementById('aiBtn');
             const origText = aiBtn.innerHTML;
             aiBtn.disabled = true;
-            aiBtn.innerHTML = '⏳ AI pisze tekst...';
-            showStatus('✨ Sztuczna inteligencja tworzy profesjonalny opis...');
+            aiBtn.innerHTML = '⏳ AI pisze PL + DE...';
+            showStatus('✨ Sztuczna inteligencja tworzy opis po polsku i niemiecku...');
 
-            const promptText = `Jesteś profesjonalnym copywriterem polskiego sklepu meblowego SLM24.pl. Napisz elegancki opis produktu w języku polskim. 
-Dane produktu: Nazwa: ${name}, Kategoria: ${cat}, Cena: ${price}. 
-Ważne: każdy nasz mebel posiada sprężynę falistą w standardzie (w cenie mebla, bez dopłat).
-Notatki właściciela: ${rawDesc}. 
-Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów i wypunktowań.`;
+            const promptText = `Jesteś profesjonalnym copywriterem sklepu meblowego SLM24.pl.
+Dane produktu: Nazwa PL: ${name}, Kategoria: ${cat}, Cena: ${price}.
+Ważne: każdy nasz mebel posiada sprężynę falistą (Wellenfederung) w standardzie.
+Notatki właściciela: ${rawDesc}.
+Zwróć odpowiedź DOKŁADNIE w tym formacie (użyj separatorów ===NAME_DE=== oraz ===DESC_DE===, bez gwiazdek Markdown):
+[Tutaj profesjonalny opis po polsku]
+===NAME_DE===
+[Tutaj przetłumaczona na niemiecki nazwa mebla wraz z numerem # jeżeli występuje]
+===DESC_DE===
+[Tutaj profesjonalny opis tego samego mebla po niemiecku dla klienta z Niemiec]`;
 
             try {
                 const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -360,15 +379,28 @@ Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów 
                     body: JSON.stringify({
                         model: 'llama-3.3-70b-versatile',
                         messages: [{ role: 'user', content: promptText }],
-                        temperature: 0.7
+                        temperature: 0.6
                     })
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error?.message || 'Błąd serwera Groq');
-                const generatedText = data.choices?.[0]?.message?.content || '';
+                const content = (data.choices?.[0]?.message?.content || '').replace(/\*\*/g, '').trim();
 
-                document.getElementById('fDesc').value = generatedText.replace(/\*\*/g, '').trim();
-                showStatus('✨ Gotowe! Opis został napisany i wstawiony.', 3500);
+                const parts = content.split('===NAME_DE===');
+                const plDesc = (parts[0] || '').trim();
+                let deName = '';
+                let deDesc = '';
+                if (parts[1]) {
+                    const subParts = parts[1].split('===DESC_DE===');
+                    deName = (subParts[0] || '').trim();
+                    deDesc = (subParts[1] || '').trim();
+                }
+
+                if (plDesc) document.getElementById('fDesc').value = plDesc;
+                if (deName) document.getElementById('fNameDE').value = deName;
+                if (deDesc) document.getElementById('fDescDE').value = deDesc;
+
+                showStatus('✨ Gotowe! Opis PL oraz tłumaczenie DE zostały wstawione.', 4000);
             } catch (err) {
                 console.error(err);
                 alert('Błąd AI: ' + err.message);
@@ -376,6 +408,80 @@ Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów 
             } finally {
                 aiBtn.disabled = false;
                 aiBtn.innerHTML = origText;
+            }
+        }
+
+        // Перекладає ВСІ існуючі товари в каталозі на німецьку мову і зберігає їх у базу
+        async function translateAllProductsToGerman() {
+            const apiKey = getGeminiKey();
+            if (!apiKey) {
+                alert('Najpierw kliknij "🤖 Klucz AI" u góry i upewnij się, że klucz jest wpisany!');
+                document.getElementById('geminiBox').style.display = 'block';
+                return;
+            }
+            if (!getToken()) {
+                alert('Najpierw wpisz swój Klucz GitHub!');
+                return;
+            }
+
+            const btn = document.getElementById('batchDeBtn');
+            btn.disabled = true;
+            let translatedCount = 0;
+
+            try {
+                for (let i = 0; i < catalogData.products.length; i++) {
+                    const p = catalogData.products[i];
+                    if (p.descriptionDE && p.nameDE && p.descriptionDE.length > 20) continue;
+
+                    showStatus(`🇩🇪 Tłumaczenie mebla ${i + 1} z ${catalogData.products.length}: ${p.name || p.title}...`);
+
+                    const prompt = `Przetłumacz poniższą nazwę i opis mebla z języka polskiego na profesjonalny język niemiecki dla niemieckiego sklepu meblowego SLM24.pl. Zachowaj numer artykułu (np. #005), wymiary i układ akapitów. Nie używaj gwiazdek (**).
+Nazwa PL: ${p.name || p.title}
+Opis PL: ${p.description || ''}
+
+Zwróć odpowiedź DOKŁADNIE w tym formacie:
+===NAME_DE===
+[Przetłumaczona nazwa po niemiecku z zachowaniem numeru #]
+===DESC_DE===
+[Przetłumaczony pełny opis po niemiecku]`;
+
+                    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'llama-3.3-70b-versatile',
+                            messages: [{ role: 'user', content: prompt }],
+                            temperature: 0.3
+                        })
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        const text = (data.choices?.[0]?.message?.content || '').replace(/\*\*/g, '').trim();
+                        const split1 = text.split('===NAME_DE===');
+                        const rest = split1[1] || text;
+                        const split2 = rest.split('===DESC_DE===');
+                        if (split2.length >= 2) {
+                            p.nameDE = split2[0].trim();
+                            p.descriptionDE = split2[1].trim();
+                            translatedCount++;
+                        }
+                    }
+                    await new Promise(r => setTimeout(r, 900));
+                }
+
+                if (translatedCount > 0) {
+                    await pushJsonToGitHub(`Dodano niemieckie tłumaczenia (DE) dla ${translatedCount} produktów`);
+                    renderProductsList();
+                    alert(`Gotowe! Przetłumaczono i zapisano ${translatedCount} produktów na język niemiecki.`);
+                } else {
+                    showStatus('✅ Wszystkie produkty mają już tłumaczenie DE!', 3500);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Wystąpił błąd podczas tłumaczenia: ' + e.message);
+            } finally {
+                btn.disabled = false;
             }
         }
 
@@ -420,6 +526,9 @@ Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów 
                 const cleanPath = firstImg.replace(/^\//, '');
                 const thumbSrc = localPhotoCache[cleanPath] || (cleanPath ? '/' + cleanPath : '');
                 const dostawa = parseFloat(p.deliveryPrice) > 0 ? p.deliveryPrice + ' zł' : 'darmowa';
+                const hasDE = (p.descriptionDE && p.descriptionDE.length > 15) 
+                    ? '<span style="color:#2e7d32; font-weight:bold;">🇩🇪 DE: Tak</span>' 
+                    : '<span style="color:#d97706;">🇩🇪 DE: Auto</span>';
                 
                 return `
                 <div class="prod-item">
@@ -430,7 +539,7 @@ Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów 
                             <div style="font-size:13px; margin-top:3px;">
                                 <span style="color:var(--accent); font-weight:bold;">${p.price || ''}</span> • 
                                 <span style="color:#666;">Kategoria: ${p.category || 'inne'}</span> • 
-                                <span style="color:#2e7d32;">🚚 Dostawa: ${dostawa}</span>
+                                <span style="color:#2e7d32;">🚚 Dostawa: ${dostawa}</span> • ${hasDE}
                             </div>
                         </div>
                     </div>
@@ -549,12 +658,14 @@ Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów 
 
         async function saveProductToList() {
             const name = document.getElementById('fName').value.trim();
+            const nameDE = document.getElementById('fNameDE').value.trim();
             const price = document.getElementById('fPrice').value.trim();
             const deliveryPrice = document.getElementById('fDelivery').value.trim();
             const carryPrice = document.getElementById('fCarry').value.trim();
             const cat = document.getElementById('fCat').value;
             const pos = document.getElementById('fPin').value;
             const desc = document.getElementById('fDesc').value.trim();
+            const descDE = document.getElementById('fDescDE').value.trim();
             const editIdx = parseInt(document.getElementById('editIdx').value);
 
             if (!name || !price) {
@@ -568,6 +679,7 @@ Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów 
             const itemObj = {
                 title: name,
                 name: name,
+                nameDE: nameDE,
                 category: cat,
                 price: price,
                 deliveryPrice: deliveryPrice,
@@ -575,7 +687,8 @@ Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów 
                 image: mainImage,
                 images: allImages,
                 fabric_images: editIdx >= 0 ? (catalogData.products[editIdx].fabric_images || "") : "",
-                description: desc
+                description: desc,
+                descriptionDE: descDE
             };
 
             if (editIdx === -1) {
@@ -585,7 +698,7 @@ Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów 
                 catalogData.products[editIdx] = itemObj;
             }
 
-            const ok = await pushJsonToGitHub('Zaktualizowano ogłoszenie (dostawa+wniesienie)');
+            const ok = await pushJsonToGitHub('Zaktualizowano ogłoszenie (PL + DE)');
             if (ok) {
                 clearForm();
                 renderProductsList();
@@ -596,11 +709,13 @@ Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów 
             const p = catalogData.products[idx];
             document.getElementById('editIdx').value = idx;
             document.getElementById('fName').value = p.name || p.title || '';
+            document.getElementById('fNameDE').value = p.nameDE || '';
             document.getElementById('fPrice').value = p.price || '';
             document.getElementById('fDelivery').value = p.deliveryPrice || '';
             document.getElementById('fCarry').value = p.carryPrice || '';
             document.getElementById('fCat').value = p.category || 'fotele';
             document.getElementById('fDesc').value = p.description || '';
+            document.getElementById('fDescDE').value = p.descriptionDE || '';
 
             const rawImgs = p.images || p.image || '';
             currentPhotos = rawImgs.split(',').map(s => s.trim()).filter(Boolean);
@@ -630,10 +745,12 @@ Zwróć TYLKO gotowy opis po polsku bez gwiazdek Markdown, używając akapitów 
         function clearForm() {
             document.getElementById('editIdx').value = '-1';
             document.getElementById('fName').value = '';
+            document.getElementById('fNameDE').value = '';
             document.getElementById('fPrice').value = '';
             document.getElementById('fDelivery').value = '';
             document.getElementById('fCarry').value = '';
             document.getElementById('fDesc').value = '';
+            document.getElementById('fDescDE').value = '';
             currentPhotos = [];
             renderPhotoPreviews();
             document.getElementById('formHeader').textContent = '➕ Dodaj nowe ogłoszenie';
