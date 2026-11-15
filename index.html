@@ -13,19 +13,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>SLM24.PL – Producent Mebli Tapicerowanych</title>
-    <meta name="description" content="Ekskluzywne meble tapicerowane prosto od producenta SLM24.pl. Produkujemy fotele Uszak, sofy, narożniki, łóżka tapicerowane.">
-    <link rel="canonical" href="https://slm24.pl/">
+    <meta name="description" id="meta-desc" content="Ekskluzywne meble tapicerowane prosto od producenta SLM24.pl. Produkujemy fotele Uszak, sofy, narożniki, łóżka tapicerowane.">
+    <link rel="canonical" id="canonical-link" href="https://slm24.pl/">
     <link rel="alternate" hreflang="pl" href="https://slm24.pl/">
     <link rel="alternate" hreflang="de" href="https://slm24.pl/de/">
 
     <!-- Social Meta -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://slm24.pl/">
-    <meta property="og:title" content="SLM24.PL – Ekskluzywne Meble Tapicerowane od Producenta">
-    <meta property="og:description" content="Fotele Uszak, sofy, narożniki. Ręczne wykonanie, 24 miesiące gwarancji.">
+    <meta property="og:url" id="og-url" content="https://slm24.pl/">
+    <meta property="og:title" id="og-title" content="SLM24.PL – Ekskluzywne Meble Tapicerowane od Producenta">
+    <meta property="og:description" id="og-desc" content="Fotele Uszak, sofy, narożniki. Ręczne wykonanie, 24 miesiące gwarancji.">
+    <meta property="og:image" id="og-image" content="https://slm24.pl/images/baner-glowny.jpg">
+
+    <!-- Динамічна мікророзмітка для Google Merchant Center та банківських роботів -->
+    <script type="application/ld+json" id="schema-product-json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FurnitureStore",
+      "name": "SLM24.PL – SLM Meble Lesia Chaikovska",
+      "url": "https://slm24.pl/",
+      "telephone": "+48666688298",
+      "taxID": "6192056820",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "ul. Leśna 11",
+        "addressLocality": "Baranów",
+        "postalCode": "63-604",
+        "addressCountry": "PL"
+      }
+    }
+    </script>
     
     <style>
-        :root { --bg-main: #fbfaf8; --bg-card: #ffffff; --bg-soft: #f4f2ee; --text-dark: #111111; --text-muted: #666666; --border-color: #e5e0d8; --shadow: 0 4px 15px rgba(0, 0, 0, 0.03); }
+        :root { --bg-main: #fbfaf8; --bg-card: #ffffff; --bg-soft: #f4f2ee; --text-dark: #111111; --text-muted: #666666; --border-color: #e5e0d8; --accent: #8B1E41; --shadow: 0 4px 15px rgba(0, 0, 0, 0.03); }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg-main); color: var(--text-dark); line-height: 1.5; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
@@ -38,8 +58,8 @@
         .icon-btn:hover { opacity: 0.6; }
 
         .lang-switch { display: flex; gap: 6px; font-size: 12px; font-weight: 800; align-items: center; }
-        .lang-switch a { padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 4px; }
-        .lang-switch a.active { background: #8B1E41; color: #fff; border-color: #8B1E41; }
+        .lang-switch a { padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 4px; transition: 0.2s; }
+        .lang-switch a.active { background: var(--accent); color: #fff; border-color: var(--accent); }
         
         .logo { font-size: 24px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; text-align: center; }
         .logo span { display: block; font-size: 9px; font-weight: 500; letter-spacing: 4px; color: var(--text-muted); margin-top: 2px; }
@@ -83,7 +103,8 @@
         .card-img-wrap { width: 100%; aspect-ratio: 1/1; background: var(--bg-soft); position: relative;}
         .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
         
-        .outlet-badge { position: absolute; top: 15px; right: 15px; background: #b91c1c; color: #fff; padding: 6px 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; border-radius: 4px; letter-spacing: 1px;}
+        .sku-badge { position: absolute; top: 12px; left: 12px; background: rgba(17,17,17,0.82); color: #fff; padding: 4px 9px; font-size: 11px; font-weight: 800; border-radius: 4px; letter-spacing: 0.5px; }
+        .outlet-badge { position: absolute; top: 12px; right: 12px; background: #b91c1c; color: #fff; padding: 6px 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; border-radius: 4px; letter-spacing: 1px;}
         
         .card-body { padding: 25px 20px; display: flex; flex-direction: column; flex: 1; text-align: center;}
         .card-title { font-size: 14px; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; flex: 1;}
@@ -131,18 +152,27 @@
         .gallery-prev { left: 10px; } .gallery-next { right: 10px; }
         .gallery-thumbs { display: flex; gap: 10px; padding: 12px; overflow-x: auto; background: var(--bg-soft); border-top: 1px solid var(--border-color); max-width: 100%; box-sizing: border-box; }
         .gallery-thumb { width: 60px; height: 60px; border: 2px solid transparent; cursor: pointer; flex-shrink: 0; background: #fff; border-radius: 3px; overflow: hidden;}
-        .gallery-thumb.active { border-color: #8B1E41; }
+        .gallery-thumb.active { border-color: var(--accent); }
         .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
         .modal-info-col { width: 100%; max-width: 100%; overflow-wrap: break-word; word-wrap: break-word; }
+        .modal-sku-tag { display: inline-block; background: #f4f2ee; border: 1px solid var(--border-color); color: var(--text-dark); font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 4px; margin-bottom: 10px; letter-spacing: 0.5px; }
         .modal-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; line-height: 1.25; letter-spacing: -0.5px;}
-        .modal-price { font-size: 22px; font-weight: 800; color: #8B1E41; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
-        .modal-desc { font-size: 14px; line-height: 1.7; color: var(--text-dark); font-weight: 500; margin-bottom: 30px; white-space: pre-line; overflow-wrap: break-word; word-wrap: break-word; }
+        .modal-price { font-size: 22px; font-weight: 800; color: var(--accent); padding-bottom: 15px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; }
+        
+        /* Блок ідентифікації банківського платежу */
+        .bank-id-box { background: #fdf5f7; border: 1px dashed var(--accent); border-radius: 4px; padding: 12px; margin-bottom: 20px; font-size: 12px; line-height: 1.5; color: #333; }
+        .bank-id-box strong { color: var(--accent); display: block; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .bank-code-badge { display: inline-block; background: #fff; border: 1px solid #e5e0d8; padding: 3px 8px; font-family: monospace; font-size: 13px; font-weight: 800; color: #111; border-radius: 3px; margin-top: 4px; user-select: all; }
 
-        .btn-primary-action, .btn-phone-action { display: flex; align-items: center; justify-content: center; width: 100%; padding: 16px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: 2px solid var(--text-dark); margin-bottom: 12px; transition: 0.2s; border-radius: 4px;}
-        .btn-primary-action { background: var(--text-dark); color: #fff; }
+        .modal-desc { font-size: 14px; line-height: 1.7; color: var(--text-dark); font-weight: 500; margin-bottom: 25px; white-space: pre-line; overflow-wrap: break-word; word-wrap: break-word; }
+
+        .btn-cart-modal, .btn-primary-action, .btn-phone-action { display: flex; align-items: center; justify-content: center; width: 100%; padding: 16px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-bottom: 12px; transition: 0.2s; border-radius: 4px;}
+        .btn-cart-modal { background: var(--accent); color: #fff; border: 2px solid var(--accent); }
+        .btn-cart-modal:hover { background: #6b1732; border-color: #6b1732; }
+        .btn-primary-action { background: var(--text-dark); color: #fff; border: 2px solid var(--text-dark); }
         .btn-primary-action:hover { background: #333; }
-        .btn-phone-action { background: transparent; color: var(--text-dark); margin-bottom: 0; }
+        .btn-phone-action { background: transparent; color: var(--text-dark); border: 2px solid var(--text-dark); margin-bottom: 0; }
         .btn-phone-action:hover { background: var(--bg-soft); }
 
         @media (max-width: 767px) {
@@ -192,7 +222,7 @@
             </div>
         </div>
         <div class="search-bar" id="search-bar">
-            <input type="text" id="search-input" placeholder="Wpisz nazwę mebla..." oninput="renderCatalog()">
+            <input type="text" id="search-input" placeholder="Wpisz nazwę lub kod mebla (np. #005)..." oninput="renderCatalog()">
         </div>
     </header>
 
@@ -309,7 +339,7 @@
     <div class="product-modal" id="product-modal">
         <div class="modal-content">
             <div class="modal-top-bar">
-                <span>Karta produktu</span>
+                <span id="modal-top-sku">Karta produktu</span>
                 <button class="close-modal-btn" onclick="closeProductModal()">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
@@ -328,10 +358,23 @@
                     <div class="gallery-thumbs" id="gallery-thumbs"></div>
                 </div>
                 <div class="modal-info-col">
+                    <div class="modal-sku-tag" id="modal-sku-tag">KOD MEBLA: #001</div>
                     <h2 class="modal-title" id="modal-title"></h2>
                     <div class="modal-price" id="modal-price"></div>
+
+                    <!-- Блок ідентифікації товару для банківського платежу -->
+                    <div class="bank-id-box">
+                        <strong>💳 Płatność przelewem / Bank:</strong>
+                        Abyśmy od razu wiedzieli, który dokładnie mebel kupujesz, w tytule przelewu wpisz ten kod identyfikacyjny:<br>
+                        <span class="bank-code-badge" id="modal-bank-ref">ZAMÓWIENIE #001</span>
+                    </div>
+
                     <p class="modal-desc" id="modal-desc"></p>
                     
+                    <button type="button" class="btn-cart-modal" onclick="addOpenedProductToCart()">
+                        🛒 Wybierz opcje i dodaj do koszyka
+                    </button>
+
                     <a id="modal-wa-btn" href="#" target="_blank" class="btn-primary-action">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                         Zapytaj na WhatsApp
@@ -385,14 +428,25 @@
 
     <script>
         window.allProducts = [];
+        window.SLM_BANK_ORDER = null; // Глобальний об'єкт для банківської інтеграції (Przelewy24 / PayU / Stripe)
         let activeCategory = 'all';
         let contactPhoneRaw = '48666688298';
+        let currentOpenedIndex = -1;
 
         function toggleDrawer(open) {
             document.getElementById('side-drawer').classList.toggle('open', open);
             document.getElementById('drawer-overlay').classList.toggle('open', open);
         }
         function toggleSearch() { document.getElementById('search-bar').classList.toggle('active'); }
+
+        // Витягує постійний код товару (напр. #005 -> 005), який НЕ збивається при переміщенні товару в адмінці
+        function getProductSku(item, fallbackIdx) {
+            const rawTitle = (item.name || item.title || '').trim();
+            const match = rawTitle.match(/#\s*(\d+)/);
+            if (match && match[1]) return match[1];
+            if (item.sku) return String(item.sku).replace(/[^0-9a-zA-Z]/g, '');
+            return String(fallbackIdx + 1).padStart(3, '0');
+        }
 
         function matchesCategory(item, cat) {
             if (cat === 'all') return true;
@@ -433,7 +487,9 @@
 
             let filtered = window.allProducts.filter((item, idx) => {
                 item._index = idx;
-                return matchesCategory(item, activeCategory) && (!searchQuery || (item.name || item.title || '').toLowerCase().includes(searchQuery));
+                item._sku = getProductSku(item, idx);
+                const fullSearchText = ((item.name || item.title || '') + ' #' + item._sku).toLowerCase();
+                return matchesCategory(item, activeCategory) && (!searchQuery || fullSearchText.includes(searchQuery));
             });
 
             if (sortBy === 'price-asc') filtered.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
@@ -447,7 +503,9 @@
 
             container.innerHTML = filtered.map(item => {
                 const mainImg = item.image || (item.images ? item.images.split(',')[0].trim() : '');
-                const title = item.name || item.title || 'Mebel';
+                const rawTitle = item.name || item.title || 'Mebel';
+                const skuCode = item._sku;
+                const displayTitle = rawTitle.includes('#') ? rawTitle : `#${skuCode} ${rawTitle}`;
                 const cat = (item.category || '').toLowerCase();
                 const isOutlet = cat === 'outlet';
                 const badgeHtml = isOutlet ? `<div class="outlet-badge">Od ręki 24h</div>` : '';
@@ -455,6 +513,7 @@
                 const delPriceNum = parsePrice(item.deliveryPrice);
                 const carryPriceNum = parsePrice(item.carryPrice);
                 const basePriceNum = parsePrice(item.price);
+                const totalWithDelGrosze = Math.round((basePriceNum + delPriceNum) * 100);
 
                 const deliveryTextHtml = delPriceNum > 0 
                     ? `<div style="font-size:12px; color:#8B1E41; font-weight:800; margin-top:-5px; margin-bottom:15px; text-transform:uppercase;">🚚 Dostawa: ${delPriceNum.toFixed(2)} zł</div>` 
@@ -463,18 +522,22 @@
                 return `
                     <div class="product-card" 
                          data-index="${item._index}"
+                         data-sku="#${skuCode}"
+                         data-title="${displayTitle.replace(/"/g, '"')}"
                          data-price="${basePriceNum}"
+                         data-price-grosze="${totalWithDelGrosze}"
                          data-delivery="${delPriceNum}" 
                          data-carry="${carryPriceNum}" 
                          data-category="${cat}"
                          onclick="openProductModal(${item._index})">
                         <div class="card-img-wrap">
-                            <img src="${mainImg}" alt="${title}" loading="lazy">
+                            <img src="${mainImg}" alt="${displayTitle.replace(/"/g, '"')}" loading="lazy">
+                            <div class="sku-badge">KOD: #${skuCode}</div>
                             ${badgeHtml}
                         </div>
                         <div class="card-body">
-                            <div class="card-title">${title}</div>
-                            <div class="card-price">${item.price || ''}</div>
+                            <div class="card-title">${displayTitle}</div>
+                            <div class="card-price">${basePriceNum > 0 ? basePriceNum.toFixed(2) + ' zł' : (item.price || '')}</div>
                             ${deliveryTextHtml}
                             <button class="card-order-btn">Sprawdź szczegóły</button>
                         </div>
@@ -483,26 +546,127 @@
             }).join('');
         }
 
+        // Оновлює Schema.org для робота Google Merchant Center та банків
+        function updateProductSchema(item, skuCode, productUrl) {
+            const basePrice = parsePrice(item.price);
+            const delPrice = parsePrice(item.deliveryPrice);
+            const mainImg = item.image || (item.images ? item.images.split(',')[0].trim() : '');
+            const absImg = mainImg.startsWith('http') ? mainImg : ('https://slm24.pl/' + mainImg.replace(/^\//, ''));
+
+            const schemaObj = {
+                "@context": "https://schema.org/",
+                "@type": "Product",
+                "name": item.name || item.title || ("Mebel #" + skuCode),
+                "sku": "#" + skuCode,
+                "mpn": "SLM-" + skuCode,
+                "image": [absImg],
+                "description": item.description || "Ekskluzywny mebel tapicerowany ze sprężyną falistą w standardzie od producenta SLM24.pl.",
+                "brand": {
+                    "@type": "Brand",
+                    "name": "SLM24.PL"
+                },
+                "offers": {
+                    "@type": "Offer",
+                    "url": productUrl,
+                    "priceCurrency": "PLN",
+                    "price": basePrice.toFixed(2),
+                    "availability": "https://schema.org/InStock",
+                    "itemCondition": "https://schema.org/NewCondition",
+                    "shippingDetails": {
+                        "@type": "OfferShippingDetails",
+                        "shippingRate": {
+                            "@type": "MonetaryAmount",
+                            "value": delPrice.toFixed(2),
+                            "currency": "PLN"
+                        },
+                        "shippingDestination": {
+                            "@type": "DefinedRegion",
+                            "addressCountry": "PL"
+                        }
+                    }
+                }
+            };
+            const el = document.getElementById('schema-product-json');
+            if (el) el.textContent = JSON.stringify(schemaObj);
+        }
+
         let currentModalImages = [], currentImageIndex = 0;
         
-        function openProductModal(index) {
+        function openProductModal(index, skipPushState) {
             const item = window.allProducts[index];
             if (!item) return;
+            currentOpenedIndex = index;
+
             currentModalImages = (item.images || item.image || '').split(',').map(s => s.trim()).filter(Boolean);
             if (currentModalImages.length === 0) currentModalImages = [''];
             currentImageIndex = 0;
 
-            document.getElementById('modal-title').textContent = item.name || item.title || '';
+            const skuCode = getProductSku(item, index);
+            const rawTitle = item.name || item.title || '';
+            const displayTitle = rawTitle.includes('#') ? rawTitle : `#${skuCode} ${rawTitle}`;
+            const baseNum = parsePrice(item.price);
             const delNum = parsePrice(item.deliveryPrice);
-            const delInfo = delNum > 0 ? ` (+ dostawa ${delNum.toFixed(2)} zł)` : '';
-            document.getElementById('modal-price').textContent = (item.price || '') + delInfo;
+            const totalNum = baseNum + delNum;
+
+            document.getElementById('modal-top-sku').textContent = `Karta produktu • KOD #${skuCode}`;
+            document.getElementById('modal-sku-tag').textContent = `KOD IDENTYFIKACYJNY MEBLA: #${skuCode}`;
+            document.getElementById('modal-title').textContent = displayTitle;
+            
+            const delInfo = delNum > 0 ? ` (+ dostawa ${delNum.toFixed(2)} zł = razem ${totalNum.toFixed(2)} zł)` : ' (Darmowa dostawa)';
+            document.getElementById('modal-price').textContent = (baseNum > 0 ? baseNum.toFixed(2) + ' zł' : (item.price || '')) + delInfo;
+            
+            // Формуємо точний банківський ідентифікатор, щоб ви у виписці банку завжди бачили, яке крісло оплачено
+            const shortCleanName = rawTitle.replace(/#\s*\d+/g, '').trim().substring(0, 32);
+            const bankTransferTitle = `ZAMOWIENIE #${skuCode} - ${shortCleanName}`;
+            document.getElementById('modal-bank-ref').textContent = bankTransferTitle;
+
+            // Зберігаємо дані для майбутнього платіжного шлюзу банку
+            window.SLM_BANK_ORDER = {
+                sku: `#${skuCode}`,
+                productIndex: index,
+                title: displayTitle,
+                basePricePln: baseNum,
+                deliveryPricePln: delNum,
+                totalPricePln: totalNum,
+                amountGrosze: Math.round(totalNum * 100),
+                currency: 'PLN',
+                transferTitle: bankTransferTitle
+            };
+
             document.getElementById('modal-desc').textContent = item.description || '';
             updateGalleryView();
 
-            const msg = encodeURIComponent(`Dzień dobry! Chcę zapytać o mebel: ${item.name || item.title} (${item.price || ''})`);
+            // Оновлюємо URL з постійним кодом ?sku=..., щоб посилання ніколи не плуталися
+            const productUrl = `https://slm24.pl/?sku=${skuCode}`;
+            document.title = `${displayTitle} – SLM24.PL`;
+            document.getElementById('canonical-link').setAttribute('href', productUrl);
+            document.getElementById('og-url').setAttribute('content', productUrl);
+            document.getElementById('og-title').setAttribute('content', `${displayTitle} – ${baseNum.toFixed(2)} zł`);
+            updateProductSchema(item, skuCode, productUrl);
+
+            if (!skipPushState) {
+                window.history.pushState({ sku: skuCode, idx: index }, '', `?sku=${skuCode}`);
+            }
+
+            const msg = encodeURIComponent(`Dzień dobry! Chcę zapytać o mebel [KOD #${skuCode}]: ${displayTitle} (${baseNum.toFixed(2)} zł)`);
             document.getElementById('modal-wa-btn').href = `https://wa.me/${contactPhoneRaw}?text=${msg}`;
             document.getElementById('product-modal').classList.add('open');
             document.body.style.overflow = 'hidden';
+        }
+
+        // Дозволяє додати товар у кошик прямо з відкритого модального вікна
+        function addOpenedProductToCart() {
+            if (currentOpenedIndex < 0) return;
+            const idx = currentOpenedIndex;
+            closeProductModal();
+            const card = document.querySelector(`.product-card[data-index="${idx}"]`);
+            if (card) {
+                const addBtn = card.querySelector('.slm-add-btn');
+                if (addBtn) {
+                    addBtn.click();
+                    return;
+                }
+            }
         }
 
         function updateGalleryView() {
@@ -519,10 +683,25 @@
             updateGalleryView();
         }
 
-        function closeProductModal() {
+        function closeProductModal(fromHistory) {
             document.getElementById('product-modal').classList.remove('open');
             document.body.style.overflow = '';
+            document.title = 'SLM24.PL – Producent Mebli Tapicerowanych';
+            document.getElementById('canonical-link').setAttribute('href', 'https://slm24.pl/');
+            if (!fromHistory && window.location.search) {
+                window.history.pushState({}, '', window.location.pathname);
+            }
         }
+
+        // Підтримка кнопки "Назад" у браузері та на телефоні
+        window.addEventListener('popstate', function() {
+            const params = new URLSearchParams(window.location.search);
+            if (!params.get('sku') && !params.get('id')) {
+                closeProductModal(true);
+            } else {
+                checkUrlProduct(true);
+            }
+        });
 
         function openLightboxGallery() {
             document.getElementById('lightbox-img').src = currentModalImages[currentImageIndex];
@@ -542,12 +721,38 @@
             }
         }
 
+        // Перевіряє пряме посилання з Google Merchant або банку (?sku=005 або ?id=0)
+        function checkUrlProduct(skipPushState) {
+            const params = new URLSearchParams(window.location.search);
+            const skuParam = params.get('sku');
+            const idParam = params.get('id');
+
+            if (skuParam) {
+                const cleanTarget = skuParam.replace(/[^0-9a-zA-Z]/g, '').toLowerCase();
+                const foundIdx = window.allProducts.findIndex((item, idx) => {
+                    return getProductSku(item, idx).toLowerCase() === cleanTarget;
+                });
+                if (foundIdx !== -1) {
+                    openProductModal(foundIdx, skipPushState);
+                    return;
+                }
+            }
+
+            if (idParam !== null && window.allProducts[parseInt(idParam)]) {
+                openProductModal(parseInt(idParam), skipPushState);
+            }
+        }
+
         async function loadSiteContent() {
             try {
                 const res = await fetch('content/home.json?v=' + new Date().getTime());
                 if (!res.ok) return;
                 const data = await res.json();
-                if (data.products) { window.allProducts = data.products; renderCatalog(); }
+                if (data.products) { 
+                    window.allProducts = data.products; 
+                    renderCatalog(); 
+                    checkUrlProduct(true);
+                }
             } catch (e) { console.error(e); }
         }
 
