@@ -1,4 +1,4 @@
-// Повнофункціональний німецький кошик для SLM24.pl/de/ (У ЄВРО: 60€ КРІСЛО / 120€ ДИВАН)
+// Повнофункціональний німецький кошик для SLM24.pl/de/ (У ЄВРО: 60€ КРІСЛО / 120€ ДИВАН + ШВИДКЕ ПИТАННЯ БЕЗ АДРЕСИ)
 
 (function() {
     function initSLMCartDE() {
@@ -13,7 +13,7 @@
         style.innerHTML = `
             .slm-prod-actions { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; width: 100%; }
             .slm-qty-box { display: flex; align-items: center; justify-content: space-between; margin: 4px 0; font-size: 13px; color: #333; }
-            .slm-qty-controls { display: flex; align-items: center; border: 1px solid #d5cdc2; border-radius: 4px; overflow: hidden; background: #fff; }
+            .slm-qty-controls { display: inline-flex; align-items: center; border: 1px solid #d5cdc2; border-radius: 4px; overflow: hidden; background: #fff; flex-shrink: 0; }
             .slm-qty-btn { background: #f4f2ee; border: none; width: 28px; height: 28px; font-size: 15px; font-weight: bold; cursor: pointer; color: #111; }
             .slm-qty-input { width: 36px; text-align: center; border: none; font-size: 13px; font-weight: bold; background: #fff; color: #111; }
             .slm-add-btn { width: 100%; background: #8B1E41; color: #fff; border: none; padding: 12px 8px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
@@ -46,26 +46,34 @@
                     <h2 style="margin:0; color:#8B1E41; font-size:18px; text-transform:uppercase;">🛒 Ihr Warenkorb (DE)</h2>
                     <div style="display:flex; align-items:center; gap:12px;">
                         <button type="button" id="slm-clear-cart" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:4px 8px; border-radius:4px; font-size:12px; cursor:pointer;">Warenkorb leeren</button>
-                        <span id="slm-close-cart" style="cursor:pointer; font-size:26px; font-weight:bold; color:#888;">×</span>
+                        <span id="slm-close-cart" style="cursor:pointer; font-size:26px; font-weight:bold; color:#888;">&times;</span>
                     </div>
                 </div>
                 <div id="slm-cart-items"></div>
                 <div id="slm-cart-summary" style="text-align:right; font-size:18px; font-weight:bold; color:#111; margin:15px 0; display:none;">
                     Gesamtbetrag (inkl. Lieferung): <span id="slm-total-price" style="color:#8B1E41;">0.00</span> €
                 </div>
+
+                <!-- Швидка кнопка питання по кошику БЕЗ заповнення адреси -->
+                <div id="slm-quick-ask-box" style="display:none; margin-bottom:15px;">
+                    <button type="button" id="slm-cart-ask-wa" style="width:100%; background:#f4f2ee; color:#111; border:1px solid #111; padding:12px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px; text-transform:uppercase;">
+                        💬 Nur eine Frage zu diesen Möbeln per WhatsApp stellen (ohne Adresse)
+                    </button>
+                </div>
+
                 <div id="slm-checkout-form" style="display:none; border-top:1px solid #e5e0d8; padding-top:15px;">
-                    <h3 style="margin:0 0 10px 0; font-size:14px; color:#333; text-transform:uppercase;">Lieferadresse in Deutschland:</h3>
+                    <h3 style="margin:0 0 10px 0; font-size:14px; color:#333; text-transform:uppercase;">Oder direkt bestellen – Lieferadresse in Deutschland:</h3>
                     <input type="text" id="slm-name" class="slm-input" placeholder="* Vor- und Nachname" required>
                     <div style="display:flex; gap:8px;">
                         <input type="tel" id="slm-phone" class="slm-input" placeholder="* Telefonnummer (WhatsApp)" style="flex:1;" required>
-                        <input type="email" id="slm-email" class="slm-input" placeholder="* Ihre E-Mail-Adresse" style="flex:1;" required>
+                        <input type="email" id="slm-email" class="slm-input" placeholder="E-Mail-Adresse (optional)" style="flex:1;">
                     </div>
                     <div style="display:flex; gap:8px;">
                         <input type="text" id="slm-street" class="slm-input" placeholder="* Straße" style="flex:2;" required>
-                        <input type="text" id="slm-house" class="slm-input" placeholder="* Hausnummer" style="flex:1;" required>
+                        <input type="text" id="slm-house" class="slm-input" placeholder="* Hausnr." style="flex:1;" required>
                     </div>
                     <div style="display:flex; gap:8px;">
-                        <input type="text" id="slm-zip" class="slm-input" placeholder="* PLZ (Postleitzahl)" style="flex:1;" required>
+                        <input type="text" id="slm-zip" class="slm-input" placeholder="* PLZ" style="flex:1;" required>
                         <input type="text" id="slm-city" class="slm-input" placeholder="* Ort / Stadt" style="flex:2;" required>
                     </div>
                     <textarea id="slm-notes" class="slm-input" placeholder="Anmerkungen zur Bestellung (z.B. Etage, Wunschfarbe)" style="height:50px;"></textarea>
@@ -92,15 +100,14 @@
             <div class="slm-modal-box" style="max-width:420px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e5e0d8; padding-bottom:10px; margin-bottom:12px;">
                     <h3 style="margin:0; color:#8B1E41; font-size:16px; text-transform:uppercase;">Frage zum Produkt</h3>
-                    <span id="slm-close-ask" style="cursor:pointer; font-size:24px; font-weight:bold; color:#888;">×</span>
+                    <span id="slm-close-ask" style="cursor:pointer; font-size:24px; font-weight:bold; color:#888;">&times;</span>
                 </div>
                 <p id="slm-ask-prod-name" style="font-weight:bold; color:#333; margin:0 0 12px 0; font-size:13px;"></p>
-                <input type="email" id="slm-ask-email" class="slm-input" placeholder="* Ihre E-Mail-Adresse">
-                <input type="tel" id="slm-ask-phone" class="slm-input" placeholder="Telefonnummer (optional)">
-                <textarea id="slm-ask-question" class="slm-input" placeholder="* Ihre Frage..." style="height:80px;"></textarea>
+                <input type="text" id="slm-ask-phone" class="slm-input" placeholder="Ihre Telefonnummer oder E-Mail (optional)">
+                <textarea id="slm-ask-question" class="slm-input" placeholder="* Ihre Frage zum Möbelstück..." style="height:85px;"></textarea>
                 <div style="display:flex; gap:8px;">
-                    <button type="button" id="slm-send-ask-email" style="flex:1; background:#8B1E41; color:#fff; border:none; padding:12px; border-radius:4px; font-weight:bold; cursor:pointer; text-transform:uppercase;">E-Mail</button>
-                    <button type="button" id="slm-send-ask-wa" style="flex:1; background:#25D366; color:#fff; border:none; padding:12px; border-radius:4px; font-weight:bold; cursor:pointer; text-transform:uppercase;">WhatsApp</button>
+                    <button type="button" id="slm-send-ask-wa" style="flex:1; background:#25D366; color:#fff; border:none; padding:12px; border-radius:4px; font-weight:bold; cursor:pointer; text-transform:uppercase;">📲 Per WhatsApp fragen</button>
+                    <button type="button" id="slm-send-ask-email" style="flex:1; background:#8B1E41; color:#fff; border:none; padding:12px; border-radius:4px; font-weight:bold; cursor:pointer; text-transform:uppercase;">✉️ Per E-Mail</button>
                 </div>
             </div>
         `;
@@ -139,7 +146,7 @@
                 const oldBtn = card.querySelector(".card-order-btn");
 
                 const title = titleEl ? titleEl.innerText.trim() : ("#" + String(index + 1).padStart(3, "0") + " Möbel SLM24");
-                const sku = extractSku(title, index);
+                const sku = card.dataset.sku || extractSku(title, index);
                 let basePrice = extractPriceNumber(card.dataset.price) || 250;
                 if (oldBtn) oldBtn.style.display = "none";
 
@@ -182,16 +189,17 @@
                 actionsDiv.querySelector(".slm-add-btn").addEventListener("click", (e) => {
                     e.stopPropagation();
 
+                    const currentTitle = titleEl ? titleEl.innerText.trim() : title;
                     let deliveryPrice = extractPriceNumber(card.dataset.delivery) || 60;
                     let cat = card.dataset.category || "";
-                    const bMode = getButtonsMode(title, cat);
+                    const bMode = getButtonsMode(currentTitle, cat);
                     
                     let defaultButtons = "Muster A";
                     if (bMode === "none") defaultButtons = "Nicht zutreffend";
                     if (bMode === "chester") defaultButtons = "Stoffknöpfe (im Preis)";
 
                     cart.push({
-                        name: title,
+                        name: currentTitle,
                         cardId: sku,
                         buttonsMode: bMode,
                         basePrice: basePrice,
@@ -211,7 +219,8 @@
 
                 actionsDiv.querySelector(".slm-ask-btn").addEventListener("click", (e) => {
                     e.stopPropagation();
-                    document.getElementById("slm-ask-prod-name").innerText = `Produkt (${sku}): ${title}`;
+                    const currentTitle = titleEl ? titleEl.innerText.trim() : title;
+                    document.getElementById("slm-ask-prod-name").innerText = `Produkt (${sku}): ${currentTitle}`;
                     document.getElementById("slm-ask-modal").style.display = "flex";
                 });
             });
@@ -226,7 +235,7 @@
 
             cart.forEach((item, idx) => {
                 const base = parseFloat(item.basePrice) || 0;
-                const crExtra = (item.buttons && item.buttons.includes("+12")) ? 12 : 0; // Кришталики +12 € (50 zł / 4.25)
+                const crExtra = (item.buttons && item.buttons.includes("+12")) ? 12 : 0;
                 const delivery = parseFloat(item.baseDeliveryPrice) || 60;
 
                 item.unitPrice = base + crExtra + delivery;
@@ -245,13 +254,14 @@
             const container = document.getElementById("slm-cart-items");
             const form = document.getElementById("slm-checkout-form");
             const summary = document.getElementById("slm-cart-summary");
+            const quickAsk = document.getElementById("slm-quick-ask-box");
 
             if (cart.length === 0) {
                 container.innerHTML = "<p style='color:#777; text-align:center; padding:18px 0;'>Ihr Warenkorb ist leer.</p>";
-                form.style.display = "none"; summary.style.display = "none"; return;
+                form.style.display = "none"; summary.style.display = "none"; quickAsk.style.display = "none"; return;
             }
 
-            form.style.display = "block"; summary.style.display = "block";
+            form.style.display = "block"; summary.style.display = "block"; quickAsk.style.display = "block";
             document.getElementById("slm-total-price").innerText = totalSum.toFixed(2);
 
             container.innerHTML = cart.map((item, i) => {
@@ -289,7 +299,7 @@
                 <div class="slm-cart-item-edit" style="border-bottom:1px solid #e5e0d8; padding:12px 0;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:8px;">
                         <strong style="font-size:13px; color:#111; line-height:1.35; text-transform:uppercase;">${displayTitle}</strong>
-                        <button type="button" onclick="window.slmRemoveItem(${i})" style="background:#ff4d4d; color:#fff; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-weight:bold;">×</button>
+                        <button type="button" onclick="window.slmRemoveItem(${i})" style="background:#ff4d4d; color:#fff; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-weight:bold;">&times;</button>
                     </div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:11px; color:#555; background:#fbfaf8; padding:10px; border-radius:4px; border:1px solid #e5e0d8;">
                         <div>
@@ -312,16 +322,16 @@
                             <span style="font-size:11px; color:#8B1E41; padding:6px; display:block; border:1px solid #8B1E41; border-radius:4px; margin-top:3px; background:#fdf5f7; font-weight:bold;">Speditionslieferung (+${parseFloat(item.baseDeliveryPrice).toFixed(2)} €)</span>
                         </div>
                     </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:12px;">
-                        <div>
-                            Menge: 
-                            <button type="button" onclick="window.slmChangeQty(${i}, -1)" style="padding:2px 8px; cursor:pointer; background:#e5e0d8; border:none; border-radius:3px;">-</button>
-                            <b style="margin:0 6px;">${item.qty} Stk.</b>
-                            <button type="button" onclick="window.slmChangeQty(${i}, 1)" style="padding:2px 8px; cursor:pointer; background:#e5e0d8; border:none; border-radius:3px;">+</button>
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-top:10px; font-size:12px;">
+                        <div style="display:inline-flex; align-items:center; white-space:nowrap;">
+                            Menge:&nbsp;
+                            <button type="button" onclick="window.slmChangeQty(${i}, -1)" style="padding:3px 9px; cursor:pointer; background:#e5e0d8; border:none; border-radius:3px; font-weight:bold;">-</button>
+                            <b style="margin:0 8px;">${item.qty} Stk.</b>
+                            <button type="button" onclick="window.slmChangeQty(${i}, 1)" style="padding:3px 9px; cursor:pointer; background:#e5e0d8; border:none; border-radius:3px; font-weight:bold;">+</button>
                         </div>
-                        <div>
+                        <div style="text-align:right; margin-left:auto;">
                             <span style="color:#666; font-size:11px; margin-right:6px;">(${item.basePrice.toFixed(0)} € + ${item.baseDeliveryPrice.toFixed(0)} € Versand)</span>
-                            <b style="color:#8B1E41; font-size:15px;">${item.totalPrice.toFixed(2)} €</b>
+                            <b style="color:#8B1E41; font-size:15px; white-space:nowrap;">${item.totalPrice.toFixed(2)} €</b>
                         </div>
                     </div>
                 </div>`;
@@ -358,6 +368,19 @@
             document.getElementById("slm-ask-modal").style.display = "none";
         });
 
+        // Швидке питання по вмісту кошика без заповнення адреси
+        document.getElementById("slm-cart-ask-wa").addEventListener("click", () => {
+            let total = 0;
+            let skus = [];
+            let itemsText = cart.map((item, idx) => {
+                total += item.totalPrice;
+                skus.push(item.cardId);
+                return `${idx + 1}. [${item.cardId}] ${item.name} (${item.qty} Stk., Fuß Nr. ${item.leg}, ${item.buttons}) = ${item.totalPrice.toFixed(2)} €`;
+            }).join("\n");
+            const msg = `Guten Tag! Ich habe eine Frage zu folgenden Möbeln im Warenkorb (Ref: ${skus.join(", ")}):\n\n${itemsText}\n\nGesamtsumme inkl. Lieferung: ${total.toFixed(2)} €\n\nMeine Frage: `;
+            window.open(`https://wa.me/48666688298?text=${encodeURIComponent(msg)}`, "_blank");
+        });
+
         function buildOrderMessage() {
             const name = document.getElementById("slm-name").value.trim();
             const phone = document.getElementById("slm-phone").value.trim();
@@ -369,16 +392,18 @@
             const notes = document.getElementById("slm-notes").value.trim();
             const payment = document.getElementById("slm-payment").value;
 
-            if (!name || !phone || !email || !street || !house || !zip || !city) {
-                alert("Bitte füllen Sie alle Pflichtfelder aus (Name, Telefon, E-Mail und vollständige Lieferadresse)!");
+            if (!name || !phone || !street || !house || !zip || !city) {
+                alert("Bitte füllen Sie für eine verbindliche Bestellung Name, Telefon und Lieferadresse aus – oder nutzen Sie oben den Button 'Nur eine Frage per WhatsApp stellen'!");
                 return null;
             }
             
             const fullAddress = `${street} ${house}, ${zip} ${city}, Deutschland`;
 
             let total = 0;
+            let allSkus = [];
             let itemsText = cart.map((item, idx) => {
                 total += item.totalPrice;
+                allSkus.push(`${item.cardId}x${item.qty}`);
                 return `${idx + 1}. [${item.cardId}] *${item.name}*\n` +
                        `   - Menge: ${item.qty} Stk. x ${item.unitPrice.toFixed(2)} € = ${item.totalPrice.toFixed(2)} €\n` +
                        `   - 🪑 Sitzfläche: Wellenfederung (Standard)\n` +
@@ -388,11 +413,14 @@
                        `   - 🚚 Versand nach DE: +${item.baseDeliveryPrice.toFixed(2)} €`;
             }).join("\n\n");
 
+            const bankRefCode = `BESTELLUNG ${allSkus.join("+")} (${name})`;
+
             const fullMsg = `NEUE BESTELLUNG (DEUTSCHLAND) - SLM24.PL/DE\n========================\n` +
+                            `BANK-REFERENZCODE: ${bankRefCode}\n========================\n` +
                             `BESTELLTE PRODUKTE:\n${itemsText}\n\n` +
                             `GESAMTBETRAG: ${total.toFixed(2)} €\n` +
                             `ZAHLUNGSART: ${payment}\n========================\n` +
-                            `KUNDENDATEN:\nName: ${name}\nTelefon: ${phone}\nE-Mail: ${email}\nLieferadresse: ${fullAddress}\nAnmerkungen: ${notes || "Keine"}`;
+                            `KUNDENDATEN:\nName: ${name}\nTelefon: ${phone}\nE-Mail: ${email || "-"}\nLieferadresse: ${fullAddress}\nAnmerkungen: ${notes || "Keine"}`;
 
             cart = [];
             localStorage.removeItem("slm_cart_de");
@@ -413,20 +441,18 @@
 
         document.getElementById("slm-send-ask-wa").addEventListener("click", () => {
             const prod = document.getElementById("slm-ask-prod-name").innerText;
-            const email = document.getElementById("slm-ask-email").value.trim();
             const phone = document.getElementById("slm-ask-phone").value.trim();
             const q = document.getElementById("slm-ask-question").value.trim();
-            if (!email || !q) { alert("Bitte E-Mail-Adresse und Frage eingeben!"); return; }
-            window.open(`https://wa.me/48666688298?text=${encodeURIComponent(`PRODUKTANFRAGE (DE) - SLM24.PL\n${prod}\nE-Mail: ${email}\nTelefon: ${phone || "-"}\nFrage: ${q}`)}`, "_blank");
+            if (!q) { alert("Bitte geben Sie Ihre Frage ein!"); return; }
+            window.open(`https://wa.me/48666688298?text=${encodeURIComponent(`PRODUKTANFRAGE (DE) - SLM24.PL\n${prod}\nKontakt: ${phone || "-"}\nFrage: ${q}`)}`, "_blank");
         });
 
         document.getElementById("slm-send-ask-email").addEventListener("click", () => {
             const prod = document.getElementById("slm-ask-prod-name").innerText;
-            const email = document.getElementById("slm-ask-email").value.trim();
             const phone = document.getElementById("slm-ask-phone").value.trim();
             const q = document.getElementById("slm-ask-question").value.trim();
-            if (!email || !q) { alert("Bitte E-Mail-Adresse und Frage eingeben!"); return; }
-            window.location.href = `mailto:slmmble2022@gmail.com?subject=${encodeURIComponent("Produktanfrage (DE) - SLM24.pl")}&body=${encodeURIComponent(`${prod}\nE-Mail: ${email}\nTelefon: ${phone || "-"}\n\nFrage:\n${q}`)}`;
+            if (!q) { alert("Bitte geben Sie Ihre Frage ein!"); return; }
+            window.location.href = `mailto:slmmble2022@gmail.com?subject=${encodeURIComponent("Produktanfrage (DE) - SLM24.pl")}&body=${encodeURIComponent(`${prod}\nKontakt: ${phone || "-"}\n\nFrage:\n${q}`)}`;
         });
 
         saveAndRenderCart();
